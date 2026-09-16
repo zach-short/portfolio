@@ -97,7 +97,7 @@ as leads, not facts** (`docs/AGENT-PRACTICES.md` R3).
 | I3 | Any `prerender = false` route, and Astro Actions, need an adapter | docs.astro.build, 2026-09-08 | Phase 4 (board item 6) |
 | I4 | `<ClientRouter />` replaced `ViewTransitions`; islands lose state across navigations unless `transition:persist` | docs.astro.build, 2026-09-08 | Phase 1 (board item 3) |
 | I5 | Tailwind v4 integrates via `@tailwindcss/vite` | docs.astro.build, 2026-09-08 | Phase 1, **only if** Tailwind is kept — D3 ports a hand-written token system, so Tailwind may not be needed at all |
-| I6 | Claude Code deep links: `claude-cli://open?repo=owner/name&q=<url-encoded>` opens a terminal in the person's clone with the prompt **pre-filled, not sent**; `q` max 5000 chars, over 1000 adds a review warning; `cwd=` beats `repo=`; **the handler registers only after the person's first interactive prompt**, so a copy-paste fallback is mandatory. VS Code variant `vscode://anthropic.claude-code/open` | code.claude.com/docs/en/deep-links, read 2026-09-15 | Phase 4 (board item 6) |
+| I6 | Claude Code deep links: `claude-cli://open?repo=owner/name&q=<url-encoded>` opens a terminal in the person's clone with the prompt **pre-filled, not sent**; `q` max 5000 chars, over 1000 adds a review warning; `cwd=` beats `repo=`; **the handler registers only after the person's first interactive prompt**, so a copy-paste fallback is mandatory. VS Code variant `vscode://anthropic.claude-code/open` | code.claude.com/docs/en/deep-links, read 2026-09-15 | **Done — re-verified 2026-09-16 by Phase 3. No longer inherited.** Three corrections and what they changed are the `As built:` note under D7 |
 | I7 | The npm package name `personal-config` was free (404) on 2026-09-15 | npm, 2026-09-15 | Phase 3 (board item 5), immediately before publishing |
 | I8 | The wizard with `--yes` picks the first repo alphabetically under `--projects-dir` (`src/commands/setup.ts`, `scans.slice(0, 1)`); its ownership guard compares the remote owner to `identity.githubLogin` | `REBUILD-PASSOFF.md`, 2026-09-15 | Any future wizard run. Not needed again for this effort — the wizard has already run (HANDOFF 1) |
 
@@ -139,6 +139,13 @@ new evidence produces a dated supersession in §6, not a quiet reversal.
 
 Ratified 2026-09-15. The site builds static; exactly one route runs on demand (D7's POST
 endpoint), which is what requires an adapter (I3).
+
+**As built: there are two on-demand routes, not one** (Phase 3, 2026-09-16, `HANDOFF` step 8).
+D1 was ratified before `PLAN.md` Phase 3 step 4 spelled D7's store out as a POST **and** a
+`GET /p/<id>`; both read the same KV binding, so both carry `export const prerender = false`.
+The decision's substance is unchanged and was measured rather than assumed:
+`find dist/client -name index.html | wc -l` → 65, one more than Phase 2's 64, and the extra one
+is `/setup/`. Everything that can be static still is.
 
 *Defense.* The site is four routes and a content folder (G6), so a rewrite is small and buys a
 zero-runtime baseline that matches what the site already is (G10). **Against: rewrite cost —
@@ -236,6 +243,19 @@ command. Rung 3: download the profile JSON with a `bunx personal-config setup --
 line. A POST endpoint stores the profile under a short id in Cloudflare KV; `GET /p/<id>`
 returns it; the prompt stays under 1000 characters and points at that URL. Requires
 `setup --from <url|path>` in personal-config (P5) and an npm publish (I7). **No MCP, no plugin.**
+
+**As built: I6 re-verified 2026-09-16, and the deep link carries only `q`** (Phase 3, `HANDOFF`
+step 8). Read at code.claude.com/docs/en/deep-links. The two facts this decision rests on hold —
+the prompt is *populated but not sent* until Enter, and the handler registers only *when you
+send your first prompt of an interactive session*. Three things §1.4 had wrong or missing.
+**The `Prompt from an external link` warning appears under every deep link, not only long ones**;
+1,000 characters escalates it to a character count plus a scroll-and-review instruction, and `q`
+is capped at 5,000. `settings.json` can disable handler registration outright
+(`disableDeepLinkRegistration`), so "the visitor has used Claude Code before" is not sufficient
+for rung 1 either. And **`repo=` resolves only against clones Claude Code has already recorded
+on that machine** — otherwise the session opens in the home directory. A stranger's repo is the
+one thing this page cannot know, so `repo=` and `cwd=` are both omitted and the session opens at
+home, which is where `setup` scans from anyway. Measured: the prompt is **453 characters**.
 
 *Defense.* The whole product claim is "one click to a configured repo", and the deep link is the
 only rung that delivers it. **Against: the deep-link handler registers only after the person's
@@ -461,6 +481,9 @@ paragraph — not as a changelog here, and not in a commit message. This section
 
 - **D3** — five deviations, one of them a changed value (the prominent glass label colour).
 - **D4** — wired but unexercised; the script wiring and a new `<noscript>` fallback.
+- **D1** — two on-demand routes rather than one; the intent is unchanged and was measured.
+- **D7** — I6 re-verified 2026-09-16, with three corrections to §1.4; the deep link carries only
+  `q`, no `repo=` and no `cwd=`.
 
 One change belongs to no decision, so it is recorded here. **The wordmark stopped being an
 `<h1>`.** `app/page.tsx:17` made `zs` the page's `<h1>` and the hero's "Hi, I'm Zach" an `<h2>`;

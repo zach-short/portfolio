@@ -1,0 +1,45 @@
+---
+import Base from '@/src/layouts/Base.astro';
+import { Survey } from '@/src/components/survey/survey';
+import { PAGE } from '@/src/lib/setup-copy';
+
+// This page stays prerendered. Only the two routes that touch the KV binding opt out
+// (`src/pages/api/profile.ts`, `src/pages/p/[id].ts`); the survey itself is a static shell with
+// one island in it (D1, D5).
+---
+
+<Base title={PAGE.title} description={PAGE.description}>
+  <section class="wrap survey-intro" data-reveal>
+    <p class="eyebrow">{PAGE.eyebrow}</p>
+    <h1 class="display">{PAGE.heading}</h1>
+    <p class="lede">{PAGE.lede}</p>
+    <p class="faint survey-reassurance">{PAGE.reassurance}</p>
+  </section>
+
+  <section class="wrap survey">
+    {/* D5: client:load, so the survey is interactive the moment it paints rather than after a
+        scroll. It is the only island on the site. */}
+    <Survey client:load />
+    <noscript>
+      <p class="card survey-noscript muted">{PAGE.noscript}</p>
+    </noscript>
+  </section>
+</Base>
+
+<style>
+  .survey-intro {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-width: 720px;
+    margin-inline: auto;
+    padding: clamp(56px, 10vh, 104px) 0 clamp(28px, 5vh, 44px);
+  }
+  .survey-reassurance { font-size: 13.5px; line-height: 1.55; max-width: 56ch; }
+  .survey {
+    max-width: 720px;
+    margin-inline: auto;
+    padding-bottom: clamp(48px, 9vh, 96px);
+  }
+  .survey-noscript { display: block; padding: 20px 22px; margin-top: 16px; }
+</style>

@@ -1,0 +1,40 @@
+{
+  // The Worker config for the rebuilt site.
+  //
+  // It is a *separate file* from `wrangler.jsonc` deliberately. `wrangler.jsonc` still
+  // configures the Cloudflare **Pages** project `my-next-app` that serves the live Next.js
+  // site, and it belongs to board item 7 — the Workers cutover. Phase 3 needs a real
+  // `wrangler dev` to exercise the KV binding, and a Pages config cannot provide one, so the
+  // Worker config lands here and item 7 promotes it: rename this file over `wrangler.jsonc`,
+  // drop `pages_build_output_dir`, and retire the Pages project (D8).
+  //
+  // Verified 2026-09-16: `compatibility_date` matches the workerd this checkout installed
+  // (`getLocalWorkerdCompatibilityDate()` -> 2026-09-15), so wrangler does not warn about a
+  // date its runtime cannot honour.
+  // `main` and `assets` are deliberately absent: the adapter fills both in and writes the
+  // resolved config to `dist/server/wrangler.json` at build time (verified 2026-09-16 — it
+  // comes out as `main: entry.mjs`, `assets.directory: ../client`). That generated file is what
+  // `wrangler dev -c dist/server/wrangler.json` and any later `wrangler deploy` read, so
+  // spelling either here would only be a second answer waiting to go stale.
+  //
+  // The adapter also adds a `SESSION` KV binding of its own for Astro sessions. Nothing on this
+  // site uses sessions; on a real deploy Cloudflare would auto-provision that namespace, which
+  // is item 7's to decide on rather than a surprise to discover.
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "zacharyshort-com",
+  "compatibility_date": "2026-09-15",
+  "compatibility_flags": ["nodejs_compat"],
+  "kv_namespaces": [
+    {
+      // D7's profile store. DIAL-3: no TTL is set on the put, so entries are kept forever.
+      //
+      // `id` is a placeholder. `wrangler dev` runs the namespace locally through Miniflare and
+      // never reads it, and creating a real namespace is an action against Zach's authenticated
+      // Cloudflare account — which `CLAUDE.md` puts out of a session's reach. Item 7 runs
+      // `wrangler kv namespace create PROFILES` and writes the real id here before any deploy;
+      // until then, a deployed Worker would 500 on `/api/profile`.
+      "binding": "PROFILES",
+      "id": "local-dev-placeholder-replaced-by-item-7"
+    }
+  ]
+}

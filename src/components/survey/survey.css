@@ -1,0 +1,217 @@
+/* The survey's layout only. Every colour, radius, font and easing comes from the tokens in
+   src/styles/global.css — S1 of docs/conventions-typescript.md, and BD-5's rule that the whole
+   site's colour is the first two lines of :root. There is no literal in this file. */
+
+/* Every string in the catalog is markdown, so code spans turn up in question asks and option
+   examples as well as in the long form. `.prose code` in global.css only reaches the long-form
+   panel; this is the same recipe for the rest of the survey, written in tokens rather than the
+   rgba literal global.css uses. */
+.survey-card code,
+.survey-result code {
+  font-family: var(--mono);
+  font-size: 0.9em;
+  color: var(--cream);
+  background: color-mix(in srgb, var(--cream) 8%, transparent);
+  padding: 1px 5px;
+  border-radius: 6px;
+}
+
+.survey-command code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+}
+
+.survey-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: clamp(22px, 4vw, 32px);
+}
+
+.survey-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* The progress rail doubles as the only always-visible sign that the survey is finite. */
+.survey-rail {
+  height: 2px;
+  border-radius: 999px;
+  background: var(--edge);
+  overflow: hidden;
+}
+
+.survey-rail-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.35s var(--ease);
+}
+
+.survey-ask {
+  font-family: var(--display-mid);
+  font-weight: 600;
+  font-size: clamp(21px, 3.2vw, 27px);
+  letter-spacing: -0.015em;
+  line-height: 1.18;
+  outline: none;
+}
+
+/* The mono face runs much wider than the display one, so a code span left at the heading's own
+   size reads as a second heading rather than as a word inside this one. */
+.survey-ask code {
+  font-size: 0.76em;
+  padding: 2px 7px;
+  border-radius: 8px;
+}
+
+.survey-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.survey-option {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  padding: 14px 16px;
+  text-align: left;
+  border: 1px solid var(--edge);
+  border-radius: 14px;
+  background: transparent;
+  color: var(--cream);
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.45;
+  cursor: pointer;
+  transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
+}
+
+.survey-option:hover { border-color: var(--edge-strong); }
+
+.survey-option.is-picked {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.survey-option-label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+}
+
+.survey-option-example { font-size: 13.5px; line-height: 1.5; }
+
+.survey-input {
+  width: 100%;
+  padding: 13px 16px;
+  border: 1px solid var(--edge);
+  border-radius: 14px;
+  background: var(--card);
+  color: var(--cream);
+  font-size: 15px;
+}
+
+.survey-input::placeholder { color: var(--faint); }
+.survey-input:focus { border-color: var(--accent); outline: none; }
+
+.survey-text { display: flex; flex-direction: column; gap: 8px; }
+
+/* Under the field rather than inside it, so the examples are still there once the placeholder
+   has been typed over — which is the moment you actually want to see them. */
+.survey-examples { font-size: 13px; line-height: 1.5; padding-left: 2px; }
+
+.survey-more { margin-top: -4px; }
+
+.survey-more-toggle {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--amber);
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: 13.5px;
+  cursor: pointer;
+}
+
+.survey-more-toggle:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* The long form is the wizard's `Read more…`, so it reads as a document rather than as UI:
+   a hairline rule on the accent side, and the site's own .prose rhythm inside. */
+.survey-long {
+  margin-top: 14px;
+  padding: 2px 0 2px 16px;
+  border-left: 2px solid var(--edge);
+  max-height: 46vh;
+  overflow-y: auto;
+}
+
+.survey-long h3 {
+  font-family: var(--display-small);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  color: var(--amber);
+  margin: 20px 0 6px;
+}
+
+.survey-long h3:first-child { margin-top: 0; }
+.survey-long p, .survey-long li { font-size: 14.5px; line-height: 1.6; }
+
+.survey-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.survey-state { align-items: flex-start; gap: 14px; }
+
+/* The result: three rungs stacked, every one of them visible without a click. */
+.survey-result { display: flex; flex-direction: column; gap: 18px; }
+
+.survey-permalink { font-size: 14px; word-break: break-all; }
+
+.survey-rung {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: clamp(20px, 3.5vw, 28px);
+}
+
+.survey-fallback { font-size: 13.5px; line-height: 1.55; }
+
+.survey-copy { display: flex; align-items: stretch; gap: 8px; width: 100%; }
+
+.survey-command {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--edge);
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--cream);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.survey-copy-button { flex: 0 0 auto; align-self: flex-start; }
+
+@media (max-width: 520px) {
+  .survey-actions { justify-content: stretch; }
+  .survey-actions .glass { flex: 1; }
+}

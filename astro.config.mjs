@@ -1,14 +1,24 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import cloudflare from '@astrojs/cloudflare';
 import mdx from '@astrojs/mdx';
+import preact from '@astrojs/preact';
 
-// Static for now. Phase 3 adds the Cloudflare adapter with the one on-demand route that needs
-// it (DESIGN.md D1); adding it earlier would put a server runtime under a site that has none.
+// Still static. Phase 3 added the adapter for D7's profile store, and only the two routes that
+// need the KV binding opt out with `export const prerender = false` (I3, confirmed 2026-09-15)
+// — every page on the site is still prerendered at build time.
 export default defineConfig({
   // Without this Astro.site is undefined and Base.astro emits no canonical link at all.
   site: 'https://zacharyshort.com',
   output: 'static',
-  integrations: [mdx()],
+
+  // The Worker config is `wrangler.worker.jsonc`, not `wrangler.jsonc`: the latter still
+  // configures the Pages project that serves the live Next.js site and belongs to board item 7.
+  adapter: cloudflare({ configPath: './wrangler.worker.jsonc' }),
+
+  // D5: Preact, not React — one interactive widget on one page should not decide the whole
+  // site's runtime, and React is roughly ten times the runtime for it.
+  integrations: [mdx(), preact()],
 
   // D10: the typo slug redirects to the corrected one. Empirically tested 2026-09-15 against
   // this repo, not assumed from docs — and the first result was a false positive (a stale

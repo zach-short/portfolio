@@ -440,11 +440,16 @@ nothing needs asking mid-build. Runs in parallel with Phases 1 and 2.
 
 ### Phase 3 — Survey island, KV store, result page
 
-**Status: PLANNED.** Board item 6. Lane A. Driver: Default (Opus 5). GATE 2 given 2026-09-15.
-**Waits on Phase 1** (layout and tokens) **and Phase B** (the catalog and `--from`). **Every
-dial it consumes is answered**: DIAL-2 and DIAL-4's warm register (§5.1) and DIAL-3 and DIAL-6
-(§5.2). What is owed here is DIAL-2 and DIAL-4's actual *words*, drafted in this phase and
-shown to Zach before they ship — that is copy to write, not a dial to ask.
+**Status: BUILT 2026-09-16 — all five steps done**, on branch `item6-survey` off `astro-rebuild`
+at `8074751`; no portfolio commit yet, because commits are Zach's. Recorded in full as
+`HANDOFF` step 8. Board item 6. Lane A. Driver: Default (Opus 5). GATE 2 given 2026-09-15.
+
+**Three of the six proofs below are unrun and are Zach's** — the phone walkthrough, and rung 1
+on a machine with the handler registered and on one without. **Item 7 inherits the real KV
+namespace**: `wrangler.worker.jsonc` carries a placeholder id, so a deployed Worker would 500 on
+`/api/profile` until `wrangler kv namespace create PROFILES` has been run and its id written in.
+**And the DIAL-2 / DIAL-4 words are drafted, not approved** — all of them in
+`src/lib/setup-copy.ts`, one file, so a change is one edit.
 
 **Scope.**
 
