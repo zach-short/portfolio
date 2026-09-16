@@ -27,9 +27,16 @@ The second verification pass the standard requires at build time (`docs/AGENT-PR
 Stage 4 §0). **Every number here rots.** Re-run this section at the start of each phase — 2.4
 requires it of any resumed effort, and every phase after the first is one.
 
-### 0.1 The blocker — the only gate is red, and not because of this rebuild
+### 0.1 The blocker — RESOLVED 2026-09-15: the PNGs come back
 
-`bun run build` fails in the working tree. `content/leetcode/powx-n.tsx:8-9` statically imports
+**Answered at GATE 2.** Zach's call was *restore the pngs*. Both were restored from `HEAD`
+byte-identical and `bun run build` now exits 0 with 66/66 static pages and zero
+`Module not found` (`HANDOFF` step 3). **Phase 2 may convert `powx-n` with its images**, like
+any other post. **No phase is blocked on this any more, and a red build is no longer expected
+in this repo** — if you see one, suspect your own work first. The account below is kept because
+it is the evidence for the gate lesson in §0.1.1, which has not expired.
+
+`bun run build` failed in the working tree. `content/leetcode/powx-n.tsx:8-9` statically imports
 `@/public/leetcode/images/powx-n.png` and `powx-n2.png`; both are in Zach's uncommitted
 deletions and `public/leetcode/images/` is empty on disk.
 
@@ -55,11 +62,18 @@ hazard here that makes a phase lie about itself.
 
 Two consequences that bind every phase:
 
-- **No phase can claim "gates green" until this is resolved**, and a session that runs the build
-  and sees red **must not attribute it to its own work**. Check this file first.
-- **No session may decide it.** `DESIGN.md` §2 puts restoring or deleting those files out of
-  scope. It is a GATE 2 question for Zach — restore the two PNGs, convert the post without its
-  images, or drop the post — and **Phase 2 cannot convert `powx-n` faithfully until he answers.**
+#### 0.1.1 What survives now the blocker is gone
+
+- **The gate lesson is permanent and is the reason this section is kept.** `bunx tsc --noEmit`
+  cannot see a missing asset and a gate piped into `head` reports the pipe's exit code. **A
+  done-when that gates on `tsc` alone, or that pipes a gate, is green while the site does not
+  build.** Redirect, echo `$?`, read the file.
+- **The ownership rule is permanent; its example is spent.** A session that finds a gate red
+  because of something in Zach's uncommitted work still reports it and names the file rather
+  than fixing it. What changed on 2026-09-15 is that *he answered* — the rule was never that
+  those two files are untouchable forever.
+- **Both consequences that used to bind every phase are discharged.** Phases may claim gates
+  green on their own merits, and Phase 2's `powx-n` carve-out is closed.
 
 ### 0.2 The inherited facts, now checked
 
@@ -434,15 +448,17 @@ question. A ninth is now open and is **not** a dial but a blocker: §0.1, the tw
 
 | Dial | Consumed by |
 |---|---|
-| DIAL-1 accent hue | Phase 1, step 2 — blocks the token port |
-| DIAL-2 survey prompt copy · DIAL-4 `/setup` title | Phase 3, steps 2 and 5 |
+| DIAL-1 accent hue | Phase 1, step 2 — blocks the token port. **Answered 2026-09-15: teal — hue only, exact swatch still open** |
+| DIAL-2 survey prompt copy · DIAL-4 `/setup` title | Phase 3, steps 2 and 5. **Answered 2026-09-15: the warm register** |
 | DIAL-3 KV retention · DIAL-6 short-id shape | Phase 3, step 4 |
 | DIAL-5 `--from` accepts a bare short id | Phase B, step 3 |
-| DIAL-7 GitHub contact link · DIAL-8 project-card links | Phase 1, steps 4 and 5 |
-| §0.1 the `powx-n` images | Phase 2, and every phase's ability to claim a green gate |
+| DIAL-7 GitHub contact link · DIAL-8 project-card links | Phase 1, steps 4 and 5. **Answered 2026-09-15: `github.com/zach-short`; one link per card to the real domain** |
+| DIAL-9 `--amber` follows the accent or stays warm | Phase 1, step 2. **Opened 2026-09-15**, see `DESIGN.md` §5 |
+| §0.1 the `powx-n` images | **RESOLVED 2026-09-15 — restored.** No longer blocks anything |
 
-**DIAL-1, DIAL-7 and DIAL-8 block Phase 1. §0.1 blocks one post in Phase 2.** The rest can be
-answered while Phase 1 runs.
+**As of 2026-09-15 only DIAL-1's exact swatch and DIAL-9 block Phase 1.** GATE 2 is given, §0.1 is
+resolved, and DIAL-7 and DIAL-8 are answered. DIAL-3, DIAL-5 and DIAL-6 can be answered while
+Phase 1 runs.
 
 ---
 
@@ -468,7 +484,8 @@ So the next effort need not guess whether an omission was considered.
 
 ## 5. Repo hazards, with live numbers as of 2026-09-15
 
-- **The only gate is red and it is not yours** — §0.1. Read it before reporting any build failure.
+- **The gate is green as of 2026-09-15** — §0.1 resolved, `bun run build` exit 0, 66/66 pages.
+  A red build is now most likely yours.
 - **`bunx tsc --noEmit` cannot see a missing asset**, and in a checkout that has never been built
   it fails on those same two lines for the opposite reason (G4). Build once, then the type check
   means something.

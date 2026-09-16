@@ -47,7 +47,7 @@ can be re-read.
 | G10 | **Zero client JavaScript.** No `"use client"`, `useState` or `useEffect` anywhere | this session | `grep -rlE '"use client"\|useState\|useEffect' app components content utils \| wc -l` → 0 |
 | G11 | Exactly **4 distinct** content files import a helper component: `problem-link.tsx` by `add-two-numbers`, `fibonacci-number`, `happy-number`; `string-ll-visual.ts` by `add-two-numbers`, `reverse-linked-list` | this session | `grep -rl` for each helper over `content/` |
 | G12 | Exactly **one** post imports an image (`powx-n.tsx`). Both pngs are tracked in git and deleted in the working tree, so `public/leetcode/images/` is empty on disk | this session | `git ls-files public/leetcode/images` → 2; `ls public/leetcode/images \| wc -l` → 0; `grep -rl public/leetcode/images content/ \| wc -l` → 1 |
-| G13 | **The working tree does not build**, because of G12's deletions. That red is Zach's uncommitted work — do not fix it, do not fold it in | ledger | `HANDOFF.md` Known facts; `CLAUDE.md` rule 1 |
+| G13 | ~~**The working tree does not build**, because of G12's deletions~~ — **SUPERSEDED 2026-09-15.** Zach answered `PLAN.md` §0.1: the PNGs come back. Both restored byte-identical to `HEAD`, `bun run build` exit 0, 66/66 pages. G12 still describes the deletions accurately *as of the date it was written* | ledger | `HANDOFF.md` step 3; `PLAN.md` §0.1 |
 | G14 | Dead code: `app/lib/getLeetcodePosts.ts` (no importers) and `test.go` (no `go.mod`) | ledger | `HANDOFF.md` Known facts |
 | G15 | **Not dead, despite `REBUILD-PASSOFF.md` claiming so:** `env.d.ts` (named in `tsconfig.json:24-25`; removing it gives `TS2688`) and `app/blog/components/problem-link.tsx` (3 importers) | ledger | `HANDOFF.md` Known facts — the correction and its disproof |
 | G16 | `/blog/economics` is a dead link on the blog index | this session | `app/blog/page.tsx:9` |
@@ -327,11 +327,12 @@ rebuilt footer:
 | Label | Target |
 |---|---|
 | Email | `mailto:zach.short@fantomworks.com` |
-| GitHub | `https://github.com/zachmshort` |
+| GitHub | `https://github.com/zach-short` — **changed 2026-09-15, DIAL-7** |
 | LinkedIn | `https://www.linkedin.com/in/zachary-short-12a1ab2a8/` |
 
-**Open, and asked at GATE 2:** the GitHub target is the old username (G18). It carries forward
-verbatim unless Zach says otherwise — changing a contact link silently is not a build-level call.
+**Answered 2026-09-15 (DIAL-7).** The target was `https://github.com/zachmshort` (`app/page.tsx:155`),
+the old username (G18). Zach's call is **`zach-short`**, matching this repo's own remote
+`git@github.com:zach-short/portfolio.git`. Email and LinkedIn carry forward verbatim.
 
 ### 4.3 The three project cards
 
@@ -343,9 +344,13 @@ From `app/page.tsx:63-87`, verified 2026-09-15. Same three, same order, same cop
 | E-Money | A minimal real time monopoly funds & properties tracker. | Go, WebSocket, Next.js | emoney.club |
 | Bocas Adventures | A site exposing travellers to the beauty of island life in Bocas del Toro & connecting them to local attractions. | Next.js | bocasadventures.com |
 
-**Open, and asked at GATE 2:** on 2026-09-15 both links on every card pointed at
-`projects/<slug>`, and no such route exists (G17), so all six are dead. The data already carries a real domain in
-`project.link` that is never rendered. The cards survive; where their links point is Zach's call.
+**Answered 2026-09-15 (DIAL-8).** On 2026-09-15 both links on every card pointed at
+`projects/<slug>` and no such route exists (G17), so all six were dead, while the real domain in
+`project.link` was never rendered. **Zach's call: one link per card, to the real domain.** The two
+buttons — `View Project →` and `Go to Site →` (`app/page.tsx:118-128`) — collapse to a single
+`Go to Site →` whose href is `project.link` (`https://ezhomesteading.com`, `https://emoney.club`,
+`https://bocasadventures.com`). `localLink` is no longer rendered; the `projects/<slug>` route stays
+a reserved, unbuilt seam (`PLAN.md` §4).
 
 ### 4.4 Everything else that survives
 
@@ -377,6 +382,24 @@ Each has a recommended default. Every one is asked at GATE 2; none is a build-le
 | DIAL-6 | Short-id length and alphabet (D7) | 8 characters, lowercase alphanumeric, crypto-random | Unguessability is the only access control on a stored profile (§2: no auth) |
 | DIAL-7 | The GitHub contact link (§4.2) | Carry `zachmshort` forward verbatim | G18: it is the old username and may already be a redirect or a dead account |
 | DIAL-8 | Where the three project cards' links point (§4.3) | Both links go to the real domain in `project.link` | G17: all six were dead on 2026-09-15 and `project.link` is never rendered |
+| DIAL-9 | Whether `--amber #F59E4A` follows the accent, or stays warm (D3) | Opened 2026-09-15, no default yet | The accent is not a lone token: `global.css:15-16` defines `--ember` and `--amber` as a warm pair and the wall renders both (`Base.astro:56`, `global.css:61-62`). A teal `--ember` beside an orange `--amber` is a clash, not a sibling accent |
+
+### 5.1 Answers — GATE 2, 2026-09-15
+
+Given by Zach in chat: *restore the pngs, teal accent, warm copy, plan approved.* Recorded by
+`HANDOFF` step 3. **An answer here is not a licence to reopen a D** (§3 stays frozen); it fills
+in the parameter that D left open.
+
+| # | Answer | Enough to build on? |
+|---|---|---|
+| DIAL-1 | **Teal** | **No, not yet** — a hue, not a swatch. §5 promised three swatches on `--ground #0F0D0B`; the exact value is still to pick and Phase 1 step 2 is blocked on it |
+| DIAL-2 | The **warm** register | Yes, as a register. The words themselves are drafted in Phase 3 and shown before they ship |
+| DIAL-4 | The **warm** register, with DIAL-2 | Same |
+| DIAL-3 · DIAL-5 · DIAL-6 | Not answered | They keep their recommended defaults above and block only Phase B / Phase 3 |
+| DIAL-7 | **`https://github.com/zach-short`** | Yes. Changed from `zachmshort` on the evidence that this repo's own remote is `git@github.com:zach-short/portfolio.git` — the old username was never verified to redirect |
+| DIAL-8 | **One link per card, to the real domain** | Yes. The two buttons collapse to a single `Go to Site →` pointing at `project.link`. `localLink` and the `projects/<slug>` route stay unbuilt (§4, reserved seam) |
+| DIAL-9 | Not answered — opened by this pass | Blocks Phase 1 step 2 alongside DIAL-1 |
+| §0.1 (not a dial) | **The PNGs come back** | Yes — restored and verified, `HANDOFF` step 3 |
 
 ---
 
