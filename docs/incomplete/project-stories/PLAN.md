@@ -124,8 +124,8 @@ No Deep phase, no Deep review.
 
 ### P1 — The story page, on Furlough
 
-**Status: BUILT 2026-09-16, commit `3e2d790`. RUNTIME PASS OWED.** Every gate is
-green — `bun run build` exit 0 at 66 pages, `bunx tsc --noEmit` exit 0,
+**Status: BUILT 2026-09-16, commit `3e2d790`; sticky-phone fix `afab8a7`. RUNTIME PASS OWED.**
+Every gate is green — `bun run build` exit 0 at 66 pages, `bunx tsc --noEmit` exit 0,
 `wrangler deploy --dry-run` exit 0 — and every *Walked* row below is **owed**: the Browser pane
 starts dev servers only in the primary tree, so P1 never saw the page. `RUNTIME-PASS.md` P1
 carries the eight entries, marked `NOT WALKED`. Full account: `HANDOFF.md` step 16.
