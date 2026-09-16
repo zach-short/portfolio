@@ -1,0 +1,22 @@
+---
+// Ported from components/slug-helpers.tsx's `Problem`. `items` render as plain text, matching
+// the original's `{item}` interpolation — some source items embed literal `<strong>` markup as
+// text (e.g. content/leetcode/distribute-candies.tsx), which the original also rendered escaped
+// rather than as HTML (no dangerouslySetInnerHTML). Preserved as-is; flagged, not fixed here.
+import Title from './title.astro';
+
+interface Props {
+  items: string[];
+  input?: string;
+  output?: string;
+}
+const { items, input, output } = Astro.props;
+---
+
+<Title title="Problem" />
+<ul>
+  {items.map((item) => <li>{item}</li>)}
+</ul>
+{input && output && <p>Example:</p>}
+{input && <p>Input: {input}</p>}
+{output && <p>Output: {output}</p>}

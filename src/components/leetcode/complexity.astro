@@ -1,0 +1,18 @@
+---
+// Rendered by [slug].astro from the collection entry's frontmatter, not imported into MDX
+// bodies — matches app/blog/leetcode/[slug]/page.tsx's PerformanceComplexity, which reads
+// post-level fields rather than something children renders.
+interface Props {
+  time: string;
+  space: string;
+  timeExplanation?: string;
+  spaceExplanation?: string;
+}
+const { time, space, timeExplanation, spaceExplanation } = Astro.props;
+---
+
+<h2>Complexity</h2>
+<ul>
+  <li><strong>Time:</strong> <code>{time}</code> {timeExplanation}</li>
+  <li><strong>Space:</strong> <code>{space}</code> {spaceExplanation}</li>
+</ul>

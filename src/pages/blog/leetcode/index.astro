@@ -1,0 +1,51 @@
+---
+import { getCollection } from 'astro:content';
+import { format } from 'date-fns';
+import Base from '@/src/layouts/Base.astro';
+import { formatSlug } from '@/src/lib/format-slug';
+
+// Sorted by date descending — the current loader's order (utils/get-leetcode-posts.ts:32),
+// which a gate cannot see (PLAN.md Phase 2 done-when #5).
+const posts = (await getCollection('leetcode')).sort(
+  (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime(),
+);
+---
+
+<Base title="LeetCode Solutions" description="Table of Contents for all of my logged leetcode solutions">
+  <div class="wrap page">
+    <div class="head">
+      <h1 class="display">LeetCode Solutions</h1>
+      <p class="muted count">{posts.length} Solved</p>
+    </div>
+    <ul class="list">
+      {
+        posts.map((post) => (
+          <li>
+            <a href={`/blog/leetcode/${post.id}`}>
+              <div class="title">
+                {post.data.leetcodeNumber}. {post.data.title ?? formatSlug(post.id)}
+              </div>
+              <div class="muted sub">
+                {format(post.data.pubDate, 'MMMM dd, yyyy')} &bull; {post.data.languages.join(', ')} &bull;{' '}
+                {post.data.difficulty}
+                {post.data.testsPassed && ` • ${post.data.testsPassed}`}
+              </div>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</Base>
+
+<style>
+  .page { padding: 48px 0 40px; }
+  .head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+  .count { font-size: 15px; }
+  .list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 16px; }
+  .list a { display: block; padding: 14px 0; border-bottom: 1px solid var(--edge); }
+  .list a:hover { text-decoration: none; }
+  .list a:hover .title { color: var(--amber); }
+  .title { color: var(--cream); font-size: 18px; font-weight: 600; }
+  .sub { font-size: 13px; margin-top: 4px; }
+</style>

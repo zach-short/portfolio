@@ -1,0 +1,11 @@
+---
+import Title from './title.astro';
+
+interface Props {
+  items: string[];
+}
+const { items } = Astro.props;
+---
+
+<Title title="Reflections" />
+{items.map((item) => <p>{item}</p>)}

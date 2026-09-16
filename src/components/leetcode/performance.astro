@@ -1,0 +1,13 @@
+---
+interface Props {
+  time: number;
+  memory: number;
+}
+const { time, memory } = Astro.props;
+---
+
+<h2>Performance</h2>
+<ul>
+  <li><strong>Runtime beats:</strong> {time}%</li>
+  <li><strong>Memory beats:</strong> {memory}%</li>
+</ul>

@@ -1,0 +1,20 @@
+---
+leetcodeNumber: 58
+pubDate: 2025-04-08T00:00:00Z
+tags: ["string"]
+languages: ["Python"]
+---
+
+## Python Solution
+
+```python
+class Solution:
+    def lengthOfLastWord(self, s: str) -> int:
+        s = s.strip()
+
+        start = len(s) - 1
+        while s[start] != " " and start >= 0:
+            start -= 1
+        
+        return len(s[start+1:])
+```

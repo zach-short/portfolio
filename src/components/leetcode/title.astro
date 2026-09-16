@@ -1,0 +1,10 @@
+---
+// Ported from components/slug-helpers.tsx's `Title`. Styling comes entirely from `.prose h2`
+// (src/styles/global.css) rather than the original's Tailwind utility classes — S1.
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+---
+
+<h2>{title}</h2>

@@ -1,0 +1,71 @@
+---
+leetcodeNumber: 1945
+pubDate: 2025-05-28T12:00:00Z
+tags: ["string", "simulation"]
+difficulty: easy
+languages: ["Go"]
+---
+
+The `getLucky` function converts a given lowercase string into a numeric string by mapping each letter to its corresponding position in the alphabet (a → 1, b → 2, …, z → 26). It then repeatedly sums the digits of this numeric string `k` times to reduce it down to a single integer.
+
+- Each character is converted to its number string using a lookup map, then concatenated into one big string. **Recursive digit sum:** The recursiveDigitSum helper takes that string, sums all digits, and repeats the process `k` times.
+
+The recursion stops when `k` reaches 1, returning the final sum. This approach is straightforward, but the map lookup for alphabet positions is a bit verbose and probably could be replaced with some simple trick I'm unaware of at this time, in the past I didn't know that `rune - '0'` gave you the rune int, so atleast some stuff is sticking.
+
+The extra space is mainly from the new strings created during recursion, which is `O(n)` in the worst case. This can be optimized by avoiding string concatenations and using more in-place computations. Overall, this solution beats 100% of submissions on runtime but performs horrendously on space, making it a decent solution if time is the issue.
+
+## Go Solution
+
+```go
+func getLucky(s string, k int) int {
+	alphabet := map[string]string{
+		"a": "1",
+		"b": "2",
+		"c": "3",
+		"d": "4",
+		"e": "5",
+		"f": "6",
+		"g": "7",
+		"h": "8",
+		"i": "9",
+		"j": "10",
+		"k": "11",
+		"l": "12",
+		"m": "13",
+		"n": "14",
+		"o": "15",
+		"p": "16",
+		"q": "17",
+		"r": "18",
+		"s": "19",
+		"t": "20",
+		"u": "21",
+		"v": "22",
+		"w": "23",
+		"x": "24",
+		"y": "25",
+		"z": "26",
+	}
+
+	str := ""
+	for _, rune := range s {
+		letter := string(rune)
+		str += alphabet[letter]
+	}
+
+	return recursiveDigitSum(str, k)
+}
+
+func recursiveDigitSum(s string, k int) int {
+	res := 0
+	for _, runeLetter := range s {
+		digit := runeLetter - '0'
+		res += int(digit)
+	}
+    if k == 1 {
+	    return res
+    }
+
+    return recursiveDigitSum(strconv.Itoa(res), k-1)
+};
+```

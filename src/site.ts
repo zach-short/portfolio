@@ -1,10 +1,12 @@
 // The few facts the pages need. Everything else is copy.
 export const site = {
   name: 'Zachary Short',
-  // Carried verbatim from app/layout.tsx:11-12. It still advertises the Economics blog that
-  // D9 cuts; replacing it is Phase 2 step 6's job, and the words are Zach's to pick (R7).
+  // D9, discharged 2026-09-15 (Phase 2 step 6): the Economics clause is trimmed, not
+  // reworded — app/layout.tsx:11-12 is left as-is, since it belongs to the Next tree this
+  // phase does not delete. The rest of the sentence carries forward verbatim (R7: this is a
+  // deletion of a dead reference, not a re-pick of the copy).
   description:
-    'Hi, my name is Zachary Short. This is my programming portfolio as well as my LeetCode and Economics blog page.',
+    'Hi, my name is Zachary Short. This is my programming portfolio as well as my LeetCode blog page.',
   email: 'zach.short@fantomworks.com',
   // DIAL-7, answered 2026-09-15: was github.com/zachmshort, the old username.
   githubURL: 'https://github.com/zach-short',

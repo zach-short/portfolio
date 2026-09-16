@@ -1,0 +1,13 @@
+---
+import Title from './title.astro';
+
+interface Props {
+  items: string[];
+}
+const { items } = Astro.props;
+---
+
+<Title title="Edge Cases" />
+<ul>
+  {items.map((item) => <li>{item}</li>)}
+</ul>

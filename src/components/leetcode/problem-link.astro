@@ -1,0 +1,16 @@
+---
+// Ported from app/blog/components/problem-link.tsx. Only used by content/leetcode/add-two-numbers.tsx,
+// which passes name="9-palindrome-number" — not a real slug (the real one is "palindrome-number").
+// That is a pre-existing broken link in the source prose, not something this port fixes (no
+// drive-by fixes); preserved verbatim and flagged in the hand-back.
+interface Props {
+  name: string;
+}
+const { name } = Astro.props;
+const formattedName = name
+  .replace('-', '. ')
+  .replaceAll('-', ' ')
+  .replace(/\b\w/g, (c) => c.toUpperCase());
+---
+
+<a href={`/blog/leetcode/${name}`}>{formattedName}</a>

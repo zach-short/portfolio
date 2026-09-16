@@ -1,0 +1,77 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { format } from 'date-fns';
+import Base from '@/src/layouts/Base.astro';
+import Complexity from '@/src/components/leetcode/complexity.astro';
+import Performance from '@/src/components/leetcode/performance.astro';
+import { formatSlug } from '@/src/lib/format-slug';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('leetcode');
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+interface Props {
+  post: CollectionEntry<'leetcode'>;
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const title = post.data.title ?? formatSlug(post.id);
+const { performance, complexity, testsPassed, quote } = post.data;
+---
+
+<Base title={title} description={`Solution and explanation for LeetCode problem: ${title}`}>
+  <article class="wrap page">
+    <a class="back muted" href="/blog/leetcode">&larr; All solutions</a>
+    <h1 class="display">{title}</h1>
+    <div class="meta muted">
+      {format(post.data.pubDate, 'MMMM dd, yyyy')} &bull; {post.data.languages.join(', ')} &bull;
+      {post.data.tags.join(', ')} &bull; {post.data.difficulty}
+      {testsPassed && ` • ${testsPassed}`}
+    </div>
+    {quote && (
+      <p class="quote">
+        <em>{quote}</em>
+      </p>
+    )}
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    {(performance || complexity) && (
+      <div class="prose">
+        {performance && <Performance time={performance.time} memory={performance.memory} />}
+        {complexity && (
+          <Complexity
+            time={complexity.time}
+            timeExplanation={complexity.timeExplanation}
+            space={complexity.space}
+            spaceExplanation={complexity.spaceExplanation}
+          />
+        )}
+      </div>
+    )}
+
+    <a
+      class="leetcode-link"
+      href={`https://leetcode.com/problems/${post.id}/description`}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      LeetCode Problem Link
+    </a>
+  </article>
+</Base>
+
+<style>
+  .page { padding: 48px 0 40px; max-width: 66ch; }
+  .back { display: inline-block; margin-bottom: 20px; font-size: 14px; }
+  .meta { font-size: 14px; margin-top: 6px; }
+  .quote { color: var(--muted); margin-top: 16px; }
+  .leetcode-link { display: inline-block; margin-top: 48px; color: var(--amber); }
+</style>

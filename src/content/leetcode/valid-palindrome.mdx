@@ -1,0 +1,71 @@
+---
+leetcodeNumber: 125
+pubDate: 2025-05-30T12:00:00Z
+tags: ["string", "two pointer"]
+difficulty: easy
+languages: ["Go"]
+performance: { time: 10, memory: 10 }
+---
+
+import Problem from '@/src/components/leetcode/problem.astro';
+import Approach from '@/src/components/leetcode/approach.astro';
+import EdgeCases from '@/src/components/leetcode/edge-cases.astro';
+import Reflections from '@/src/components/leetcode/reflections.astro';
+
+<Problem
+  items={[
+    `Given a string s, return true if it is a palindrome, or false otherwise.`,
+  ]}
+/>
+<Approach
+  items={[
+    `Clean up the string by converting to lower case then removing whitespace/checking the rune values.`,
+    `Compare the left and right side moving inward with two pointers`,
+  ]}
+/>
+<EdgeCases items={[" ' ' -> true"]} />
+
+<Reflections
+  items={[
+    `This was a horrendous approach. I need to study up on runes, ASCII, and strings mutation.`,
+  ]}
+/>
+
+## Go Solution
+
+```go
+import "strings"
+
+func isPalindrome(s string) bool {
+  s = formatString(s)
+  fmt.Print(s)
+  left, right := 0, len(s) - 1
+  for left <= right {
+    leftLetter, rightLetter:= s[left], s[right]
+
+        if leftLetter != rightLetter  {
+      return false
+    }
+
+        left++
+  right--
+}
+
+return true
+}
+
+func formatString(s string) string {
+  s = strings.ToLower(s)
+  s = strings.TrimSpace(s)
+
+  res:= ""
+  for _, letter := range s {
+
+    if (letter >= 'a' && letter <= 'z') || (letter >= '0' && letter <= '9') {
+      res += string(letter)
+    }
+  }
+
+  return res
+};
+```

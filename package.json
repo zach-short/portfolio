@@ -13,6 +13,7 @@
 		"cf-typegen": "wrangler types --env-interface CloudflareEnv ./env.d.ts"
 	},
 	"dependencies": {
+		"@astrojs/mdx": "8.0.1",
 		"astro": "7.3.2",
 		"cookie": "2.0.1",
 		"date-fns": "^4.1.0",

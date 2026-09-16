@@ -1,0 +1,81 @@
+---
+leetcodeNumber: 704
+pubDate: 2025-04-08T00:00:00Z
+tags: ["array", "binary search"]
+languages: ["Python", "Go", "Javascript"]
+---
+
+Do I really need to explain.
+
+## Python Solution
+
+```python
+class Solution:
+    def search(self, nums: List[int], target: int) -> int:
+        low = 0 
+        high = len(nums) - 1
+        while low <= high: 
+            mid = (low + high) // 2
+            if nums[mid] == target:
+                return mid
+            if nums[mid] < target:
+                low = mid + 1
+            else: 
+                high = mid - 1
+        return -1
+
+```
+
+## Go Solution
+
+```go
+func search(nums []int, target int) int {
+    low, high := 0, len(nums) - 1
+
+    for low <= high {
+        mid := low + ( high - low ) / 2
+        if nums[mid] == target {
+            return mid
+        }
+
+        if nums[mid] < target {
+            low = mid + 1
+        } else {
+            high = mid -1 
+        }
+    }
+    return -1
+}
+
+```
+
+## Javascript Solution
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number}
+ */
+var search = function(nums, target) {
+    var low = 0
+    var high = nums.length - 1
+
+    while (low <= high) {
+        var mid = Math.floor((low + high),2 )
+
+        if (nums[mid] == target) {
+            return mid 
+        }
+
+        if (nums[mid] < target) {
+            low = mid + 1
+        } else {
+            high = mid - 1
+        }
+        
+    }
+    return -1
+}
+
+```

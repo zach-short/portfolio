@@ -1,0 +1,16 @@
+---
+import Base from '@/src/layouts/Base.astro';
+
+// D9: the Economics link is cut (it was dead — app/blog/page.tsx:9 pointed at a route that
+// was never built) and nothing replaces it (DESIGN.md §2). One card survives.
+---
+
+<Base title="Blog" description="LeetCode solutions and write-ups by Zachary Short">
+  <div class="wrap page">
+    <a class="glass large prominent" href="/blog/leetcode">Programming</a>
+  </div>
+</Base>
+
+<style>
+  .page { min-height: 60vh; display: flex; align-items: center; justify-content: center; padding: 48px 0; }
+</style>

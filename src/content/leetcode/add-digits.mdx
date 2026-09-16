@@ -1,0 +1,28 @@
+---
+leetcodeNumber: 258
+pubDate: 2025-05-28T12:00:00Z
+tags: ["math", "simulation", "number theory"]
+difficulty: easy
+languages: ["Go"]
+---
+
+This problem is an example of recursive digit manipulation. The task is to repeatedly sum the digits of a number until only one digit remains. The base case checks whether the number is already a single digit. If so, it’s returned immediately. Otherwise, the function breaks the number into digits using modulo and division, sums them, and calls itself recursively with the result. Recursion here is elegant and performant due to the problem’s inherently logarithmic reduction, each step roughly cuts the number’s magnitude by an order.
+
+## Go Solution
+
+```go
+func addDigits(num int) int {
+  if num < 10 {
+    return num
+  }
+
+  newNum := 0
+  for num > 0 {
+    newNum += num % 10
+    num /= 10
+  }
+
+  return addDigits(newNum)
+}
+
+```

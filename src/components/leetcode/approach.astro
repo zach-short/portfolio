@@ -1,0 +1,13 @@
+---
+import Title from './title.astro';
+
+interface Props {
+  items: string[];
+}
+const { items } = Astro.props;
+---
+
+<Title title="Approach" />
+<ul>
+  {items.map((item, index) => <li>{index + 1}. {item}</li>)}
+</ul>

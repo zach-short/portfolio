@@ -1,0 +1,29 @@
+---
+leetcodeNumber: 136
+pubDate: 2025-05-23T00:00:00Z
+tags: ["array", "bit manipulation", "easy"]
+languages: ["Go"]
+---
+
+Very simple O(n) solution, since I am repeatedly doing hashMap problems the pattern is becoming clear. However I have no doubt there is a better aproach since one of the tags is bit manipulation. But my main goal is completing many different types of problems for the time being.
+
+## Go Solution
+
+```go
+func singleNumber(nums []int) int {
+    hashMap := make(map[int]int)
+
+    for _,num := range nums {
+        hashMap[num]++
+    }
+
+    for _,num := range nums {
+        if hashMap[num] == 1 {
+            return num
+        }
+    }
+
+    return -1
+}
+
+```

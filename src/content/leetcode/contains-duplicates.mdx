@@ -1,0 +1,26 @@
+---
+leetcodeNumber: 2117
+pubDate: 2025-03-03T00:00:00Z
+tags: ["array", "hash table", "sorting"]
+languages: ["Go"]
+---
+
+Fairly straight forward, I am getting the hang of the pattern behind simple hashmap.
+
+## Go Solution
+
+```go
+func containsDuplicate(nums []int) bool {
+    m := make(map[int]bool)
+
+    for _, num := range nums {
+        if _,k := m[num]; k {
+            return true
+        }
+
+        m[num] = true
+    }
+    return false
+}
+
+```

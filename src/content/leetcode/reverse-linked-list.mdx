@@ -1,0 +1,54 @@
+---
+leetcodeNumber: 206
+pubDate: 2025-05-24T12:00:00Z
+tags: ["linked list"]
+languages: ["Go"]
+---
+
+import { strLLVisual } from '@/src/lib/str-ll-visual';
+
+This was one of the methods on a project in DSA so implementation was fairly straightforward. The basic methodology is that you must keep track of three running variables at a time. There's previous node, current node, and next node. The previous node always starts off as null because it will be the tail's previous at the end. The current node initializes as the head node, and next is current's next. Then you essentially just point current to previous, then increment all of the pointers.
+
+Ex:
+
+{strLLVisual([1, 2, 3])}
+
+- Prev: null
+- Curr: 1
+- Next: Curr.Next = 1
+
+null &larr; 1 2 &rarr; 3
+
+Now swap curr to point to the previous. (1&rarr;null), and then update the rest of the values
+
+- Prev: 1
+- Curr: 2
+- Next: Curr.Next = 3
+
+null &larr; 1 &larr; 2 3
+
+Repeat this process & the entire Linked List will end up reversed.
+
+1 &larr; 2 &larr; 3
+
+or
+
+{strLLVisual([3, 2, 1])}
+
+## Go Solution
+
+```go
+func reverseList(head *ListNode) *ListNode {
+	var prev *ListNode 
+	curr := head
+
+	for curr != nil {
+        next := curr.Next
+		curr.Next = prev
+		prev = curr
+		curr = next
+	}
+
+	return prev
+}
+```

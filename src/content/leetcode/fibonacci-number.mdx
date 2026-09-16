@@ -1,0 +1,74 @@
+---
+leetcodeNumber: 509
+pubDate: 2025-05-23T00:00:00Z
+tags: ["math", "dynamic programming", "recursion", "memoization"]
+languages: ["Go"]
+---
+
+import ProblemLink from '@/src/components/leetcode/problem-link.astro';
+
+Although there is obviously the recursive version:
+
+```go
+func fib(n int) int {
+    if n <= 1 {
+        return n
+    }
+
+    if n <= 4 {
+        return n - 1
+    }
+
+    return fib(n-1) + fib(n-2)
+}
+```
+
+I prefer the dynamic programming approach because it consumes far less memory by doing far less calculations. My first step was that I listed out the first 6 values of fib(n).
+
+f(0) = 0
+
+f(1) = 1
+
+f(2) = 1
+
+f(3) = 2
+
+f(4) = 3
+
+f(5) = 5
+
+f(6) = 8
+
+At this point I noticed a pattern for atleast the first 4 values. If the value was less than or equal to 1, return n obviously, and up to n = 5, I could return n - 1.
+
+```go
+if n <= n-1 {
+  return n
+}
+
+if n <= 4 {
+  return n - 1
+}
+```
+
+I did this problem following <ProblemLink name="70-climbing-stairs" />, which involves a very similar approach. So the pattern of adding up to the final value rather than breaking down in recursively was very straight forward. I initialized the index at 5, because thats the lowest value not covered by the base case. And then I thought about what value a and b would need to be if i := 5, which would be 2 + 3, (i.e. fib(3) & fib(4)).
+
+## Go Solution
+
+```go
+func fib(n int) int {
+  if n <= 1 {
+    return n
+  }
+
+  if n <= 4 {
+    return n - 1
+  }
+
+  a, b := 2, 3
+  for i := 5; i <= n; i++ {
+    a, b = b, a + b
+  }
+  return b
+}
+```

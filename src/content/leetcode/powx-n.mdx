@@ -1,0 +1,76 @@
+---
+leetcodeNumber: 50
+title: "Pow(x, n)"
+pubDate: 2025-05-31T12:00:00Z
+tags: ["math", "recursion"]
+difficulty: medium
+languages: ["Go"]
+complexity: { time: "O(log n)", space: "O(log n)" }
+performance: { time: 100, memory: 80.48 }
+---
+
+import Problem from '@/src/components/leetcode/problem.astro';
+import Approach from '@/src/components/leetcode/approach.astro';
+import Title from '@/src/components/leetcode/title.astro';
+import EdgeCases from '@/src/components/leetcode/edge-cases.astro';
+import Reflections from '@/src/components/leetcode/reflections.astro';
+
+<Problem items={[
+  `Implement pow(x, n), which calculates x raised to the power n (i.e., xⁿ).`,
+]} />
+
+<Approach items={[
+  `Base Case: x ∈ S`,
+  `Recursive Case: if x ∈ S, x*n ∈ S`,
+  `JUST KIDDING`,
+]} />
+
+<Title title="My Saving Grace" />
+
+By some miracle, my Algorithms Professor happended to be covering this exact formula in class just a few days ago. And I remembered it enough to grind through the problem.
+
+<div style="display: flex; flex-direction: column; align-items: center; gap: 16px; margin: 16px 0;">
+  <img src="/leetcode/images/powx-n2.png" alt="Exponentiation" width="800" />
+  <img src="/leetcode/images/powx-n.png" alt="Exponentiation" width="800" />
+</div>
+
+<EdgeCases items={[
+  `If n is negative, convert it to (1/x)ⁿ `,
+  `Ex: 2⁻² == (1/2)²`,
+]} />
+
+<Reflections items={[
+  `I would have absolutely tried to brute force it with a recurrence relation had I not seen the exact formula just a couple days before.`,
+]} />
+
+## Go Solution
+
+```go
+func myPow(x float64, n int) float64 {
+    if n <= 1 {
+        return baseCase(x,n)
+    }
+
+    if isEven(n) {
+        return myPow(x*x, n / 2)
+    }
+    
+    return myPow(x*x, n / 2) * x
+}
+
+func isEven(n int) bool {
+    return n % 2 == 0 
+}
+
+func baseCase(x float64, n int) float64 {
+    if n < 0 {
+        return myPow(1/x, n * -1)
+    }
+
+    if n == 0 {
+        return 1
+    }
+
+    return x
+}
+```
