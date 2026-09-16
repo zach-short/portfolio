@@ -1,0 +1,309 @@
+---
+import { Image } from 'astro:assets';
+import type { Project } from '@/src/lib/projects';
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+const { frames } = project;
+---
+
+{/* `--count` is the only place the frame count reaches CSS; S-1 itself lives in the data
+    module as the length of this array, and is written nowhere else. */}
+<article class="story-page wrap" data-story style={`--count: ${frames.length}`}>
+  <header class="head" data-reveal>
+    <p class="eyebrow">Project</p>
+    <h1 class="display" transition:name={`project-${project.slug}`}>{project.title}</h1>
+    <p class="lede blurb">{project.blurb}</p>
+    <ul class="tech">
+      {project.tech.map((item) => <li class="chip">{item}</li>)}
+    </ul>
+  </header>
+
+  <div class="story">
+    <div class="stage">
+      <div class="phone">
+        {
+          frames.map((frame, i) => (
+            <Image
+              class="screen"
+              src={frame.screen}
+              alt={frame.headline}
+              width={350}
+              widths={[350, 700]}
+              sizes="(min-width: 860px) 310px, 46vw"
+              loading={i === 0 ? 'eager' : 'lazy'}
+              style={`--i: ${i}`}
+            />
+          ))
+        }
+      </div>
+      <a class="glass large prominent cta" href={project.link} target="_blank" rel="noopener noreferrer">
+        {project.linkLabel} &#8599;
+      </a>
+    </div>
+
+    <div class="rail" aria-hidden="true">
+      {/* The SVG's CSS width equals its viewBox width, so `preserveAspectRatio="none"` stretches
+          only the y axis — which a vertical line does not care about, and which leaves the 3 px
+          stroke exactly 3 px. `pathLength="1"` normalises the dash maths, so the draw is a
+          fraction rather than a pixel length that changes with the page's height. */}
+      <svg class="line" viewBox="0 0 24 1000" preserveAspectRatio="none" focusable="false">
+        <defs>
+          <linearGradient id="story-line" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--accent)" />
+            <stop offset="52%" stop-color="var(--accent-2)" />
+            <stop offset="100%" stop-color="var(--accent-glint)" />
+          </linearGradient>
+        </defs>
+        <path class="line-path" d="M12 0 V1000" pathLength="1" />
+      </svg>
+      {frames.map((_frame, i) => <i class="dot" style={`--i: ${i}`} />)}
+    </div>
+
+    <div class="frames">
+      {
+        frames.map((frame, i) => (
+          <section class="frame" data-frame={i} style={`--i: ${i}`}>
+            <p class="eyebrow amber">{frame.eyebrow}</p>
+            <h2 class="display">{frame.headline}</h2>
+            <p class="lede">{frame.sub}</p>
+          </section>
+        ))
+      }
+    </div>
+  </div>
+</article>
+
+<style>
+  .story-page {
+    /* ── The dials, written once each (PLAN.md §3). ──────────────────────────────────
+       S-2 is the phone's height; its width follows from the captures' own aspect rather
+       than from the dial's 350 px — see BD-9. `min()` keeps a 672 px phone from outgrowing
+       a short laptop viewport, where a sticky element taller than the screen cannot stick. */
+    --phone-h: min(672px, calc(100svh - 230px));
+    --phone-w: calc(var(--phone-h) * 1206 / 2622);
+    --tilt: 12deg; /* S-3, swept from +tilt to −tilt */
+    --fade: 0.45s; /* S-4 */
+    --line-w: 3px; /* S-8 */
+    --halo: 40px; /* S-8 */
+    --halo-alpha: 35%; /* S-8 */
+
+    /* The nav is 64 px of sticky glass; the stage clears it by 32 px (PLAN.md P1 step 6). */
+    --stick-top: 96px;
+    --rail-w: 64px;
+    --sweep: 0.6s;
+    /* How tall a frame's scroll box is. It is a dial only in the sense that the dots divide the
+       rail by it — see `.dot` — and the mobile copy offset below is derived from it. */
+    --frame-h: 62vh;
+
+    /* Defaults, and the whole of the no-JS state (BD-5): frame 1's screen is the opaque one,
+       the phone holds the start of its arc, the line is undrawn. The script overwrites both. */
+    --active: 0;
+    --progress: 0;
+
+    padding: 40px 0 0;
+    isolation: isolate;
+  }
+
+  .head { max-width: 62ch; }
+  .head .display { margin: 10px 0 18px; }
+  .blurb { max-width: 56ch; }
+  .tech { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 0; padding: 0; list-style: none; }
+
+  /* Mobile and tablet: one column, the phone sticking above the frames it illustrates, the
+     line down the left gutter. `display: contents` lets the phone and the CTA become grid
+     items in their own right, so the CTA can sit after the last frame (S-9) without the
+     document carrying a second copy of the link. */
+  .story {
+    display: grid;
+    grid-template-columns: 22px 1fr;
+    column-gap: 16px;
+    margin-top: clamp(32px, 6vh, 56px);
+  }
+  .stage { display: contents; }
+  .phone { grid-area: 1 / 1 / 2 / -1; position: sticky; top: var(--stick-top); justify-self: center; }
+  .rail { grid-area: 2 / 1 / 3 / 2; }
+  .frames { grid-area: 2 / 2 / 3 / 3; }
+  .cta { grid-area: 3 / 1 / 4 / -1; justify-self: center; margin: 8px 0 clamp(48px, 9vh, 96px); }
+
+  /* S-2's mobile half: 40 vh tall, the width following from the aspect exactly as it does on
+     desktop. The stacked layout and this height both begin at 860 px rather than at D2's
+     640 px — between the two a 672 px phone cannot stick usefully above its own copy, so the
+     one breakpoint that matters is where the columns collapse. Recorded as an As built: note
+     under D2. `--stick-top` drops to clear the nav only, not the nav plus a desktop gutter. */
+  @media (max-width: 859px) {
+    .story-page { --phone-h: 40vh; --stick-top: 72px; }
+  }
+
+  @media (min-width: 860px) {
+    .story { grid-template-columns: var(--phone-w) var(--rail-w) 1fr; column-gap: 0; }
+    /* The phone and the CTA travel together, so the call to action is under the phone the
+       whole way down the page rather than only at the end of it (S-9). */
+    .stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+      grid-area: 1 / 1 / 2 / 2;
+      position: sticky;
+      top: var(--stick-top);
+    }
+    .phone, .cta { position: static; grid-area: auto; margin: 0; }
+    .rail { grid-area: 1 / 2 / 2 / 3; }
+    .frames { grid-area: 1 / 3 / 2 / 4; }
+  }
+
+  /* ── The phone. Furlough's `.phone` recipe (HeroPage.astro:244-253) with its two hand-written
+     rgba() accent glows rewritten as color-mix on the tokens — BD-7, and the rebuild's rule
+     that a ported rgba shade is how an accent literal sneaks back in. ── */
+  .phone {
+    position: relative;
+    width: var(--phone-w);
+    height: var(--phone-h);
+    overflow: hidden;
+    border-radius: 44px;
+    border: 1px solid var(--edge);
+    background: var(--ground);
+    background-image:
+      radial-gradient(ellipse 70% 42% at 28% 104%, color-mix(in srgb, var(--ember) 60%, transparent), transparent 62%),
+      radial-gradient(ellipse 60% 40% at 90% -4%, color-mix(in srgb, var(--amber) 14%, transparent), transparent 60%);
+    box-shadow:
+      0 40px 90px rgba(0, 0, 0, 0.55),
+      0 0 120px color-mix(in srgb, var(--ember) 10%, transparent),
+      inset 0 0 0 1px rgba(0, 0, 0, 0.6);
+    /* D2's "rotating": one notch of an arc per frame, +tilt at the first and −tilt at the last. */
+    --ry: calc(var(--tilt) - 2 * var(--tilt) * var(--progress));
+    transform: perspective(1400px) rotateY(var(--ry));
+    transition: transform var(--sweep) var(--ease);
+  }
+
+  /* Every screen is stacked in the same box and the active one is opaque. `--d` and `--nd` are
+     the signed distances from the active index; max() of the two is |d|, and min(1, |d|) is 0
+     for the active screen and 1 for every other — an equality test CSS has no operator for.
+     It costs one rule instead of one rule per frame, so nothing here knows there are five. */
+  .screen {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    /* The captures and `--phone-w` share an aspect, so this crops nothing today; it is here so
+       a future capture at a different aspect fills the bezel instead of letterboxing inside it. */
+    object-fit: cover;
+    --d: calc(var(--i) - var(--active));
+    --nd: calc(var(--active) - var(--i));
+    opacity: calc(1 - min(1, max(var(--d), var(--nd))));
+    transition: opacity var(--fade) var(--ease);
+  }
+
+  .cta { white-space: nowrap; }
+
+  /* ── The line and its dots. ── */
+  .rail { position: relative; align-self: stretch; justify-self: center; width: 24px; }
+  .line {
+    width: 24px;
+    height: 100%;
+    /* The halo is a CSS filter on the element, not an SVG filter on the path: CSS pixels are
+       immune to the viewBox's y stretch, so the glow stays round at any page height (S-8). */
+    filter: drop-shadow(0 0 calc(var(--halo) / 2) color-mix(in srgb, var(--accent) var(--halo-alpha), transparent));
+  }
+  .line-path {
+    fill: none;
+    stroke: url(#story-line);
+    stroke-width: var(--line-w);
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: calc(1 - var(--progress));
+    transition: stroke-dashoffset var(--sweep) var(--ease);
+  }
+  .dot {
+    position: absolute;
+    left: 50%;
+    top: calc((var(--i) + 0.5) / var(--count) * 100%);
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--accent-2);
+    /* Lit once the reader has reached it: max(--d, 0) is 0 for every frame at or behind the
+       active one, and at least 1 ahead of it. */
+    --d: calc(var(--i) - var(--active));
+    --reached: calc(1 - min(1, max(var(--d), 0)));
+    opacity: calc(0.22 + 0.78 * var(--reached));
+    transform: translate(-50%, -50%) scale(calc(0.7 + 0.3 * var(--reached)));
+    box-shadow: 0 0 12px color-mix(in srgb, var(--accent-2) 45%, transparent);
+    transition: opacity var(--sweep) var(--ease), transform var(--sweep) var(--ease);
+  }
+
+  /* ── The frames. Equal heights are what put each dot beside its own frame: the dot sits at
+     (i + 0.5) / count of the rail, which is the middle of frame i only while the frames divide
+     the column evenly. ── */
+  .frame {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    min-height: var(--frame-h);
+    /* Stacked, the phone owns the top of the viewport, so a frame's copy has to land *under*
+       it at the moment that frame goes active — otherwise the reader activates a screen whose
+       headline is behind the phone. A frame goes active when its box crosses the middle of the
+       viewport, which puts the box's top edge at `50vh − --frame-h / 2`; the copy therefore
+       starts that far down plus whatever clears the phone's footprint. Derived rather than
+       guessed, so changing --frame-h or the phone's height keeps it true. */
+    padding-top: calc(var(--stick-top) + var(--phone-h) + 24px - (50vh - var(--frame-h) / 2));
+    padding-bottom: 8px;
+  }
+  .frame .display { margin: 10px 0 14px; }
+  .frame .lede { max-width: 40ch; }
+
+  @media (min-width: 860px) {
+    /* Two columns: the phone is beside the copy, not above it, so the offset goes away and the
+       copy centres in its own box again. */
+    .story-page { --frame-h: 88vh; }
+    .frame { justify-content: center; padding-top: 0; padding-left: 40px; }
+    .rail { width: var(--rail-w); }
+  }
+
+  /* The dim is keyed on `data-active`, which only exists once the script has run. With JS off
+     the attribute is absent and every frame stays at full opacity — BD-5's "all five frames'
+     copy is readable" is then a property of the stylesheet, not of a lucky default. */
+  [data-story][data-active] .frame {
+    --d: calc(var(--i) - var(--active));
+    --nd: calc(var(--active) - var(--i));
+    opacity: calc(1 - 0.55 * min(1, max(var(--d), var(--nd))));
+    transition: opacity var(--fade) var(--ease);
+  }
+
+  /* ── The enhancement: where a scroll timeline exists, the line draws continuously instead of
+     stepping frame to frame. Chrome 115+ and Safari 26+; Firefox keeps the stepped baseline
+     above, which is the whole reason the baseline is the one that carries the meaning. ── */
+  @supports (animation-timeline: scroll()) {
+    .story { timeline-scope: --story-frames; }
+    .frames { view-timeline: --story-frames block; }
+    .line-path {
+      transition: none;
+      animation: story-draw linear both;
+      animation-timeline: --story-frames;
+      animation-range: entry 100% exit 0%;
+    }
+    @keyframes story-draw {
+      from { stroke-dashoffset: 1; }
+      to { stroke-dashoffset: 0; }
+    }
+  }
+
+  /* ── Reduced motion, the third of the three layers (the others are `story.ts` needing no
+     branch and Base.astro's <noscript>). Nothing moves: no sweep, no cross-fade, no draw —
+     the line is simply already there. ── */
+  @media (prefers-reduced-motion: reduce) {
+    .phone { --ry: 0deg; transform: none; transition: none; }
+    .screen { transition: none; }
+    .dot { transition: none; }
+    [data-story][data-active] .frame { transition: none; }
+    .line-path {
+      animation: none;
+      transition: none;
+      stroke-dashoffset: 0;
+    }
+  }
+</style>

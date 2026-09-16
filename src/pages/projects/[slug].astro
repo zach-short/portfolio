@@ -1,0 +1,42 @@
+---
+import Base from '@/src/layouts/Base.astro';
+import ProjectStory from '@/src/components/ProjectStory.astro';
+import { projects, type Project } from '@/src/lib/projects';
+
+export function getStaticPaths() {
+  return projects.map((project) => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+---
+
+<Base title={project.title} description={project.blurb}>
+  <ProjectStory project={project} />
+</Base>
+
+<script>
+  import { startStory } from '@/src/lib/story';
+
+  // This module runs once per session, not once per visit — so it registers listeners rather
+  // than doing the work inline. `astro:page-load` fires after every ClientRouter swap as well
+  // as on the first load, and `astro:before-swap` fires on the page being left, which is where
+  // the observer has to go: leaving this page for `/` and coming back must not arm a second one.
+  let stop: (() => void) | undefined;
+
+  document.addEventListener('astro:page-load', () => {
+    const root = document.querySelector<HTMLElement>('[data-story]');
+    if (root) stop = startStory(root);
+  });
+
+  document.addEventListener('astro:before-swap', () => {
+    stop?.();
+    stop = undefined;
+  });
+</script>

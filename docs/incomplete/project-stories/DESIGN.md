@@ -255,6 +255,13 @@ because the site link never leaves the card.
 
 Ratified 2026-09-16.
 
+**As built: the CTA label is per project, and Furlough's is not "Go to site".** 2026-09-16, P1.
+This decision names the button *Go to site ↗* for all three, but Furlough's link is an App Store
+page (`apps.apple.com/app/id6810006594`, 200 → `/us/app/furlough/id6810006594`, curl 2026-09-16),
+not a site. Asked in chat and answered the same day: **"On the App Store ↗"**. `linkLabel` is
+therefore a field on `Project` rather than a constant, and EZHomesteading and E-Money still read
+*Go to site ↗* when P2 adds them.
+
 ### D2 — Vertical scroll, a sticky phone, and the tilt sweep is the "rotating"
 
 **Decision.** On screens ≥ 860 px the story is two columns: the phone sticks in one while the
@@ -286,6 +293,28 @@ the mobile room is handled by S-2 and by keeping each frame's copy to a headline
 
 Ratified 2026-09-16. Builds on rebuild D4; supersedes nothing.
 
+**As built, 2026-09-16, P1 — four deviations, none of them to what a reader sees.**
+
+1. **The stacked layout begins at 860 px, not 640 px.** This decision names ≥ 860 px for two
+   columns and < 640 px for the stacked phone, and says nothing about the band between. There is
+   no sensible third layout for it: at 700 px wide the columns have collapsed, and a 672 px phone
+   sticking above its own copy leaves nothing to read. So the one breakpoint is 860 px, and S-2's
+   mobile height (40 vh) applies from there down.
+2. **The observer's threshold is 0, not the plan's 0.5.** The active frame is "the one nearest
+   the middle", which is a zero-height root band (`rootMargin: -50% 0px -50% 0px`). Against a
+   zero-height root the intersection ratio never approaches 0.5, so a 0.5 threshold would never
+   fire. The rootMargin is what carries the intent; the threshold had to give way.
+3. **The dots are HTML elements, not SVG `<circle>`s.** The line's SVG is stretched with
+   `preserveAspectRatio="none"` so one path can span a column of unknown height. A filled circle
+   inside a non-uniformly scaled SVG renders as an ellipse, and nothing in CSS can undo a scale
+   it cannot read. The path stays one `<path>`; the five dots are absolutely positioned
+   elements on the same rail.
+4. **The script writes one custom property the plan did not list.** Plan step 7 has it write
+   `root.dataset.active` and `--progress`. CSS cannot read a data attribute as a number, so it
+   also writes `--active`. `data-active` is kept and earns its place independently: its presence
+   is how the stylesheet distinguishes a scripted visit from a scriptless one, which is what
+   keeps BD-5's "every frame's copy is readable" true rather than lucky.
+
 ### D3 — The line is the site's accent
 
 **Decision.** The line's gradient is `--accent` → `--accent-2` → `--accent-glint` — the three
@@ -302,6 +331,15 @@ palette on the one element that runs the length of every story page; Furlough's 
 the phone carry the warmth instead, and read as *the product*, not the site.
 
 Ratified 2026-09-16. Explicitly **not** a supersession of rebuild D3 / DIAL-1 / DIAL-9.
+
+**As built: the halo is a filter on the line, not a second line under it.** 2026-09-16, P1. S-8
+asks for "3 px sharp over a 40 px halo at 35 %", which reads as two strokes; it is one `<path>`
+with `filter: drop-shadow(0 0 20px color-mix(in srgb, var(--accent) 35%, transparent))` on the
+SVG element. Two reasons: the plan's step 6 asks for exactly one path, and a CSS filter on the
+element resolves in CSS pixels, so the halo stays round under the `preserveAspectRatio="none"`
+y-stretch that lets the line span a column of unknown height. A second SVG path would have been
+stretched into an oval. **No new colour literal**: the three stops are `var(--accent)`,
+`var(--accent-2)` and `var(--accent-glint)`, and the halo `color-mix`es off `--accent`.
 
 ### D4 — Real captures only, through `astro:assets`
 
@@ -321,6 +359,17 @@ a portfolio; the stateful screens are supplied by Zach or replaced by a public s
 choice per frame is PLAN.md's first job (§5 H1).
 
 Ratified 2026-09-16.
+
+**As built: "through `astro:assets`" needed a config change to be true.** 2026-09-16, P1. The
+Cloudflare adapter's default image service does no build-time transform, so `<Image>` shipped the
+source PNGs untouched at 172–978 KB. `imageService: 'compile'` (PLAN.md BD-10) is what makes this
+decision's "sized WebP/AVIF, with `width` and `height` set" actually happen. Furlough's five are
+copied byte-identical out of `design/store/raw/` — `shasum -a 256` matched on all five pairs,
+and all ten source PNGs are still in place.
+
+**Verify at build, discharged.** §7.3's check on frame 3: `raw/06.png` shows **`60 MIN`** under
+`DAILY BUDGET` with the slider at the 60 stop. The headline's *sixty* stands; the panorama's
+"fifty-five" is the stale reading, exactly as §7.3 predicted.
 
 ### D5 — Furlough joins first; Bocas Adventures leaves the site
 

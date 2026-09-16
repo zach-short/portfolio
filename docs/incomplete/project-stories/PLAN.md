@@ -20,18 +20,18 @@ Written the same day as the design, so `DESIGN.md` §1 is this plan's baseline. 
 are the ones that go stale between sessions. **Every phase re-runs them as its first step and
 edits this table**; where the two disagree, this table wins and says so.
 
-| Fact | Value 2026-09-16 | How to re-check |
+| Fact | Value 2026-09-16, **re-run by P1 the same day** | How to re-check |
 |---|---|---|
-| `main` | `269d4aa` — moved twice during the scoping session (was `5b64d57`; `7e0fbc4` backfilled item 8's hash, `269d4aa` merged `item8-registry-pin`, so `personal-config` is now the registry pin `0.2.0` and `git branch --no-merged main` is empty) | `git -C /Users/zachshort/Projects/portfolio log --oneline -1 main` |
-| Live worktrees | `item6-survey`, `item7-cutover`, `item8-registry-pin` (merged, worktree still present), plus a prunable `setup-scratch` | `git -C /Users/zachshort/Projects/portfolio worktree list` |
-| Zach's uncommitted set | `.gitignore` modified; `.claude/worktrees/` untracked | `git status --short` — never stage either |
-| Next free `HANDOFF` step | **15** — 14 is this scoping's; another session took 13 while this one scoped | `grep -nE '^\*\*[0-9]+\. ' HANDOFF.md \| tail -1`, read it, do not trust this cell |
-| Build baseline | `bun run build` exit 0, **65 pages** | `HANDOFF.md` Environment; re-run in the worktree before believing it |
+| `main` | **`daede6d`** — moved a third time between the hand-off and P1's first command: Zach committed step 14's three owed doc files (`astro-rebuild/DESIGN.md` +30/−2, and this folder's `DESIGN.md` and `PLAN.md`, new). So the design and this plan are **tracked and present in the worktree**, which they were not when P1 was written. `git branch --no-merged main` still empty | `git -C /Users/zachshort/Projects/portfolio log --oneline -1 main` |
+| Live worktrees | `item6-survey` (`ea4feb7`), `item7-cutover` (`6dcafd7`), `item8-registry-pin` (`7e0fbc4`, merged, worktree still present), plus **`item10-stories` (`daede6d`) — this phase's.** `setup-scratch` is gone, pruned by step 15 | `git -C /Users/zachshort/Projects/portfolio worktree list` |
+| Zach's uncommitted set | **`.gitignore` modified only**; `.claude/worktrees/` untracked. The three doc files left it when `daede6d` landed | `git status --short` — never stage either |
+| Next free `HANDOFF` step | **16** — step 15 (`item8-registry-pin` proved and merged) landed after this plan was written. The cell's own warning held: it said 15 and 15 was taken | `grep -nE '^\*\*[0-9]+\. ' HANDOFF.md \| tail -1`, read it, do not trust this cell |
+| Build baseline | `bun run build` exit 0 in this worktree, **65 emitted HTML files** — the log prints **66** prerender lines, the 66th being D10's `roman-to-interger` redirect, which writes no file (`file not created, response body was empty`). "66 pages" in P1's done-when is the **emitted-file** count, so the target is 66 files / 67 lines | `find dist/client -name '*.html' \| wc -l`, beside the log |
 | Furlough's raw screens | `design/store/raw/01.png` … `10.png` exist | `ls ~/Projects/furlough/design/store/raw` |
 | `sharp` | 0.35.4, transitive | `node -p "require('/Users/zachshort/Projects/portfolio/node_modules/sharp/package.json').version"` |
-| The three sites | all 200; EZH redirects apex → `www` | `curl -sI -L -m 10 <url> -o /dev/null -w '%{http_code} %{url_effective}\n'` |
+| The three sites | all 200; EZH and E-Money both redirect apex → `www`. **Furlough's App Store link is live**: `apps.apple.com/app/id6810006594` → 200 at `apps.apple.com/us/app/furlough/id6810006594` | `curl -sI -L -m 10 <url> -o /dev/null -w '%{http_code} %{url_effective}\n'` |
 | Item 7 | **`DONE — HANDOFF 13`**, closed by another session on 2026-09-16 while this was being scoped: the site is **live on the Worker** at `www.zacharyshort.com` (61/61 slugs 200, apex answering too) and the Pages project is gone. Consequence for BD-2: the first deploy of this branch publishes the slugs for good | `PASSOFF.md` row 7; `HANDOFF.md` step 13 |
-| Context7 | not available in the scoping session; Astro facts came from `node_modules` | `ToolSearch` for it; if present, prefer it for `astro:assets` and `transition:*` |
+| Context7 | **still not available** in P1 — `ToolSearch` returned no `resolve-library-id` / `query-docs`. Astro facts came from `node_modules/astro` again | `ToolSearch` for it; if present, prefer it for `astro:assets` and `transition:*` |
 
 ---
 
@@ -73,6 +73,32 @@ Each carries a one-line reversal.
   `alt=""` is wrong, and the headline is the one sentence already written about it. Reversal:
   a dedicated `alt` field on `Frame`.
 
+- **BD-9 — The phone's width comes from the captures' aspect, not from S-2's 350 px.** S-2 reads
+  350×672, an aspect of 0.521; Furlough's ten captures are 1206×2622, an aspect of 0.460
+  (`sips`, 2026-09-16). Filling a 0.521 bezel with a 0.460 image means cropping ~12 % of its
+  height, and `raw/10.png` — frame 5, whose headline is *"Nothing to tap but Close."* — carries
+  the Close button in the bottom 8 % of the frame. Cropping either end damages a screen: the top
+  holds `01`/`02`'s settings pill, the bottom holds `01`/`02`'s tab bar and `10`'s Close. So the
+  **height** keeps S-2's 672 px, which is the number that decides whether a sticky phone fits a
+  laptop viewport, and the **width** is derived: `calc(var(--phone-h) * 1206 / 2622)` = 309 px.
+  This is S-2's own mobile idiom ("40 vh tall, width from the aspect") applied to desktop, and
+  the emitted `<img>` agrees — `width="350" height="761"`, the same 0.460. Reversal: set
+  `--phone-w: 350px` and add `object-position` tuning, accepting a clipped Close button.
+- **BD-10 — `imageService: 'compile'` on the Cloudflare adapter.** Not cosmetic: without it BD-1
+  does not happen at all. `@astrojs/cloudflare` 14.3.1 defaults `imageService` to
+  `'cloudflare-binding'`, whose `transformAtBuild` is `false`
+  (`node_modules/@astrojs/cloudflare/dist/utils/image-config.js:3-12`), so `<Image>` copies the
+  source file untouched and defers every resize to the Images binding at request time. Measured
+  2026-09-16: the first build emitted the five source PNGs byte for byte, **172–978 KB each**,
+  against S-10's 150 KB cap. `'compile'` runs sharp at build time and leaves the runtime service
+  as passthrough. Safe because every page here is prerendered and nothing else on the site uses
+  `astro:assets` (grep over `src/`, 2026-09-16). After: ten WebP, largest **39.7 KB**. Reversal:
+  drop the option and raise S-10 to ~1 MB, or set `format`/`quality` by hand.
+
+**Numbering note.** §3 reserved `BD-9` for a lowered *mobile* phone height if H6 failed. The
+aspect deviation above came first and took the number; a mobile-height change would now be
+`BD-11`. Renumbered here rather than leaving a gap.
+
 ---
 
 ## 2. Phases
@@ -98,7 +124,11 @@ No Deep phase, no Deep review.
 
 ### P1 — The story page, on Furlough
 
-**Status: OPEN.**
+**Status: BUILT 2026-09-16, commit <pending Zach's commit>. RUNTIME PASS OWED.** Every gate is
+green — `bun run build` exit 0 at 66 pages, `bunx tsc --noEmit` exit 0,
+`wrangler deploy --dry-run` exit 0 — and every *Walked* row below is **owed**: the Browser pane
+starts dev servers only in the primary tree, so P1 never saw the page. `RUNTIME-PASS.md` P1
+carries the eight entries, marked `NOT WALKED`. Full account: `HANDOFF.md` step 16.
 
 Scope, executable without re-reading the design:
 
