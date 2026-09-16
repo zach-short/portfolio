@@ -293,7 +293,10 @@ the mobile room is handled by S-2 and by keeping each frame's copy to a headline
 
 Ratified 2026-09-16. Builds on rebuild D4; supersedes nothing.
 
-**As built, 2026-09-16, P1 — four deviations, none of them to what a reader sees.**
+**As built, 2026-09-16, P1 — six deviations.** The first four are mechanism only, invisible to a
+reader. **Numbers 4 and 6 are not**: they were added by the runtime pass, and each is a thing a
+reader would have seen. The heading used to end "none of them to what a reader sees" — that was
+true of what a green build could show, which is exactly the claim the pass was there to test.
 
 1. **The stacked layout begins at 860 px, not 640 px.** This decision names ≥ 860 px for two
    columns and < 640 px for the stacked phone, and says nothing about the band between. There is
@@ -309,11 +312,38 @@ Ratified 2026-09-16. Builds on rebuild D4; supersedes nothing.
    inside a non-uniformly scaled SVG renders as an ellipse, and nothing in CSS can undo a scale
    it cannot read. The path stays one `<path>`; the five dots are absolutely positioned
    elements on the same rail.
-4. **The script writes one custom property the plan did not list.** Plan step 7 has it write
+4. **`position` belongs to the layout rules, not to the phone's recipe.** Added 2026-09-16 by
+   P1's runtime pass (`HANDOFF.md` step 17), which is when this decision was first *seen* rather
+   than built. The phone's look is written in one block after the two layout rules, and that block
+   declared `position: relative` — same specificity, later in source, so **it won the cascade at
+   every width**. The consequences were the two things this decision is most about. Stacked, the
+   phone was `relative` instead of `sticky`, so **it did not stick at all**: measured at 375×812,
+   its top ran 224 → **−781** → **−1790** across frames 1, 3 and 5. That is the same symptom
+   `afab8a7` was committed to fix; that fix's reasoning about grid areas was correct and simply
+   could never take effect, which is why "built green but never seen" is not a small gap. In
+   columns the phone was `relative` while still inheriting the stacked rule's `top: 96px`, so it
+   hung 96 px below its own flex slot and **the CTA that is supposed to sit under it ended up
+   under it in the other sense** — covered by the phone's lower third. The rule that replaces it:
+   the phone's `position` is stated once per layout — `sticky` stacked, `relative` in columns,
+   both positioned so `.screen`'s `inset: 0` still resolves against the phone — and `top` is reset
+   in the same breath as `position`. The recipe block carries no `position` at all, and says why.
+
+5. **The script writes one custom property the plan did not list.** Plan step 7 has it write
    `root.dataset.active` and `--progress`. CSS cannot read a data attribute as a number, so it
    also writes `--active`. `data-active` is kept and earns its place independently: its presence
    is how the stylesheet distinguishes a scripted visit from a scriptless one, which is what
    keeps BD-5's "every frame's copy is readable" true rather than lucky.
+
+6. **The first frame's copy offset is derived differently from the other four — PLAN.md BD-11.**
+   Added 2026-09-16 by the runtime pass. This decision's stacked half says the frames scroll under
+   a phone stuck at the top, and the offset that keeps a frame's copy clear of it assumes the
+   phone has already reached that stuck position. Frame 1 activates before it has: at 375×812 it
+   crosses the middle of the viewport at scrollY 261 and the phone does not pin until 341, so its
+   eyebrow and headline were sitting **behind** the phone (−60.1 px and −35.8 px of clearance).
+   §3 had reserved a number for "lower the mobile phone height if H6 fails", and the measurement
+   killed that remedy: unpinned, the phone's bottom and the copy move down together, so the
+   shortfall is −56.28 px at *every* phone height. The first frame gets `--phone-h + 24px`
+   instead — the clearance for a phone that shares its top edge. Full working in `PLAN.md` BD-11.
 
 ### D3 — The line is the site's accent
 

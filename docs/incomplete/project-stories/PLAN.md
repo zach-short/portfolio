@@ -95,9 +95,27 @@ Each carries a one-line reversal.
   `astro:assets` (grep over `src/`, 2026-09-16). After: ten WebP, largest **39.7 KB**. Reversal:
   drop the option and raise S-10 to ~1 MB, or set `format`/`quality` by hand.
 
+- **BD-11 — the first frame's top padding is `--phone-h + 24px`, not the derived pinned-case
+  offset.** Taken 2026-09-16 by P1's runtime pass (`HANDOFF.md` step 17), which is where H6
+  actually failed. `.frame`'s `padding-top` is derived on the assumption that the phone is already
+  pinned at `--stick-top` when the frame goes active. That holds for frames 2–5 and not for frame
+  1: at 375×812 frame 1 crosses the middle of the viewport at **scrollY 261**, while the phone does
+  not pin until **scrollY 341**, so it is still at the top of its own grid area, 80 px lower than
+  the formula assumes. Measured consequence: frame 1's eyebrow cleared the phone by **−60.1 px**
+  and its headline by **−35.8 px** — both behind it. **§3 reserved this number for a lowered mobile
+  phone height, and that remedy provably does not work**: unpinned, the phone's bottom edge and the
+  copy move down together, so the deficit is **−56.28 px at every `--phone-h`** (checked at 40, 34,
+  30 and 25 vh — identical to the hundredth). The fix is in the derivation instead: unpinned, the
+  phone and the frame share a top edge, so the clearance the first frame needs is just the phone's
+  height plus the same 24 px gap — note the expression contains no `--stick-top` term. Written as
+  `.frame:where(:first-child)`, whose `:where()` keeps it at `.frame`'s own specificity so the
+  two-column rule still resets it to 0. After: clearance **22.2 / 22.4 / 23.7 / 23.3 / 21.8 px**
+  across the five frames. Reversal: drop the rule and accept that frame 1's eyebrow and headline
+  are read from behind the phone, or delay frame 1's activation instead by giving it a taller box.
+
 **Numbering note.** §3 reserved `BD-9` for a lowered *mobile* phone height if H6 failed. The
-aspect deviation above came first and took the number; a mobile-height change would now be
-`BD-11`. Renumbered here rather than leaving a gap.
+aspect deviation took that number first, and **BD-11 is now the H6 entry** — though it lowers
+nothing, for the reason recorded above. Renumbered here rather than leaving a gap.
 
 ---
 
@@ -124,11 +142,15 @@ No Deep phase, no Deep review.
 
 ### P1 — The story page, on Furlough
 
-**Status: BUILT 2026-09-16, commit `3e2d790`; sticky-phone fix `afab8a7`. RUNTIME PASS OWED.**
-Every gate is green — `bun run build` exit 0 at 66 pages, `bunx tsc --noEmit` exit 0,
-`wrangler deploy --dry-run` exit 0 — and every *Walked* row below is **owed**: the Browser pane
-starts dev servers only in the primary tree, so P1 never saw the page. `RUNTIME-PASS.md` P1
-carries the eight entries, marked `NOT WALKED`. Full account: `HANDOFF.md` step 16.
+**Status: BUILT 2026-09-16, commit `3e2d790`; sticky-phone fix `afab8a7`. RUNTIME PASS DONE
+2026-09-16 — `HANDOFF.md` step 17, all eight `RUNTIME-PASS.md` entries walked and passing.** The
+walk found two defects no gate could see and fixed both in `src/components/ProjectStory.astro`:
+`.phone` never resolved to `position: sticky` at any width (the recipe block's `position:
+relative` won the cascade by source order), so **stacked, the phone did not stick at all** — the
+bug `afab8a7` was meant to fix, whose grid-area half was right but could never take effect — and
+in columns it hung 96 px low **with the CTA underneath it**; and frame 1's copy sat behind the
+phone at 375×812 (**BD-11**). Gates re-run green after both: `bun run build` exit 0 at 66 emitted
+HTML files, `bunx tsc --noEmit` exit 0, `wrangler deploy --dry-run` exit 0.
 
 Scope, executable without re-reading the design:
 

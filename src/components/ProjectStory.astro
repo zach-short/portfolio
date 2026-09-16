@@ -167,7 +167,12 @@ const { frames } = project;
       position: sticky;
       top: var(--stick-top);
     }
-    .phone, .cta { position: static; grid-area: auto; margin: 0; z-index: auto; align-self: auto; }
+    /* The phone keeps a positioned `position` here because `.screen` is absolutely positioned
+       against it — but `top` has to be reset in the same breath: the stacked rule sets both, and
+       a leftover `top: var(--stick-top)` on a relative phone shifts it 96 px down its own column,
+       far enough that the CTA below it ends up *behind* the phone rather than below it. */
+    .phone { position: relative; top: auto; grid-area: auto; margin: 0; z-index: auto; align-self: auto; }
+    .cta { position: static; grid-area: auto; margin: 0; z-index: auto; align-self: auto; }
     .rail { grid-area: 1 / 2 / 2 / 3; }
     .frames { grid-area: 1 / 3 / 2 / 4; }
   }
@@ -176,7 +181,11 @@ const { frames } = project;
      rgba() accent glows rewritten as color-mix on the tokens — BD-7, and the rebuild's rule
      that a ported rgba shade is how an accent literal sneaks back in. ── */
   .phone {
-    position: relative;
+    /* No `position` here on purpose. This block is the phone's *look*, and it sits after both
+       layout rules in source order — a `position` in it would win the cascade at every width by
+       being last, which is how the stacked phone lost its `sticky` and stopped sticking at all.
+       Position belongs to the two layout rules above: `sticky` stacked, `relative` in columns.
+       Both are positioned, so `.screen`'s `inset: 0` still resolves against the phone. */
     width: var(--phone-w);
     height: var(--phone-h);
     overflow: hidden;
@@ -269,6 +278,17 @@ const { frames } = project;
     padding-top: calc(var(--stick-top) + var(--phone-h) + 24px - (50vh - var(--frame-h) / 2));
     padding-bottom: 8px;
   }
+  /* That offset assumes the phone is already pinned at `--stick-top` when the frame goes active,
+     which holds for every frame but the first. Frame 1 crosses the middle of the viewport at
+     scrollY 261 (at 375x812) while the phone does not pin until 341, so it is still at the top of
+     its own grid area — 80 px below where it will settle — and the pinned-case offset leaves the
+     eyebrow and headline behind it. Unpinned, the phone and the frame share a top edge, so the
+     clearance the first frame needs is simply the phone's height plus the same 24 px gap.
+     Derived, not tuned: note it does not contain `--stick-top`, and that the deficit it corrects
+     is independent of `--phone-h` — lowering S-2's mobile height cannot fix this, because the
+     phone's bottom edge and the copy move down together (BD-11). `:where()` holds the rule at
+     `.frame`'s own specificity so the two-column rule below still resets it to 0. */
+  .frame:where(:first-child) { padding-top: calc(var(--phone-h) + 24px); }
   .frame .display { margin: 10px 0 14px; }
   .frame .lede { max-width: 40ch; }
 
