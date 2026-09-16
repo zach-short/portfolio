@@ -375,7 +375,14 @@ own worktree — a subagent in the shared tree edits source even when asked only
 
 ### Phase B — personal-config: `catalog`, `setup --from`, npm publish
 
-**Status: PLANNED.** Board item 5. **Lane B — a different repo** (`~/Projects/personal-config`).
+**Status: BUILT 2026-09-16 — steps 1–3, uncommitted in a personal-config worktree at `a4da77a`
+(that repo's `HANDOFF` step 24; this repo's step 7). Steps 4 and 5 owed, both on Zach: the npm
+publish needs a login this machine does not have, and the git-dependency pin needs
+personal-config pushed — `main` is 14 commits ahead of `origin/main`, so the pin would resolve
+to a tree with neither `catalog.json` nor `--from`. `catalogVersion` is `0.2.0+39bbcb0e`; the
+origin lives in `package.json`'s `homepage`, not in `src/`, and `Question.when` is now a data
+`WhenSpec` so conditions survive serialization.** Board item 5. **Lane B — a different repo**
+(`~/Projects/personal-config`).
 Driver: Default (Opus 5). **Waits on nothing** — GATE 2 was given 2026-09-15, and DIAL-5 and
 DIAL-6 were both answered the same day (`DESIGN.md` §5.2), so step 3 is fully specified and
 nothing needs asking mid-build. Runs in parallel with Phases 1 and 2.
