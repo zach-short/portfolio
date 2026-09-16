@@ -1,50 +1,61 @@
-/**
- * For more details on how to configure Wrangler, refer to:
- * https://developers.cloudflare.com/workers/wrangler/configuration/
- */
 {
-	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "my-next-app",
-	"compatibility_date": "2025-05-22",
-	"compatibility_flags": [
-		"nodejs_compat"
-	],
-	"pages_build_output_dir": ".vercel/output/static",
-	"observability": {
-		"enabled": true
-	}
-	/**
-	 * Smart Placement
-	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
-	 */
-	// "placement": { "mode": "smart" },
-
-	/**
-	 * Bindings
-	 * Bindings allow your Worker to interact with resources on the Cloudflare Developer Platform, including
-	 * databases, object storage, AI inference, real-time communication and more.
-	 * https://developers.cloudflare.com/workers/runtime-apis/bindings/
-	 */
-
-	/**
-	 * Environment Variables
-	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
-	 */
-	// "vars": { "MY_VARIABLE": "production_value" },
-	/**
-	 * Note: Use secrets to store sensitive data.
-	 * https://developers.cloudflare.com/workers/configuration/secrets/
-	 */
-
-	/**
-	 * Static Assets
-	 * https://developers.cloudflare.com/workers/static-assets/binding/
-	 */
-	// "assets": { "directory": "./public/", "binding": "ASSETS" },
-
-	/**
-	 * Service Bindings (communicate between multiple Workers)
-	 * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings
-	 */
-	// "services": [{ "binding": "MY_SERVICE", "service": "my-service" }]
+  // The Worker config for zacharyshort.com.
+  //
+  // Promoted from `wrangler.worker.jsonc` by board item 7 on 2026-09-16. Phase 3 kept the Worker
+  // config in a separate file because this path still configured the Cloudflare **Pages** project
+  // `my-next-app`; that project is retired by this phase (D8) and `pages_build_output_dir` is
+  // gone with it. There is one wrangler config again.
+  //
+  // `compatibility_date` matches the workerd this checkout installs, so wrangler does not warn
+  // about a date its runtime cannot honour.
+  //
+  // `main` and `assets` are deliberately absent: the adapter fills both in and writes the
+  // resolved config to `dist/server/wrangler.json` at build time (verified 2026-09-16 — it comes
+  // out as `main: entry.mjs`, `assets.directory: ../client`). That generated file is what
+  // `wrangler dev -c dist/server/wrangler.json` and `wrangler deploy` read, so spelling either
+  // here would only be a second answer waiting to go stale.
+  //
+  // The adapter also injects a `SESSION` KV binding of its own for Astro sessions. Nothing on
+  // this site uses sessions; Cloudflare auto-provisions that namespace on deploy.
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "zacharyshort-com",
+  "compatibility_date": "2026-09-15",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true
+  },
+  "assets": {
+    // **This preserves the shape of all 61 published URLs.** Measured 2026-09-16 against the
+    // live Pages site and a local `wrangler dev`, and the two disagreed:
+    //
+    //   live (Next/Pages)  GET /blog/leetcode/two-sum   -> 200
+    //                      GET /blog/leetcode/two-sum/  -> 308 to the non-slash form
+    //   Workers default    GET /blog/leetcode/two-sum   -> 307 to the slash form
+    //   (`auto-trailing-slash`)
+    //                      GET /blog/leetcode/two-sum/  -> 200
+    //
+    // The convention is inverted, so every one of the 61 indexed, linked-to URLs would have
+    // gained a redirect hop and the canonical form would have flipped under the visitor. Astro's
+    // own `trailingSlash` option cannot fix it: these pages are prerendered, and the installed
+    // Astro 7.3.2 types say so outright — "Trailing slashes on prerendered pages are handled by
+    // the hosting platform, and may not respect your chosen configuration"
+    // (`node_modules/astro/dist/types/public/config.d.ts:223-224`). It is the asset server's
+    // call, so it is set here.
+    //
+    // `directory` and `binding` are deliberately absent — the adapter fills those in, the same
+    // way it fills in `main`. Only the override belongs here.
+    "html_handling": "drop-trailing-slash"
+  },
+  "kv_namespaces": [
+    {
+      // D7's profile store. DIAL-3: no TTL is set on the put, so entries are kept forever.
+      //
+      // Created 2026-09-16 by Zach running `bunx wrangler kv namespace create PROFILES` — a
+      // session never creates a Cloudflare resource. Before that the account had no namespaces
+      // at all (`bunx wrangler kv namespace list` returned `[]`) and this id was a placeholder
+      // that would have made a deployed Worker 500 on `/api/profile`.
+      "binding": "PROFILES",
+      "id": "d518d59067aa4b5485e467acaa52c5fa"
+    }
+  ]
 }

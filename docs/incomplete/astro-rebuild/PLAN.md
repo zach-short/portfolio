@@ -509,7 +509,15 @@ and the read/write path only, in its own worktree, verdict only.
 
 ### Phase 4 — Workers cutover
 
-**Status: PLANNED.** Board item 7. Lane A. Driver: Default (Opus 5). GATE 2 given 2026-09-15.
+**Status: BUILT 2026-09-16 (code half), SHIPPING OWED (publishing half).** Board item 7. Lane A.
+Driver: Default (Opus 5). GATE 2 given 2026-09-15. Recorded in `HANDOFF` step 9; commit hash
+follows, since a session never commits here.
+
+**What is built:** steps 1, 4 and 5 — the Worker config promoted over `wrangler.jsonc`, the Next
+tree deleted, the docs rewritten. `bun run build` exits 0 and `wrangler deploy --dry-run`
+succeeds. **What is owed and is Zach's alone:** creating the `PROFILES` KV namespace, running
+the deploy, moving `www.zacharyshort.com` (steps 2 and 3), and retiring the Pages project after
+the domain answers from the Worker — never before.
 **Waits on Phases 2 and 3.**
 
 **Scope.**

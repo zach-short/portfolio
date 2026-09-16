@@ -11,7 +11,8 @@ declare module 'cloudflare:workers' {
   export const env: {
     /**
      * Stored survey profiles, keyed by DIAL-6's eight-character id. Written by
-     * `POST /api/profile`, read by `GET /p/<id>`. Bound in `wrangler.worker.jsonc`.
+     * `POST /api/profile`, read by `GET /p/<id>`. Bound in `wrangler.jsonc` — item 7 promoted
+     * the Worker config over that path on 2026-09-16 and `wrangler.worker.jsonc` is gone.
      */
     PROFILES: {
       get(key: string): Promise<string | null>;

@@ -274,6 +274,17 @@ fine (G21).** True for a purely static site — which this stops being at D7. Th
 also the moment the deploy stops being `bun run pages:build` into `.vercel/output/static`
 (G21), so the old project is retired rather than left answering on a stale build.
 
+**As built 2026-09-16 (Phase 4, `HANDOFF` step 9), with three findings D8 did not anticipate.**
+The Worker config was promoted over `wrangler.jsonc`, project name `zacharyshort-com`, and the
+Next tree deleted. Then: **(1)** the Pages project was **not** wired to the repo
+(`Git Provider: No`), closing the "merged is not shipped" worry rather than confirming it;
+**(2)** the apex `zacharyshort.com` has never resolved — only `www.` does, so `site` was
+corrected to the `www` host, which every canonical link had been pointing away from; and
+**(3)** Workers' default `auto-trailing-slash` **inverts** the Pages site's trailing-slash
+convention, which would have put a redirect hop in front of all 61 indexed URLs. Fixed with
+`assets.html_handling: "drop-trailing-slash"`. D8 assumed the migration was a hosting swap; the
+URL shape turned out to be part of it.
+
 ### D9 — Cut the Economics link
 
 Ratified 2026-09-15. `/blog/economics` is a dead link (G16).
