@@ -232,8 +232,8 @@ there rather than assumed.
 
 ### Phase 1 — Scaffold, tokens, base layout, nav, footer, home
 
-**Status: BUILT 2026-09-15, commit pending** — Zach commits, so the hash goes in when he
-runs the two blocks from `HANDOFF` step 4. Board item 3. Lane A. Driver: Default (Opus 5).
+**Status: BUILT 2026-09-15, commit `f2f6a66`** — 26 files, and none of Zach's uncommitted set
+swept in with them. Board item 3. Lane A. Driver: Default (Opus 5).
 GATE 2 was given and all four of its dials — DIAL-1, DIAL-7, DIAL-8, DIAL-9 — were answered
 and are built as written. What was built, and the four deviations, are `HANDOFF` step 4.
 
@@ -376,8 +376,9 @@ own worktree — a subagent in the shared tree edits source even when asked only
 ### Phase B — personal-config: `catalog`, `setup --from`, npm publish
 
 **Status: PLANNED.** Board item 5. **Lane B — a different repo** (`~/Projects/personal-config`).
-Driver: Default (Opus 5). **Waits on nothing** — GATE 2 was given 2026-09-15; DIAL-5 is still
-open and is asked at step 3. Runs in parallel with Phases 1 and 2.
+Driver: Default (Opus 5). **Waits on nothing** — GATE 2 was given 2026-09-15, and DIAL-5 and
+DIAL-6 were both answered the same day (`DESIGN.md` §5.2), so step 3 is fully specified and
+nothing needs asking mid-build. Runs in parallel with Phases 1 and 2.
 
 **Scope.**
 
@@ -386,8 +387,12 @@ open and is asked at step 3. Runs in parallel with Phases 1 and 2.
    which is browser-safe — **not** through `src/phases/run.ts`, which is not (P3).
 2. `tests/catalog.test.ts`, the freshness test: it fails when a question changes and the
    committed `catalog.json` does not.
-3. `setup --from <url|path>` in `src/lib/args.ts` (P5) and `src/commands/setup.ts`, resolving a
-   local path, an https URL, and — if Zach says yes to DIAL-5 — a bare short id.
+3. `setup --from <url|path|id>` in `src/lib/args.ts` (P5) and `src/commands/setup.ts`, resolving
+   a local path, an https URL, **and a bare short id** — DIAL-5, answered **yes** 2026-09-15.
+   The id shape is DIAL-6's, answered the same day: **8 characters, `[a-z0-9]`, crypto-random.**
+   The disambiguation rule: no scheme, no `/`, no `.`, and `^[a-z0-9]{8}$` ⇒ id; anything else
+   is a URL or a path. **The origin is hardcoded to the site, not configurable** — the
+   configurable variant was offered and declined (`DESIGN.md` §5.2).
 4. Publish `personal-config` to npm (I7 — still 404 on 2026-09-15; re-check immediately before).
 5. Pin the catalog into the portfolio as a git dependency (D6). **This is the one step that
    touches Lane A's `package.json`** — do not run it while Phase 1 is in flight.
@@ -424,8 +429,10 @@ open and is asked at step 3. Runs in parallel with Phases 1 and 2.
 ### Phase 3 — Survey island, KV store, result page
 
 **Status: PLANNED.** Board item 6. Lane A. Driver: Default (Opus 5). GATE 2 given 2026-09-15.
-**Waits on Phase 1** (layout and tokens) **and Phase B** (the catalog and `--from`), and on
-DIAL-2's drafted copy in the warm register plus DIAL-3, DIAL-4 and DIAL-6.
+**Waits on Phase 1** (layout and tokens) **and Phase B** (the catalog and `--from`). **Every
+dial it consumes is answered**: DIAL-2 and DIAL-4's warm register (§5.1) and DIAL-3 and DIAL-6
+(§5.2). What is owed here is DIAL-2 and DIAL-4's actual *words*, drafted in this phase and
+shown to Zach before they ship — that is copy to write, not a dial to ask.
 
 **Scope.**
 
@@ -436,8 +443,11 @@ DIAL-2's drafted copy in the warm register plus DIAL-3, DIAL-4 and DIAL-6.
 3. The island: 30 questions in three phases, the two conditionals (`track-mode` when
    `owned !== false`, `tracker` when `mode === 'team'`), the hidden derived
    `commit-policy-practice`, the long-form bodies from the 28 choices files, and back-navigation.
-4. `POST /api/profile` — store the profile in KV under a short id (DIAL-6), return the id.
-   `GET /p/<id>` — return the stored profile. Retention per DIAL-3.
+4. `POST /api/profile` — store the profile in KV under a short id, return the id. `GET /p/<id>`
+   — return the stored profile. The id is DIAL-6's answered shape, **already pinned into Phase
+   B step 3's resolver**: 8 characters, `[a-z0-9]`, crypto-random. Generate exactly that — a
+   different shape breaks rung 2 silently. Retention is DIAL-3's: **keep forever, no TTL on the
+   put.**
 5. The result page's three rungs (D7), in order, with the deep link's prompt under 1000
    characters (I6) and the copy from DIAL-2.
 
@@ -536,16 +546,21 @@ question. A ninth is now open and is **not** a dial but a blocker: §0.1, the tw
 |---|---|
 | DIAL-1 accent hue | Phase 1, step 2. **Answered 2026-09-15: `#0FA79A`** |
 | DIAL-2 survey prompt copy · DIAL-4 `/setup` title | Phase 3, steps 2 and 5. **Answered 2026-09-15: the warm register** |
-| DIAL-3 KV retention · DIAL-6 short-id shape | Phase 3, step 4 |
-| DIAL-5 `--from` accepts a bare short id | Phase B, step 3 |
+| DIAL-3 KV retention | Phase 3, step 4. **Answered 2026-09-15: keep forever, no TTL** |
+| DIAL-6 short-id shape | Phase B, step 3 **and** Phase 3, step 4 — DIAL-5's yes pulled it into both. **Answered 2026-09-15: 8 chars, `[a-z0-9]`, crypto-random** |
+| DIAL-5 `--from` accepts a bare short id | Phase B, step 3. **Answered 2026-09-15: yes — origin hardcoded, the configurable variant declined (`DESIGN.md` §5.2)** |
 | DIAL-7 GitHub contact link · DIAL-8 project-card links | Phase 1, steps 4 and 5. **Answered 2026-09-15: `github.com/zach-short`; one link per card to the real domain** |
 | DIAL-9 `--amber` follows the accent or stays warm | Phase 1, step 2. **Opened and answered 2026-09-15: follows cool, `#7DE8D0`** |
 | §0.1 the `powx-n` images | **RESOLVED 2026-09-15 — restored.** No longer blocks anything |
 
-**As of 2026-09-15 nothing blocks Phase 1.** GATE 2 is given, §0.1 is resolved, and DIAL-1,
-DIAL-7, DIAL-8 and DIAL-9 are all answered and pinned into Phase 1's steps. DIAL-3, DIAL-5 and
-DIAL-6 remain open on their recommended defaults and block only Phase B / Phase 3 — they can be
-answered while Phase 1 runs.
+**As of 2026-09-15 every dial is answered and no dial blocks anything.** GATE 2 is given, §0.1
+is resolved, and DIAL-1, DIAL-7, DIAL-8 and DIAL-9 are pinned into Phase 1's steps. DIAL-3,
+DIAL-5 and DIAL-6 were answered later the same day, all three on their recommended defaults
+(`DESIGN.md` §5.2, `HANDOFF` step 6): **Phase B now waits on nothing, and Phase 3 waits only on
+Phase B.** DIAL-5's yes moved DIAL-6 forward — Phase B step 3's *resolver* and Phase 3 step 4's
+*generator* must agree on one id shape, so neither gets to pick its own. What is still owed on
+DIAL-2 and DIAL-4 is not the dial but the words: the register is warm, the copy is drafted in
+Phase 3 and shown before it ships.
 
 ---
 

@@ -424,11 +424,28 @@ in the parameter that D left open.
 | DIAL-1 | **`#0FA79A`** | Yes. "Teal" first, then the swatch picked from three rendered on `--ground #0F0D0B` — the deeper, more restrained option, which recedes into the ground rather than pushing forward |
 | DIAL-2 | The **warm** register | Yes, as a register. The words themselves are drafted in Phase 3 and shown before they ship |
 | DIAL-4 | The **warm** register, with DIAL-2 | Same |
-| DIAL-3 · DIAL-5 · DIAL-6 | Not answered | They keep their recommended defaults above and block only Phase B / Phase 3 |
+| DIAL-3 · DIAL-5 · DIAL-6 | **Answered later the same day — see §5.2** | Yes. All three came back on their recommended defaults; §5.2 records them, the rule DIAL-5's yes forces, and the one alternative that was declined |
 | DIAL-7 | **`https://github.com/zach-short`** | Yes. Changed from `zachmshort` on the evidence that this repo's own remote is `git@github.com:zach-short/portfolio.git` — the old username was never verified to redirect |
 | DIAL-8 | **One link per card, to the real domain** | Yes. The two buttons collapse to a single `Go to Site →` pointing at `project.link`. `localLink` and the `projects/<slug>` route stay unbuilt (§4, reserved seam) |
 | DIAL-9 | **`--amber` becomes `#7DE8D0`** | Yes. Amber follows the accent cool, so the palette is one family and the wall's two orbs are teal siblings rather than a warm/cool pair. **Note:** `#7DE8D0` was rendered beside `#2FBFA8`, not beside the chosen `#0FA79A` — the pair has not been seen together |
 | §0.1 (not a dial) | **The PNGs come back** | Yes — restored and verified, `HANDOFF` step 3 |
+
+### 5.2 Answers — DIAL-3, DIAL-5, DIAL-6, 2026-09-15
+
+Given by Zach in chat, in one batch, after `HANDOFF` step 5's hand-back. Recorded by `HANDOFF`
+step 6. All three came back **on their recommended defaults** in §5 — nothing here reopens a D.
+
+| # | Answer | Enough to build on? |
+|---|---|---|
+| DIAL-5 | **Yes — `setup --from <short-id>` resolves against the site's origin**, alongside an https URL and a local path | Yes, *and it moves DIAL-6*. A resolver cannot tell a bare id from a relative path without knowing the id's shape, so DIAL-6 is now consumed by Phase B step 3 as well as Phase 3 step 4 |
+| DIAL-6 | **8 characters, `[a-z0-9]`, crypto-random** | Yes. ~2.8 × 10¹² ids. Unguessability is the only access control (§2: no auth). The rule DIAL-5 needs: a `--from` value with no scheme, no `/` and no `.` that matches `^[a-z0-9]{8}$` is an id; everything else is a URL or a path |
+| DIAL-3 | **Keep forever — no TTL on the KV put** | Yes. A bookmarked `/p/<id>` never breaks, which is the failure the dial was written to flag. Accepted cost: unbounded growth, and no deletion path for a profile a visitor regrets |
+
+**Considered and not taken — do not re-propose without a new decision.** DIAL-5 was offered with
+a variant that made the resolution origin configurable by flag or env var, defaulting to
+zacharyshort.com, so `personal-config` would not be welded to one person's domain. Zach chose the
+plain form. **`personal-config` therefore hardcodes the origin**, and a second site wanting the
+same rung-2 command is a new decision, not a configuration change.
 
 ---
 
