@@ -124,7 +124,19 @@ const { frames } = project;
     margin-top: clamp(32px, 6vh, 56px);
   }
   .stage { display: contents; }
-  .phone { grid-area: 1 / 1 / 2 / -1; position: sticky; top: var(--stick-top); justify-self: center; }
+  /* The phone's grid area spans the frames' row as well as its own. A sticky grid item's
+     containing block is its grid area, so an area exactly the item's own height gives it no
+     range to stick in and it simply scrolls away — which is what it did. Spanning both rows
+     makes it overlap the frames on purpose; it paints above them, and each frame's top padding
+     is what keeps the copy out from under it. Row 1 collapses to zero, nothing else being in it. */
+  .phone {
+    grid-area: 1 / 1 / 3 / -1;
+    align-self: start;
+    position: sticky;
+    top: var(--stick-top);
+    justify-self: center;
+    z-index: 2;
+  }
   .rail { grid-area: 2 / 1 / 3 / 2; }
   .frames { grid-area: 2 / 2 / 3 / 3; }
   .cta { grid-area: 3 / 1 / 4 / -1; justify-self: center; margin: 8px 0 clamp(48px, 9vh, 96px); }
@@ -139,7 +151,11 @@ const { frames } = project;
   }
 
   @media (min-width: 860px) {
-    .story { grid-template-columns: var(--phone-w) var(--rail-w) 1fr; column-gap: 0; }
+    /* `align-items: start` is load-bearing, not tidiness: without it the grid's default
+       `stretch` makes `.stage` as tall as the frames column, and a sticky element the full
+       height of its containing block has nowhere to stick. `.rail` opts back into stretch on
+       its own rule, because the line does have to span the whole column. */
+    .story { grid-template-columns: var(--phone-w) var(--rail-w) 1fr; column-gap: 0; align-items: start; }
     /* The phone and the CTA travel together, so the call to action is under the phone the
        whole way down the page rather than only at the end of it (S-9). */
     .stage {
@@ -151,7 +167,7 @@ const { frames } = project;
       position: sticky;
       top: var(--stick-top);
     }
-    .phone, .cta { position: static; grid-area: auto; margin: 0; }
+    .phone, .cta { position: static; grid-area: auto; margin: 0; z-index: auto; align-self: auto; }
     .rail { grid-area: 1 / 2 / 2 / 3; }
     .frames { grid-area: 1 / 3 / 2 / 4; }
   }
