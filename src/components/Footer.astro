@@ -1,0 +1,23 @@
+---
+import { site } from '@/src/site';
+---
+
+<footer class="foot" id="contact">
+  <div class="wrap inner">
+    <p class="line">Let's build something that meets your needs on a timeline you deserve.</p>
+    <nav class="links" aria-label="Contact">
+      <a href={`mailto:${site.email}`}>Email</a>
+      <a href={site.githubURL} target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href={site.linkedinURL} target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .foot { position: relative; z-index: 1; margin-top: 96px; padding: 48px 0 56px; border-top: 1px solid var(--edge); }
+  .inner { display: flex; flex-direction: column; align-items: center; gap: 22px; text-align: center; }
+  .line { color: var(--muted); font-size: 15px; max-width: 46ch; }
+  .links { display: flex; flex-wrap: wrap; justify-content: center; gap: 28px; }
+  .links a { color: var(--muted); font-size: 14px; }
+  .links a:hover { color: var(--cream); }
+</style>

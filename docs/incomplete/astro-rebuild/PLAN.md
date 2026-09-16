@@ -115,10 +115,13 @@ re-run was already recorded in personal-config's own ledger at `33f3b37` — its
 The failure was asserting an absence in another repo from notes about it instead of from its
 ledger; see §6.
 
-**One fact changes shape during this effort and will invalidate the ledger's Environment table:
-the gate command.** As of 2026-09-15 `bun run build` is `next build` (`HANDOFF.md` Environment).
-From Phase 1 it is `astro build`. The phase that changes it owes `HANDOFF.md` an edited
-Environment row in the same commit, or every later session runs the wrong gate.
+**The gate command has changed — done 2026-09-15 by Phase 1.** `bun run build` was
+`next build`; it is now `astro build`, and `bun run preview` was
+`bun pages:build && wrangler pages dev` and is now the harmless local `astro preview`.
+`HANDOFF.md`'s Environment table is edited to match (step 4). **`CLAUDE.md` is not** — it is
+board item 7's file and still forbids `bun run preview` by name, which is now over-cautious
+rather than wrong; Phase 2 needs `astro preview` for its `curl` proofs and should run
+`bunx astro preview` rather than reason about the stale rule.
 
 ---
 
@@ -169,6 +172,41 @@ changed a `D<n>` is not here — it stops and goes to Zach.
   *Reverse:* inline the two hexes back into `--ember` / `--amber` and drop `--accent`; the
   alias layer is additive and nothing else references `--accent` directly.
 
+  **As built 2026-09-15 — the instance list was short by five.** BD-5 named `global.css:63`
+  and `:69`. Porting the file found the same trap in four more places, all in the prominent
+  glass recipe and the selection colour: `:54` `rgba(245, 158, 74, 0.35)`, `:126`
+  `rgba(229, 86, 61, 0.96)` **and** `rgba(214, 74, 50, 0.9)`, `:127`
+  `rgba(229, 86, 61, 0.32)`, `:129` `rgba(255, 224, 200, 0.7)` / `rgba(255, 224, 200, 0.55)`,
+  `:130` `rgba(236, 98, 72, 1)` **and** `rgba(220, 80, 55, 0.94)`. Three of those —
+  `214, 74, 50`, `236, 98, 72`, `220, 80, 55` — are *derived shades* of the accent, so **even
+  the widened decimal-channel grep in Phase 1's proof 4 would not have caught them**: they are
+  neither `E5563D` nor `229, 86, 61`. They are now three derived tokens at the palette head,
+  `--accent-deep` / `--accent-lift` / `--accent-glint`, each a `color-mix` on `--accent` or
+  `--accent-2`. The rule that generalises: **grep the port for `rgba(` and read every hit**,
+  because a literal that is a shade of the accent matches no pattern you can write in advance.
+
+- **BD-6 — Tailwind is not part of the rebuilt site.** Answers Phase 1 step 6 (I5). Nothing in
+  `src/` uses a utility class: D3's port is a hand-written token system. The decision was
+  forced rather than chosen — Vite loads `postcss.config.mjs` by search and then rejects
+  `@tailwindcss/postcss`'s plugin shape, so the first `astro build` failed with
+  `Invalid PostCSS Plugin found at: plugins[0]`. `astro.config.mjs` now passes an inline empty
+  PostCSS config, which stops the search. **`postcss.config.mjs`, `tailwindcss` and
+  `@tailwindcss/postcss` are deliberately left on disk**: they still belong to the Next app,
+  which is not deleted until Phases 2 and 4, and removing a dependency the dying tree imports
+  would make the old site unbuildable for no gain. *Reverse:* delete the `vite.css.postcss`
+  block; the Tailwind config has to go in the same commit or the build fails again.
+- **BD-7 — `cookie` is pinned to 2.0.1 as a direct dependency, and is a temporary fix.** Astro
+  7.3.2 needs `cookie@^2`; the tree already had `cookie@0.5.0` hoisted to the root
+  `node_modules` by `@cloudflare/next-on-pages`. Astro's prerender entry is imported from
+  `dist/`, which resolves from the project root rather than from `node_modules/astro/`, so it
+  got the CommonJS 0.5.0 and the build died with
+  `Named export 'parseCookie' not found`. A direct dependency is what puts 2.0.1 in the root
+  slot; `@cloudflare/next-on-pages` keeps a nested 0.5.0 and is unaffected. A `bun` override
+  was rejected because it would have forced 2.0.1 on `wrangler`'s `youch` too, and wrangler is
+  still the deploy path. *Reverse:* when the Next toolchain is deleted (Phase 4), remove the
+  `cookie` line from `package.json` — astro's own nested copy then wins the root slot — and
+  re-run the build to confirm.
+
 ---
 
 ## 2. Phases
@@ -194,9 +232,10 @@ there rather than assumed.
 
 ### Phase 1 — Scaffold, tokens, base layout, nav, footer, home
 
-**Status: PLANNED, UNBLOCKED 2026-09-15.** Board item 3. Lane A. Driver: Default (Opus 5).
-**Waits on: nothing.** GATE 2 is given and all four of its dials — DIAL-1, DIAL-7, DIAL-8,
-DIAL-9 — are answered and pinned into the steps below.
+**Status: BUILT 2026-09-15, commit pending** — Zach commits, so the hash goes in when he
+runs the two blocks from `HANDOFF` step 4. Board item 3. Lane A. Driver: Default (Opus 5).
+GATE 2 was given and all four of its dials — DIAL-1, DIAL-7, DIAL-8, DIAL-9 — were answered
+and are built as written. What was built, and the four deviations, are `HANDOFF` step 4.
 
 **Scope.**
 

@@ -1,0 +1,83 @@
+---
+import Base from '@/src/layouts/Base.astro';
+
+// The same three, in the same order, with the same copy as app/page.tsx:63-87. `link` now
+// carries the scheme because it is rendered: DIAL-8 collapsed each card's two dead
+// `projects/<slug>` buttons into one link to the real domain, and dropped `localLink`.
+const projects = [
+  {
+    title: 'EZHomesteading',
+    description:
+      'A peer-to-peer marketplace connecting small organic farms & gardens with locals.',
+    tech: ['Next.js', 'Expo', 'MongoDB'],
+    link: 'https://ezhomesteading.com',
+  },
+  {
+    title: 'E-Money',
+    description: 'A minimal real time monopoly funds & properties tracker.',
+    tech: ['Go', 'WebSocket', 'Next.js'],
+    link: 'https://emoney.club',
+  },
+  {
+    title: 'Bocas Adventures',
+    description:
+      'A site exposing travellers to the beauty of island life in Bocas del Toro & connecting them to local attractions.',
+    tech: ['Next.js'],
+    link: 'https://bocasadventures.com',
+  },
+];
+---
+
+<Base>
+  <section class="hero wrap">
+    <div class="hero-text" data-reveal>
+      <h1 class="display">Hi, I'm Zach</h1>
+      <p class="lede">Tired of slow devs, sluggish sites, and overcomplicated apps? Me too.</p>
+      <div class="actions">
+        <a class="glass large prominent" href="#projects">Explore Projects</a>
+        <a class="glass large" href="/blog">Blog</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="work wrap" id="projects">
+    <h2 class="display heading" data-reveal>Featured Works</h2>
+    <div class="grid">
+      {
+        projects.map((project, i) => (
+          <article class="card project" data-reveal style={`--d: ${i * 0.08}s`}>
+            <h3 class="display">{project.title}</h3>
+            <p class="muted blurb">{project.description}</p>
+            <div class="tech">
+              {project.tech.map((t) => (
+                <span class="chip">{t}</span>
+              ))}
+            </div>
+            <a class="go" href={project.link} rel="noopener">
+              Go to Site →
+            </a>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero { display: flex; justify-content: center; padding: clamp(72px, 14vh, 150px) 0 clamp(64px, 11vh, 120px); }
+  .hero-text { display: flex; flex-direction: column; align-items: center; gap: 22px; text-align: center; }
+  .hero-text .lede { max-width: 44ch; }
+  .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 8px; }
+
+  .work { padding-bottom: 24px; }
+  .heading { text-align: center; margin-bottom: clamp(36px, 6vh, 64px); }
+  .grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  .project { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; padding: 26px 28px 24px; }
+  .blurb { font-size: 15px; line-height: 1.6; }
+  .tech { display: flex; flex-wrap: wrap; gap: 8px; }
+  /* The link sits on the card's bottom edge however tall the blurb runs. */
+  .go { margin-top: auto; padding-top: 6px; font-size: 14px; font-weight: 600; }
+  @media (min-width: 860px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>

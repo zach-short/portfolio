@@ -1,0 +1,79 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import Footer from '@/src/components/Footer.astro';
+import Nav from '@/src/components/Nav.astro';
+import { site } from '@/src/site';
+import '@/src/styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description = site.description } = Astro.props;
+const fullTitle = title ? `${title} · ${site.name}` : site.name;
+// `site` in astro.config.mjs; without it there is no canonical link and og:url resolves
+// against the build-time host.
+const origin = Astro.site?.origin ?? '';
+const canonical = origin ? `${origin}${Astro.url.pathname}` : undefined;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {/* A meta content attribute cannot read a custom property, so --ground is spelled out here. */}
+    <meta name="theme-color" content="#0F0D0B" />
+    <meta name="color-scheme" content="dark" />
+    {canonical && <link rel="canonical" href={canonical} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    <meta name="twitter:card" content="summary" />
+    <link rel="preload" href="/fonts/BricolageGrotesque_72pt-Bold.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/Onest-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    {/* The reveal starts every section at opacity 0 and JS adds .in. Without this, a visitor
+        or crawler with JS off gets a server-rendered page it cannot see. */}
+    <noscript><style>[data-reveal] { opacity: 1; transform: none; }</style></noscript>
+    <ClientRouter />
+    <slot name="head" />
+  </head>
+  <body>
+    <div class="wall" aria-hidden="true" data-wall transition:persist>
+      <div class="wall-ember"></div>
+      <div class="wall-amber"></div>
+      <div class="wall-grain"></div>
+    </div>
+    <Nav />
+    <main>
+      <slot />
+    </main>
+    <Footer />
+    <script>
+      import { startReveal } from '@/src/lib/reveal';
+      import { startWall } from '@/src/lib/wall';
+
+      // astro:page-load fires on the first load and after every ClientRouter navigation, so
+      // the reveal is re-armed for content the router swapped in. The wall survives the swap
+      // (transition:persist), which is why it is started once per element rather than per
+      // page: a second call would leave a second requestAnimationFrame loop running forever.
+      document.addEventListener('astro:page-load', () => {
+        const wall = document.querySelector<HTMLElement>('[data-wall]');
+        if (wall && !wall.dataset.wallStarted) {
+          wall.dataset.wallStarted = 'true';
+          startWall(wall);
+        }
+        startReveal();
+      });
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  main { position: relative; z-index: 1; }
+</style>

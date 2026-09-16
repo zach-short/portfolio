@@ -167,6 +167,19 @@ Ratified 2026-09-15. Fonts are reused as-is (F4). `hourglass.ts` is not ported (
 read as a Furlough page** — which is exactly why the accent is a sibling hue, not `--ember`.
 That hue is the one dial this decision leaves open (§5, DIAL-1).
 
+*As built 2026-09-15 (Phase 1).* Ported whole, with five recorded deviations. **One is a real
+change of value:** `.glass.prominent` labels its text in `--cream` on Furlough's ember, which is
+3.2:1; the same cream on `#0FA79A` is **2.6:1**, below any reading of AA. The label is therefore
+`var(--ground)` on this site, which is **6.4:1**. The recipe is unchanged — what moved is the
+contrast the recipe assumed, because the new hue is lighter. **Three tokens were added** to the
+palette head, `--accent-deep` / `--accent-lift` / `--accent-glint`, because Furlough hand-wrote
+its darker, lighter and specular accent stops as decimal `rgba(...)` channels (`PLAN.md` BD-5's
+as-built note lists all seven sites). **Two things were ported that F3 and F4 did not name**:
+the `.chip` recipe from Furlough's releases page, which is what the project cards' tech tags
+are, and `public/noise.png`, without which `.wall-grain` requests a file that does not exist.
+**`.prose` was ported ahead of Phase 2's need** and nothing in Phase 1 uses it. `hourglass.ts`
+was not ported, as the decision says.
+
 ### D4 — `<ClientRouter />` for page fades
 
 Ratified 2026-09-15. The survey lives on one page, so no `transition:persist` is needed (I4).
@@ -177,6 +190,22 @@ flashes white. **Against: it puts a router script on a site whose defining prope
 invariant is *being deliberately retired* by this rebuild, not accidentally broken, and the
 budget is a small script rather than a framework. Both utilities and the router honour
 `prefers-reduced-motion`.
+
+*As built 2026-09-15 (Phase 1).* Wired, and **not yet exercised**: the site is one page, so no
+navigation has been walked and the fade has not been seen. Phase 2 is the first phase that can
+prove it. Two things the reference could not tell us, because Furlough has no router: the
+startup scripts run inside `document.addEventListener('astro:page-load', …)` rather than at
+module top level, since the router swaps the document and a top-level call would re-arm nothing
+on the second page; and the wall carries `transition:persist` and is started **once per
+element**, guarded by `data-wall-started`, because `startWall` never cancels its
+`requestAnimationFrame` loop — re-running it on each navigation would leave one live loop per
+page visited. A **`<noscript>` fallback was added** that forces `[data-reveal]` visible: the
+reveal starts every section at `opacity: 0`, so without it a visitor or crawler with JS off
+gets a server-rendered page it cannot see. That is new, not ported. The three reduced-motion
+layers were confirmed in the built output on 2026-09-15 — `ClientRouter`'s own
+`@media (prefers-reduced-motion)` block (I4, read this time in
+`node_modules/astro/components/viewtransitions.css` rather than in the docs), the ported
+`[data-reveal]` override, and the early returns in `reveal.ts` and `wall.ts`.
 
 ### D5 — The survey is a Preact island, `client:load`, at `/setup`
 
@@ -410,5 +439,13 @@ dies when the replacement is partial (`docs/AGENT-PRACTICES.md` Stage 3).
 
 ## 7. As built
 
-Empty until Phase 1 lands. Every deviation from a decision above is written back **under that
-decision** as an `As built:` paragraph — not as a changelog here, and not in a commit message.
+Every deviation from a decision above is written back **under that decision** as an `As built:`
+paragraph — not as a changelog here, and not in a commit message. This section is the index.
+
+- **D3** — five deviations, one of them a changed value (the prominent glass label colour).
+- **D4** — wired but unexercised; the script wiring and a new `<noscript>` fallback.
+
+One change belongs to no decision, so it is recorded here. **The wordmark stopped being an
+`<h1>`.** `app/page.tsx:17` made `zs` the page's `<h1>` and the hero's "Hi, I'm Zach" an `<h2>`;
+the rebuilt page makes the wordmark a link to `/` and the hero the `<h1>`. The copy is
+untouched (§4.4) — only the element and the heading order changed.

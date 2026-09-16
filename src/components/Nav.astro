@@ -1,0 +1,41 @@
+---
+// The three links are the ones the site already had (app/page.tsx:20-30). "About" has pointed
+// at #contact since before the rebuild and there is no About section — left exactly as it was.
+---
+
+<header class="nav">
+  <div class="wrap bar">
+    <a class="wordmark" href="/" aria-label="Zachary Short, home">zs</a>
+    <nav class="links" aria-label="Site">
+      <a class="glass" href="#contact">About</a>
+      <a class="glass" href="#projects">Projects</a>
+      <a class="glass" href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .nav { position: sticky; top: 0; z-index: 20; padding: 14px 0; }
+  .nav::before {
+    content: ''; position: absolute; inset: 0; z-index: -1;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--ground) 85%, transparent),
+      color-mix(in srgb, var(--ground) 55%, transparent) 70%,
+      transparent
+    );
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    -webkit-mask: linear-gradient(#000 60%, transparent); mask: linear-gradient(#000 60%, transparent);
+  }
+  .bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .wordmark {
+    display: inline-flex; align-items: center; color: var(--cream); text-decoration: none;
+    font-family: var(--display); font-weight: 700; font-size: 26px; letter-spacing: -0.03em;
+  }
+  .wordmark:hover { text-decoration: none; color: var(--amber); }
+  .links { display: flex; align-items: center; gap: 8px; }
+  .links .glass { min-height: 36px; padding: 0 14px; font-size: 13px; }
+  @media (max-width: 420px) {
+    .links .glass { padding: 0 11px; font-size: 12px; }
+  }
+</style>

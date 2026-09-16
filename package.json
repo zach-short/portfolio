@@ -3,16 +3,18 @@
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
-		"dev": "next dev --turbopack",
-		"build": "next build",
+		"dev": "astro dev",
+		"build": "astro build",
 		"start": "next start",
 		"lint": "next lint",
 		"pages:build": "bunx @cloudflare/next-on-pages",
-		"preview": "bun pages:build && wrangler pages dev",
+		"preview": "astro preview",
 		"deploy": "bun pages:build && wrangler pages deploy",
 		"cf-typegen": "wrangler types --env-interface CloudflareEnv ./env.d.ts"
 	},
 	"dependencies": {
+		"astro": "7.3.2",
+		"cookie": "2.0.1",
 		"date-fns": "^4.1.0",
 		"next": "15.3.2",
 		"react": "^19.0.0",
