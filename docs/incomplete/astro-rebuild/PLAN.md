@@ -375,13 +375,16 @@ own worktree — a subagent in the shared tree edits source even when asked only
 
 ### Phase B — personal-config: `catalog`, `setup --from`, npm publish
 
-**Status: BUILT 2026-09-16 — steps 1–3, uncommitted in a personal-config worktree at `a4da77a`
-(that repo's `HANDOFF` step 24; this repo's step 7). Steps 4 and 5 owed, both on Zach: the npm
-publish needs a login this machine does not have, and the git-dependency pin needs
-personal-config pushed — `main` is 14 commits ahead of `origin/main`, so the pin would resolve
-to a tree with neither `catalog.json` nor `--from`. `catalogVersion` is `0.2.0+39bbcb0e`; the
-origin lives in `package.json`'s `homepage`, not in `src/`, and `Question.when` is now a data
-`WhenSpec` so conditions survive serialization.** Board item 5. **Lane B — a different repo**
+**Status: BUILT 2026-09-16 — steps 1, 2, 3 and 5 done** (personal-config `6e694bb` on `main`,
+pushed; that repo's `HANDOFF` step 24, this repo's step 7). The portfolio pins
+`github:zach-short/personal-config#6e694bb`; `bun install` and `bun run build` both exit 0, 64
+pages. `catalogVersion` is `0.2.0+39bbcb0e`, 30 questions phased 10 / 6 / 14 with all three
+conditions carried as data — `Question.when` is now a `WhenSpec`, not a closure, so it survives
+serialization. The site origin lives in personal-config's `package.json` `homepage`, not in its
+`src/`, because that repo's S1 grep forbids it there; §5.2 is untouched.
+**Step 4, the npm publish, is the only thing owed, and it is Zach's** — `npm whoami` returns
+`ENEEDAUTH`. 0.2.0 is cut, packed and proven from a throwaway install; the name was free (404,
+2026-09-16). Until it lands, D7's rung 3 prints a command that does not run. Board item 5. **Lane B — a different repo**
 (`~/Projects/personal-config`).
 Driver: Default (Opus 5). **Waits on nothing** — GATE 2 was given 2026-09-15, and DIAL-5 and
 DIAL-6 were both answered the same day (`DESIGN.md` §5.2), so step 3 is fully specified and
