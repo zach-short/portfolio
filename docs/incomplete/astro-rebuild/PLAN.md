@@ -87,10 +87,19 @@ citation, and the doc pages it names are the source.
 | Client JS, as of 2026-09-15 | none | `grep -rlE '"use client"\|useState\|useEffect' app components content utils \| wc -l` → 0 |
 | Versions to pin | `astro` 7.3.2, `@astrojs/mdx` 8.0.1, `@astrojs/preact` 6.0.5, `@astrojs/cloudflare` 14.3.1 | `npm view <pkg> version`, each run once |
 | Furlough's Astro | 7.3.2, sole dependency — the port lands on exactly the reference's version | `~/Projects/furlough/site/package.json` |
-| personal-config HEAD | `07c3bbd`, tree clean — **it moved twice during 2026-09-15**, from `0d4500e` with 24 uncommitted files, through `33f3b37`, to `07c3bbd`. Gates were measured green at `0d4500e` (`tsc --noEmit` 0, `bun test` 259 pass, `biome check` clean) and **not re-run at `07c3bbd`** | `git -C ~/Projects/personal-config log --oneline -1` |
+| personal-config HEAD | `07c3bbd`, tree clean — **it moved twice during 2026-09-15**, from `0d4500e` with 24 uncommitted files, through `33f3b37`, to `07c3bbd` (`git rev-list --count 0d4500e..07c3bbd` → 2) | `git -C ~/Projects/personal-config log --oneline -1` |
+| personal-config gates | **Green at HEAD.** Reported 2026-09-15 by the concurrent session, in a clean detached worktree at `07c3bbd`: `bun run typecheck` 0, `bun run lint` 0 over 82 files, `bun test` 312 pass / 0 fail over 23 files. **Not reproduced by this session** | its write-up, path in `HANDOFF` step 2 |
 | Next free `HANDOFF` step | **3**, after this session takes 2 | read `HANDOFF.md`'s step log — never trust a number written elsewhere |
 | Board items taken | 1–7 | read `PASSOFF.md` |
 | Mandatory reading, before any work | ~29k tokens (`CLAUDE.md`, `HANDOFF.md`, `PASSOFF.md`, `docs/AGENT-PRACTICES.md`, `docs/conventions-typescript.md`, `DESIGN.md`) | `wc -c <files> \| awk '{print $1/4}'` — 117,608 bytes |
+
+**Superseded 2026-09-15, recorded rather than deleted (R5).** This section first said personal-config's
+gates were green at `0d4500e` and **had not been re-run** since. That absence was wrong: a full
+re-run was already recorded in personal-config's own ledger at `33f3b37` — its `HANDOFF` step 17,
+*"Re-ran the whole gate after item 5 landed"*, verified 2026-09-15 by reading
+`~/Projects/personal-config/HANDOFF.md:1006` — and a further run at `07c3bbd` is the row above.
+The failure was asserting an absence in another repo from notes about it instead of from its
+ledger; see §6.
 
 **One fact changes shape during this effort and will invalidate the ledger's Environment table:
 the gate command.** As of 2026-09-15 `bun run build` is `next build` (`HANDOFF.md` Environment).
@@ -497,6 +506,15 @@ So the next effort need not guess whether an omission was considered.
   `HANDOFF.md` in the same commit.
 - Re-run §0 at the start of every phase (`docs/AGENT-PRACTICES.md` 2.4).
 - **Set your board row to `IN FLIGHT` before your first edit.**
+- **Verify a self-correction as rigorously as the claim it corrects.** An over-correction costs a
+  reader exactly what the original error would have — the record asserting that something true is
+  false. On 2026-09-15 a sound claim about this repo's commit count was retracted within minutes
+  of a plausible-sounding reason and had to be restored; the check was one `git rev-list --count`.
+- **Before recording that another repo has not done something, read that repo's ledger — not your
+  notes about it.** R4 says grep before recording an absence; across a repo boundary the ledger
+  *is* the grep. Twice on 2026-09-15 a claim about personal-config was made from a second-hand
+  summary and was wrong both times: the Furlough token list, and a gate re-run that had existed
+  for hours.
 - **A stale existence check is not a check.** `cat >` truncates silently, and on 2026-09-15 a
   session overwrote another's `PLAN.md` having checked that the file did not exist ten minutes
   and eight tool calls earlier. Test immediately before the write, or write to a temp path and
