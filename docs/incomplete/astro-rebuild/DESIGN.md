@@ -382,7 +382,7 @@ Each has a recommended default. Every one is asked at GATE 2; none is a build-le
 | DIAL-6 | Short-id length and alphabet (D7) | 8 characters, lowercase alphanumeric, crypto-random | Unguessability is the only access control on a stored profile (§2: no auth) |
 | DIAL-7 | The GitHub contact link (§4.2) | Carry `zachmshort` forward verbatim | G18: it is the old username and may already be a redirect or a dead account |
 | DIAL-8 | Where the three project cards' links point (§4.3) | Both links go to the real domain in `project.link` | G17: all six were dead on 2026-09-15 and `project.link` is never rendered |
-| DIAL-9 | Whether `--amber #F59E4A` follows the accent, or stays warm (D3) | Opened 2026-09-15, no default yet | The accent is not a lone token: `global.css:15-16` defines `--ember` and `--amber` as a warm pair and the wall renders both (`Base.astro:56`, `global.css:61-62`). A teal `--ember` beside an orange `--amber` is a clash, not a sibling accent |
+| DIAL-9 | Whether `--amber #F59E4A` follows the accent, or stays warm (D3) | Opened 2026-09-15; answered the same day — follows cool | The accent is not a lone token: `global.css:15-16` defines `--ember` and `--amber` as a warm pair and the wall renders both (`Base.astro:56`, `global.css:61-62`). A teal `--ember` beside an orange `--amber` is a clash, not a sibling accent |
 
 ### 5.1 Answers — GATE 2, 2026-09-15
 
@@ -392,13 +392,13 @@ in the parameter that D left open.
 
 | # | Answer | Enough to build on? |
 |---|---|---|
-| DIAL-1 | **Teal** | **No, not yet** — a hue, not a swatch. §5 promised three swatches on `--ground #0F0D0B`; the exact value is still to pick and Phase 1 step 2 is blocked on it |
+| DIAL-1 | **`#0FA79A`** | Yes. "Teal" first, then the swatch picked from three rendered on `--ground #0F0D0B` — the deeper, more restrained option, which recedes into the ground rather than pushing forward |
 | DIAL-2 | The **warm** register | Yes, as a register. The words themselves are drafted in Phase 3 and shown before they ship |
 | DIAL-4 | The **warm** register, with DIAL-2 | Same |
 | DIAL-3 · DIAL-5 · DIAL-6 | Not answered | They keep their recommended defaults above and block only Phase B / Phase 3 |
 | DIAL-7 | **`https://github.com/zach-short`** | Yes. Changed from `zachmshort` on the evidence that this repo's own remote is `git@github.com:zach-short/portfolio.git` — the old username was never verified to redirect |
 | DIAL-8 | **One link per card, to the real domain** | Yes. The two buttons collapse to a single `Go to Site →` pointing at `project.link`. `localLink` and the `projects/<slug>` route stay unbuilt (§4, reserved seam) |
-| DIAL-9 | Not answered — opened by this pass | Blocks Phase 1 step 2 alongside DIAL-1 |
+| DIAL-9 | **`--amber` becomes `#7DE8D0`** | Yes. Amber follows the accent cool, so the palette is one family and the wall's two orbs are teal siblings rather than a warm/cool pair. **Note:** `#7DE8D0` was rendered beside `#2FBFA8`, not beside the chosen `#0FA79A` — the pair has not been seen together |
 | §0.1 (not a dial) | **The PNGs come back** | Yes — restored and verified, `HANDOFF` step 3 |
 
 ---

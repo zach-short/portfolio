@@ -143,6 +143,31 @@ changed a `D<n>` is not here — it stops and goes to Zach.
 - **BD-4 — The 61-slug list in `DESIGN.md` §4.1 is the parity checklist**, rather than a list
   regenerated per phase. A list regenerated from `content/leetcode/` after Phase 2 has deleted
   those files proves nothing. *Reverse:* none needed; it is a frozen copy by design.
+- **BD-5 — The accent is a two-hex palette head with role aliases, and no colour is written as
+  a literal anywhere else.** Asked for by Zach on 2026-09-15: *"make it easy to swap in other
+  colors in the future."* Implements D3 — it changes how the ported tokens are spelled, not
+  which colours they are. Three parts, and the third is the one that actually matters:
+
+  1. **Two hexes at the top of the `:root` block, and nowhere else.**
+     `--accent: #0FA79A` (DIAL-1) and `--accent-2: #7DE8D0` (DIAL-9). Re-skinning the whole site
+     is editing these two lines.
+  2. **The Furlough names survive as aliases:** `--ember: var(--accent)` and
+     `--amber: var(--accent-2)`. Every ported recipe keeps referencing `--ember` / `--amber` by
+     name, which is what Phase 1 step 2's "same names matter" constraint protects — and it ends
+     the oddity of a token called `--ember` holding a teal, because it is now an alias for a
+     role rather than a definition of a colour.
+  3. **Every alpha use goes through `color-mix`, because Furlough hardcodes the accent as
+     decimal rgba channels.** `global.css:63` and `:69` write the wall's two orbs as
+     `rgba(229, 86, 61, 0.6)` and `rgba(245, 158, 74, 0.14)` — the same colours as `--ember` and
+     `--amber`, spelled as decimal channels so they can carry alpha. **Ported verbatim, those two
+     lines keep the Furlough palette while every hex grep passes**, because `229, 86, 61` does
+     not match `E5563D`. Rewrite them as
+     `color-mix(in srgb, var(--accent) 60%, transparent)` and the matching `0%` stop. `color-mix`
+     is already Furlough's own idiom (`releases.astro:148`), so this is a spelling change, not a
+     new technique.
+
+  *Reverse:* inline the two hexes back into `--ember` / `--amber` and drop `--accent`; the
+  alias layer is additive and nothing else references `--accent` directly.
 
 ---
 
@@ -169,7 +194,9 @@ there rather than assumed.
 
 ### Phase 1 — Scaffold, tokens, base layout, nav, footer, home
 
-**Status: PLANNED.** Board item 3. Lane A. Driver: Default (Opus 5). Waits on: GATE 2.
+**Status: PLANNED, UNBLOCKED 2026-09-15.** Board item 3. Lane A. Driver: Default (Opus 5).
+**Waits on: nothing.** GATE 2 is given and all four of its dials — DIAL-1, DIAL-7, DIAL-8,
+DIAL-9 — are answered and pinned into the steps below.
 
 **Scope.**
 
@@ -177,17 +204,29 @@ there rather than assumed.
    `package.json` scripts (`dev`, `build`, `preview`), the adapter **not yet** wired — Phase 3
    adds it with the route that needs it (I3, confirmed).
 2. Port the **whole** `:root` block from Furlough's `src/styles/global.css` (`DESIGN.md` F3 —
-   fourteen colour and shape tokens plus five font stacks and `--ease`), replacing `--ember`
-   with the hue Zach picks at GATE 2 (DIAL-1) and keeping every other token's name and role.
-   Copy the eleven font files and their three OFL texts into `public/fonts` (F4).
+   fourteen colour and shape tokens plus five font stacks and `--ease`), keeping every token's
+   name and role. **Two values change, both decided 2026-09-15:** `--ember` becomes
+   **`#0FA79A`** (DIAL-1 — the deeper, more restrained of the three teals) and `--amber` becomes
+   **`#7DE8D0`** (DIAL-9 — amber follows the accent cool, so the palette is one family). Every
+   other token keeps Furlough's value. **The names `--ember` and `--amber` are kept even though
+   they now name teals** — the glass, eyebrow and wall recipes reference them by name, and
+   renaming is a separate decision nobody has taken. Copy the eleven font files and their three
+   OFL texts into `public/fonts` (F4). **Spell the two accent values per BD-5** — a two-hex
+   palette head (`--accent`, `--accent-2`) with `--ember` / `--amber` as aliases, and the wall's
+   hardcoded `rgba(229, 86, 61, …)` / `rgba(245, 158, 74, …)` rewritten through `color-mix`.
+   Porting those two lines verbatim silently keeps the Furlough palette.
 3. Port `src/lib/reveal.ts` and `src/lib/wall.ts` verbatim from Furlough (F5). **Do not port
    `hourglass.ts`.** Re-read both files before porting — `DESIGN.md` F5's description of what
    they do is inherited, not re-verified.
 4. Build `src/layouts/Base.astro`: head, font preloads, `<ClientRouter />` (D4), the header with
-   the `zs` wordmark and the nav, and the footer with the three contact links (`DESIGN.md` §4.2,
-   verbatim, including the GitHub target unless GATE 2 changes it).
+   the `zs` wordmark and the nav, and the footer with the three contact links (`DESIGN.md` §4.2).
+   **GATE 2 changed the GitHub target** (DIAL-7): it is `https://github.com/zach-short`, not
+   `zachmshort`. Email and LinkedIn carry forward verbatim.
 5. Build `src/pages/index.astro` from `app/page.tsx`: hero copy verbatim (§4.4), the three
-   project cards verbatim (§4.3) with their links set by DIAL-8, and the two hero buttons. The
+   project cards verbatim (§4.3), and the two hero buttons. **DIAL-8:** each card gets exactly
+   **one** link, `Go to Site →`, pointing at the real domain in `project.link` — the current two
+   buttons (`app/page.tsx:118-128`) both point at the dead `projects/<slug>` and collapse to one.
+   Do not render `localLink`. The
    nav's "About" link was dead on 2026-09-15 (G20) — leave it pointing at `#contact` unless
    GATE 2 says otherwise, and say so in the hand-back rather than inventing an About section.
 6. Decide and record whether Tailwind is kept at all (I5). D3 ports a hand-written token system;
@@ -212,7 +251,13 @@ away exactly that.
      waiting for a reveal that will not fire — and the wall glow is static. Note that
      `<ClientRouter />` already disables its own animations under that setting (I4), so this
      check is about `reveal` and `wall` only; do not hand-write a transition guard.
-  4. `grep -r "E5563D" dist/ src/` returns nothing: the Furlough accent is gone, not overridden.
+  4. **Two greps, because the hex grep alone is a false negative.**
+     `grep -rn "E5563D\|F59E4A" dist/ src/` returns nothing, **and**
+     `grep -rnE "229, ?86, ?61|245, ?158, ?74" dist/ src/` returns nothing. Furlough writes the
+     wall's two orbs as decimal rgba channels rather than hex (`global.css:63`, `:69`), so a
+     clean hex grep passes while the wall still glows Furlough orange. BD-5 removes both forms.
+     Also confirm `#0FA79A` and `#7DE8D0` each appear **exactly once** in `src/` — more than once
+     means a literal escaped the palette head.
 
 **Watch for.**
 
@@ -228,8 +273,8 @@ away exactly that.
 ### Phase 2 — The 61 solutions become MDX
 
 **Status: PLANNED.** Board item 4. Lane A. Driver: Mechanical (Sonnet 5), escalating to Default
-on any failure that is not obvious. Waits on: GATE 2, then Phase 1, **and on Zach's answer to
-§0.1** before `powx-n` can be converted.
+on any failure that is not obvious. **Waits on Phase 1 only** — GATE 2 was given 2026-09-15 and
+§0.1 is resolved, so `powx-n` converts with its two images like any other post.
 
 **Scope.**
 
@@ -292,7 +337,8 @@ own worktree — a subagent in the shared tree edits source even when asked only
 ### Phase B — personal-config: `catalog`, `setup --from`, npm publish
 
 **Status: PLANNED.** Board item 5. **Lane B — a different repo** (`~/Projects/personal-config`).
-Driver: Default (Opus 5). Waits on: GATE 2 only. Runs in parallel with Phases 1 and 2.
+Driver: Default (Opus 5). **Waits on nothing** — GATE 2 was given 2026-09-15; DIAL-5 is still
+open and is asked at step 3. Runs in parallel with Phases 1 and 2.
 
 **Scope.**
 
@@ -338,8 +384,9 @@ Driver: Default (Opus 5). Waits on: GATE 2 only. Runs in parallel with Phases 1 
 
 ### Phase 3 — Survey island, KV store, result page
 
-**Status: PLANNED.** Board item 6. Lane A. Driver: Default (Opus 5). Waits on: GATE 2, then
-Phase 1 (layout and tokens) and Phase B (the catalog and `--from`).
+**Status: PLANNED.** Board item 6. Lane A. Driver: Default (Opus 5). GATE 2 given 2026-09-15.
+**Waits on Phase 1** (layout and tokens) **and Phase B** (the catalog and `--from`), and on
+DIAL-2's drafted copy in the warm register plus DIAL-3, DIAL-4 and DIAL-6.
 
 **Scope.**
 
@@ -393,8 +440,8 @@ and the read/write path only, in its own worktree, verdict only.
 
 ### Phase 4 — Workers cutover
 
-**Status: PLANNED.** Board item 7. Lane A. Driver: Default (Opus 5). Waits on: GATE 2, then
-Phases 2 and 3.
+**Status: PLANNED.** Board item 7. Lane A. Driver: Default (Opus 5). GATE 2 given 2026-09-15.
+**Waits on Phases 2 and 3.**
 
 **Scope.**
 
@@ -448,17 +495,18 @@ question. A ninth is now open and is **not** a dial but a blocker: §0.1, the tw
 
 | Dial | Consumed by |
 |---|---|
-| DIAL-1 accent hue | Phase 1, step 2 — blocks the token port. **Answered 2026-09-15: teal — hue only, exact swatch still open** |
+| DIAL-1 accent hue | Phase 1, step 2. **Answered 2026-09-15: `#0FA79A`** |
 | DIAL-2 survey prompt copy · DIAL-4 `/setup` title | Phase 3, steps 2 and 5. **Answered 2026-09-15: the warm register** |
 | DIAL-3 KV retention · DIAL-6 short-id shape | Phase 3, step 4 |
 | DIAL-5 `--from` accepts a bare short id | Phase B, step 3 |
 | DIAL-7 GitHub contact link · DIAL-8 project-card links | Phase 1, steps 4 and 5. **Answered 2026-09-15: `github.com/zach-short`; one link per card to the real domain** |
-| DIAL-9 `--amber` follows the accent or stays warm | Phase 1, step 2. **Opened 2026-09-15**, see `DESIGN.md` §5 |
+| DIAL-9 `--amber` follows the accent or stays warm | Phase 1, step 2. **Opened and answered 2026-09-15: follows cool, `#7DE8D0`** |
 | §0.1 the `powx-n` images | **RESOLVED 2026-09-15 — restored.** No longer blocks anything |
 
-**As of 2026-09-15 only DIAL-1's exact swatch and DIAL-9 block Phase 1.** GATE 2 is given, §0.1 is
-resolved, and DIAL-7 and DIAL-8 are answered. DIAL-3, DIAL-5 and DIAL-6 can be answered while
-Phase 1 runs.
+**As of 2026-09-15 nothing blocks Phase 1.** GATE 2 is given, §0.1 is resolved, and DIAL-1,
+DIAL-7, DIAL-8 and DIAL-9 are all answered and pinned into Phase 1's steps. DIAL-3, DIAL-5 and
+DIAL-6 remain open on their recommended defaults and block only Phase B / Phase 3 — they can be
+answered while Phase 1 runs.
 
 ---
 
