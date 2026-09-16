@@ -39,6 +39,20 @@ replicated, so it is the code and not a dirty tree: `Module not found: Can't res
 `powx-n.tsx` is the only one of the 61 posts that imports an image
 (`grep -rln "images/" content/leetcode/` → one file).
 
+**The gate that does not catch it, reproduced 2026-09-15 in the same worktree.** Sequence
+matters: build once first, so the gitignored `next-env.d.ts` exists and declares the `*.png`
+wildcard, *then* delete the images.
+
+```
+bunx tsc --noEmit > t1.txt 2>&1 ; echo $?   ->  0, and t1.txt is empty
+bun run build     > b1.txt 2>&1 ; echo $?   ->  1, two "Module not found"
+```
+
+And the compounding trap, reproduced alongside it: `bun run build 2>&1 | head -5` reports **exit
+0**, because a pipe reports the pipe's exit code. **A done-when that gates on `tsc` alone, or
+that pipes a gate into `head` or `grep`, is green while the site does not build.** It is the one
+hazard here that makes a phase lie about itself.
+
 Two consequences that bind every phase:
 
 - **No phase can claim "gates green" until this is resolved**, and a session that runs the build
@@ -483,6 +497,10 @@ So the next effort need not guess whether an omission was considered.
   `HANDOFF.md` in the same commit.
 - Re-run §0 at the start of every phase (`docs/AGENT-PRACTICES.md` 2.4).
 - **Set your board row to `IN FLIGHT` before your first edit.**
+- **A stale existence check is not a check.** `cat >` truncates silently, and on 2026-09-15 a
+  session overwrote another's `PLAN.md` having checked that the file did not exist ten minutes
+  and eight tool calls earlier. Test immediately before the write, or write to a temp path and
+  move.
 - Close out with Part 7: the ledger step at the next free number, then the three blocks in chat —
   the pass-off prompt, the runtime entries, and the next session's model on its own line.
 - State plainly which of "gates green, not seen running" and "walked it and saw it" you are
