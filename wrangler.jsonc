@@ -57,5 +57,14 @@
       "binding": "PROFILES",
       "id": "d518d59067aa4b5485e467acaa52c5fa"
     }
+  ],
+  "routes": [
+    // The apex was already attached as a Custom Domain via the dashboard on 2026-09-16;
+    // declared here too so a deploy doesn't treat it as undesired state. `www` is the actual
+    // live hostname (D2) — the dashboard's "Connect domain" flow returned "No zones match" for
+    // it with no DNS conflict to explain it (checked directly against the Cloudflare API), so
+    // this deploy-driven path is the fallback.
+    { "pattern": "zacharyshort.com", "custom_domain": true },
+    { "pattern": "www.zacharyshort.com", "custom_domain": true }
   ]
 }
