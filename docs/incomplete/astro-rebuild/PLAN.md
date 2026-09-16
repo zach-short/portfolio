@@ -440,8 +440,11 @@ nothing needs asking mid-build. Runs in parallel with Phases 1 and 2.
 
 ### Phase 3 — Survey island, KV store, result page
 
-**Status: BUILT 2026-09-16 — all five steps done**, on branch `item6-survey` off `astro-rebuild`
-at `8074751`; no portfolio commit yet, because commits are Zach's. Recorded in full as
+**Status: BUILT 2026-09-16, commit `34175ae`** — all five steps done, on branch `item6-survey`
+off `astro-rebuild` at `8074751`, 26 files. **Not merged into `astro-rebuild` and not pushed.**
+HEAD was built in isolation after the commit (`git archive` into a fresh directory, then
+`bun install --frozen-lockfile && bun run build`): install 0, build 0, `bunx tsc --noEmit` 0,
+65 pages — so the commit is self-contained and nothing was left untracked. Recorded in full as
 `HANDOFF` step 8. Board item 6. Lane A. Driver: Default (Opus 5). GATE 2 given 2026-09-15.
 
 **Three of the six proofs below are unrun and are Zach's** — the phone walkthrough, and rung 1

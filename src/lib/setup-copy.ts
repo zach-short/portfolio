@@ -65,9 +65,11 @@ export const INPUT_EXAMPLES: Record<string, string> = {
   'models.fast': 'Sonnet 5, Haiku 4.5',
   docsMcp: 'Context7 MCP, or none',
   projectsDir: '~/Projects, ~/code, ~/src',
-  archiveHome: '~/Projects/archive/<repo>, or docs/archive to keep it in the repo',
   tracker: 'GitHub Issues, Linear, Jira',
 };
+
+// `archiveHome` deliberately has no entry: its catalog placeholder already names two concrete
+// answers, and a hint underneath would be the same sentence twice on one screen.
 
 export const SURVEY = {
   readMore: 'Read more',
