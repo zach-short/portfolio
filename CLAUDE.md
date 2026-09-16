@@ -174,6 +174,15 @@ cannot be determined from the checkout — ask Zach before assuming either way.
 
 - Never run `bun run deploy`, `bun run preview`, or any `wrangler pages deploy` — wrangler is
   authenticated on this machine and the deploy is real.
+- **Never run `npm publish` from this directory, and `"private": true` is not a guard.** npm is
+  logged in as `zach-short` from 2026-09-16. That day a publish meant for `~/Projects/personal-config`
+  was run here instead: npm 11.19.0 ignored `package.json:4`'s `"private": true`, packed **123
+  files, 571.8 kB** of this repo — all 61 `.mdx` posts, `src/`, `wrangler.jsonc`, `test.go` — and
+  sent it to the registry as `my-next-app@0.1.0`. **The only thing that stopped it was a stranger
+  owning that name** (`pavankumar_2211`, 2023-12-10), so the registry refused the version.
+  Reproduced with `npm publish --dry-run`: same rejection, no mention of `private`. Had the name
+  been free, this repo's source would be public. Publish from the package's own directory, in the
+  same command as the `cd`.
 - Never run `bun run lint` — it offers to install ESLint and rewrite `package.json`.
 - Never run `bun run cf-typegen` unless a Cloudflare binding actually changed — it rewrites the
   tracked 237 KB `env.d.ts` and buries the real diff.

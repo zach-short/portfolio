@@ -375,16 +375,18 @@ own worktree — a subagent in the shared tree edits source even when asked only
 
 ### Phase B — personal-config: `catalog`, `setup --from`, npm publish
 
-**Status: BUILT 2026-09-16 — steps 1, 2, 3 and 5 done** (personal-config `6e694bb` on `main`,
+**Status: BUILT 2026-09-16 — all five steps done** (personal-config `6e694bb` on `main`,
 pushed; that repo's `HANDOFF` step 24, this repo's step 7). The portfolio pins
 `github:zach-short/personal-config#6e694bb`; `bun install` and `bun run build` both exit 0, 64
 pages. `catalogVersion` is `0.2.0+39bbcb0e`, 30 questions phased 10 / 6 / 14 with all three
 conditions carried as data — `Question.when` is now a `WhenSpec`, not a closure, so it survives
 serialization. The site origin lives in personal-config's `package.json` `homepage`, not in its
 `src/`, because that repo's S1 grep forbids it there; §5.2 is untouched.
-**Step 4, the npm publish, is the only thing owed, and it is Zach's** — `npm whoami` returns
-`ENEEDAUTH`. 0.2.0 is cut, packed and proven from a throwaway install; the name was free (404,
-2026-09-16). Until it lands, D7's rung 3 prints a command that does not run. Board item 5. **Lane B — a different repo**
+**Step 4 is done too: `personal-config@0.2.0` is published**, maintainer `zach-short`,
+`2026-09-16T16:20:52Z`, and proof 2 was re-run against the registry — `bunx
+personal-config@0.2.0 setup --from <url> --yes` from a throwaway directory, exit 0, profile
+byte-identical, the fetched answers in the rendered output. **Phase B is complete.** Board
+item 5. **Lane B — a different repo**
 (`~/Projects/personal-config`).
 Driver: Default (Opus 5). **Waits on nothing** — GATE 2 was given 2026-09-15, and DIAL-5 and
 DIAL-6 were both answered the same day (`DESIGN.md` §5.2), so step 3 is fully specified and
