@@ -482,8 +482,34 @@ same rung-2 command is a new decision, not a configuration change.
 
 ## 6. Supersessions
 
-None yet. Each entry, when there is one, is dated, states what it replaces, and says which half
-dies when the replacement is partial (`docs/AGENT-PRACTICES.md` Stage 3).
+Each entry is dated, states what it replaces, and says which half dies when the replacement is
+partial (`docs/AGENT-PRACTICES.md` Stage 3). ~~None yet~~ — three entries, all from one
+decision, 2026-09-16.
+
+**S1 — DIAL-8, partially superseded 2026-09-16 by `docs/incomplete/project-stories/DESIGN.md`
+D1.** DIAL-8 said *one link per card, to the real domain*, because on 2026-09-15 both of each
+card's links pointed at a `projects/<slug>` route that did not exist. That route now exists by
+decision: each card opens its project's story at `/projects/<slug>`, and keeps a smaller
+*Site ↗* to the real domain. **What dies:** "one link per card." **What survives:** "to the real
+domain" — the site link stays on the card and is repeated under the phone on the story page,
+so no visitor loses the way to the product. Ratified by Zach in chat 2026-09-16.
+
+**S2 — §4.3, the three project cards, superseded 2026-09-16 by `project-stories/DESIGN.md`
+D5.** The set was EZHomesteading, E-Money, Bocas Adventures in that order, copy verbatim from
+`app/page.tsx:63-87`. It becomes **Furlough, EZHomesteading, E-Money** — Furlough added first
+(live on the App Store since 2026-09-15), Bocas Adventures removed from the site entirely
+(Zach, 2026-09-16: *"delete bocas its a dead project"*). **What dies:** the set, the order and the
+verbatim copy column. **What survives:** §4.3's rule that the real domain is rendered
+(`project.link`), via S1. Nothing indexed breaks: no `/projects/bocas*` route ever existed
+(`PLAN.md` §4), so removing the card removes no URL.
+
+**S3 — §4.4, the hero copy carried verbatim, superseded 2026-09-16 by `project-stories/DESIGN.md`
+D6.** *"Hi, I'm Zach"* / *"Tired of slow devs, sluggish sites, and overcomplicated apps? Me
+too."* and `site.description` are re-picked in the warm register. This is not a re-litigation
+(R8): the owner reopened the copy himself on 2026-09-16 (*"the wording and content is very plain"*),
+which is the new evidence a supersession needs. **What dies:** those two strings, and only
+those. **What survives:** the footer line, the wordmark, the button labels — §4.4's other rows
+are untouched, and R7 still governs every future word.
 
 ## 7. As built
 
