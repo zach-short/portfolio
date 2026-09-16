@@ -408,8 +408,8 @@ nothing needs asking mid-build. Runs in parallel with Phases 1 and 2.
 4. Publish `personal-config` to npm (I7 — still 404 on 2026-09-15; re-check immediately before).
 5. Pin the catalog into the portfolio as a git dependency (D6). **This is the one step that
    touches Lane A's `package.json`** — do not run it while Phase 1 is in flight.
-   Moved to `personal-config@0.2.0` from the registry on 2026-09-16, commit `<pending Zach's
-   commit — fill in after committing>`, catalog unchanged.
+   Moved to `personal-config@0.2.0` from the registry on 2026-09-16, commit `15e5de6`, catalog
+   unchanged.
 
 **Subagents.** None.
 
