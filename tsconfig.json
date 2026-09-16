@@ -10,14 +10,16 @@
   "exclude": [
     "dist",
     "node_modules",
-    ".next",
-    ".vercel",
     ".wrangler",
-    "app",
-    "components",
-    "content",
-    "utils",
     "env.d.ts",
-    "next-env.d.ts"
+
+    // Item 7 deleted the Next.js tree on 2026-09-16, so the `app`, `components`, `content`,
+    // `utils` and `next-env.d.ts` entries that used to sit here are gone with it.
+    //
+    // `.next` and `.vercel` stay. Nothing generates them any more, but `include` is `**/*` and
+    // tsc does not read `.gitignore` — a checkout that still has stale output from before the
+    // rebuild would otherwise pull it into the program.
+    ".next",
+    ".vercel"
   ]
 }

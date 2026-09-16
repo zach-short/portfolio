@@ -5,35 +5,23 @@
 	"scripts": {
 		"dev": "astro dev",
 		"build": "astro build",
-		"start": "next start",
-		"lint": "next lint",
-		"pages:build": "bunx @cloudflare/next-on-pages",
 		"preview": "astro preview",
-		"deploy": "bun pages:build && wrangler pages deploy",
-		"cf-typegen": "wrangler types --env-interface CloudflareEnv ./env.d.ts"
+		"deploy": "wrangler deploy",
+		"cf-typegen": "wrangler types --env-interface CloudflareEnv ./env.d.ts",
+		"prepublishOnly": "echo 'portfolio is never published to npm — see CLAUDE.md' && exit 1"
 	},
 	"dependencies": {
 		"@astrojs/cloudflare": "14.3.1",
 		"@astrojs/mdx": "8.0.1",
 		"@astrojs/preact": "6.0.5",
 		"astro": "7.3.2",
-		"cookie": "2.0.1",
 		"date-fns": "^4.1.0",
-		"next": "15.3.2",
 		"personal-config": "github:zach-short/personal-config#6e694bb",
-		"preact": "10.29.8",
-		"react": "^19.0.0",
-		"react-dom": "^19.0.0"
+		"preact": "10.29.8"
 	},
 	"devDependencies": {
-		"@cloudflare/next-on-pages": "1",
-		"@tailwindcss/postcss": "^4",
 		"@types/node": "^22.15.21",
-		"@types/react": "^19",
-		"@types/react-dom": "^19",
-		"tailwindcss": "^4",
 		"typescript": "^5",
-		"vercel": "^42.1.1",
 		"wrangler": "^4.132.0"
 	}
 }

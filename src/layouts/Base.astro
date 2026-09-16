@@ -15,7 +15,13 @@ const fullTitle = title ? `${title} · ${site.name}` : site.name;
 // `site` in astro.config.mjs; without it there is no canonical link and og:url resolves
 // against the build-time host.
 const origin = Astro.site?.origin ?? '';
-const canonical = origin ? `${origin}${Astro.url.pathname}` : undefined;
+// The trailing slash is stripped so the canonical names the URL the server actually serves.
+// `build.format` is `directory` (the default), so `Astro.url.pathname` is `/blog/leetcode/two-sum/`
+// at build time — but `wrangler.jsonc` sets `html_handling: "drop-trailing-slash"`, so the Worker
+// serves that page at `/blog/leetcode/two-sum` and 308s the slash form away. Without this the
+// canonical would point at a URL that immediately redirects. `/` itself must keep its slash.
+const path = Astro.url.pathname.replace(/(.)\/$/, '$1');
+const canonical = origin ? `${origin}${path}` : undefined;
 ---
 
 <!doctype html>

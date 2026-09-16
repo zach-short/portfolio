@@ -10,96 +10,106 @@
 
 ## The rules that get broken
 
-Seeded 2026-09-15 from the Part 0 inventory, not yet earned by repeat violation. Replace an
-entry with a real incident the first time one happens.
+Seeded 2026-09-15 from the Part 0 inventory. Rewritten 2026-09-16 by the Workers cutover, which
+deleted most of the files the original entries pointed at. Replace an entry with a real incident
+the first time one happens.
 
-1. **Do not fix a red build by reaching into Zach's uncommitted changes.** The seeding
-   incident is now closed, and the rule is what outlives it. From 2026-09-15 the checkout
-   carried uncommitted deletions of `public/leetcode/images/powx-n.png` and `powx-n2.png`,
-   which `content/leetcode/powx-n.tsx:8-9` imports, so `bun run build` exited 1 with
-   `Module not found` before reaching anything a session wrote. **Zach decided the images come
-   back on 2026-09-15** (`PLAN.md` §0.1, `HANDOFF` step 3); they were restored from `HEAD`
-   byte-identical and the build now exits 0. Standing rule: when a gate is red because of
-   something in his uncommitted work, say so and name the file — do not restore, delete or
-   edit your way around it. He decides; you report.
-2. **Never rename, delete or re-slug a file in `content/leetcode/`.** The filename is the
-   published URL (`app/blog/leetcode/[slug]/page.tsx:14-17`) *and* the outbound link to
-   leetcode.com (`app/blog/leetcode/[slug]/page.tsx:123`). `roman-to-interger.tsx` is a typo
-   and an indexed URL; it stays until a decision replaces it with a redirect.
-3. **A green `bunx tsc --noEmit` does not mean the site builds.** It cannot see a missing
-   asset. Run `bun run build` before claiming anything.
+1. **Do not fix a red build by reaching into Zach's uncommitted changes.** The seeding incident
+   is closed and the rule is what outlives it: on 2026-09-15 the checkout carried uncommitted
+   deletions of two PNGs that a post imported, so `bun run build` exited 1 before reaching
+   anything a session wrote. He decided the images come back (`PLAN.md` §0.1, `HANDOFF` step 3).
+   Standing rule: when a gate is red because of something in his uncommitted work, say so and
+   name the file — do not restore, delete or edit your way around it. He decides; you report.
+2. **Never rename, delete or re-slug a file in `src/content/leetcode/`.** The filename is the
+   published URL (`src/pages/blog/leetcode/[slug].astro`) *and* the outbound link to
+   leetcode.com. `roman-to-interger` is a typo and an indexed URL; since 2026-09-15 it is served
+   by a 301 to `roman-to-integer` (D10) and **both must keep answering**.
+3. **A green `bunx tsc --noEmit` does not mean the site builds**, and since the Astro rebuild it
+   means even less — see *Gates that lie*. Run `bun run build` before claiming anything.
 4. **Never pipe a gate into `head`, `tail` or `grep` and read `$?`.** You get the pipe's exit
    code, which is almost always 0. Redirect to a file, echo `$?`, then read the file.
-5. **`bun run lint` is not a lint gate.** Nothing lints in this repo. Running it will try to
-   install ESLint and rewrite `package.json`. See *Commands*.
-6. **No drive-by fixes.** There is dead code here (`app/lib/getLeetcodePosts.ts`, `test.go`)
-   and a dead link (`app/blog/page.tsx:9` → `/blog/economics`). Note them and raise them; do
-   not fold them into an unrelated change.
-7. **Ask Zach in one batched message, in chat, in the same turn — before building.** He is
+5. **There is no lint gate.** Nothing lints in this repo and `bun run lint` no longer exists —
+   the cutover deleted it along with Next. Do not add one without a decision.
+6. **No drive-by fixes.** Note what you find and raise it; do not fold it into an unrelated
+   change.
+7. **A git block for work done in a worktree must carry its own `cd`, in the same command.**
+   Earned 2026-09-16, not seeded. Item 7 was built on branch `item7-cutover` in
+   `.claude/worktrees/item7-cutover`, and its hand-back put the directory in prose above the
+   blocks. Both were run from the main tree instead, and both failed on exactly
+   `wrangler.worker.jsonc` and `src/env.d.ts` — the two files item 6 created in `34175ae`, which
+   do not exist on `astro-rebuild`. Every other path existed in both trees, so the error named
+   only those two and looked like a git problem rather than a wrong-directory problem. **The
+   danger is the near miss**: had the paths all happened to exist in both trees, the command
+   would have run clean against the wrong branch. Same rule as the npm one below, same reason —
+   prefix the `cd`, do not describe it.
+8. **Ask Zach in one batched message, in chat, in the same turn — before building.** He is
    interactive. A decision built on a guess is built twice.
 
 ## Stack
 
-Verified 2026-09-15 from `package.json` and `bun install` output in a clean worktree at `f5c6d7a`.
+Verified 2026-09-16 from `package.json` and `bun install` output in a clean worktree at
+`34175ae`, after the Workers cutover removed the Next.js tree.
 
-- **Runtime / package manager:** bun 1.2.9. Lockfile `bun.lock`, 328 packages.
-- **Framework:** Next.js 15.3.2, App Router, React 19.1.0 / react-dom 19.1.0.
-- **Styling:** Tailwind CSS v4.1.7 through `@tailwindcss/postcss` (`postcss.config.mjs`);
-  tokens in `app/globals.css`. Font: `IBM_Plex_Mono` via `next/font/google`
-  (`app/layout.tsx:2`).
-- **TypeScript:** 5.8.3, `strict: true`, `noEmit`, path alias `@/*` → repo root
-  (`tsconfig.json:21-22`).
-- **Other deps:** `date-fns` 4.1.0 is the only non-framework runtime dependency.
-- **Hosting:** Cloudflare Pages via `@cloudflare/next-on-pages` 1.13.12 and wrangler 4.16.1.
+- **Runtime / package manager:** bun. Lockfile `bun.lock`, **292 packages** — down from 575
+  before the cutover dropped Next, React, Tailwind, `@cloudflare/next-on-pages` and `vercel`.
+- **Framework:** **Astro 7.3.2**, `output: 'static'`, with `@astrojs/mdx` 8.0.1 and
+  `@astrojs/preact` 6.0.5 / `preact` 10.29.8.
+- **Styling:** a hand-written token system in `src/styles/global.css`. **No Tailwind and no
+  PostCSS plugins** — both were deleted 2026-09-16. `--accent` / `--accent-2` at the head of
+  `:root` are the only two hex literals; anything else `color-mix`es off them.
+- **TypeScript:** 5.x via `astro/tsconfigs/strict`, path alias `@/*` → **repo root**, not `src/`.
+- **Other deps:** `date-fns`, and `personal-config` pinned as a git dependency (D6) for the
+  survey catalog.
+- **Hosting:** **Cloudflare Workers** with static assets, via `@astrojs/cloudflare` 14.3.1 and
+  wrangler `^4.132.0`. Worker name `zacharyshort-com` (`wrangler.jsonc`). The Pages project
+  `my-next-app` is retired by this cutover.
 - **CI:** none. `.github/` does not exist.
-- **Tests:** none. `find` for `*.test.*`, `*.spec.*`, `__tests__` returned nothing.
+- **Tests:** none.
 
 ## Architecture
 
-1. **Statically generated, with zero client JavaScript.** No `"use client"`, `useState` or
-   `useEffect` anywhere — grep over `app components content utils`, 2026-09-15, no hits.
-   Everything renders on the server at build time. Do not introduce a client component without
-   a decision that says to.
-2. **Posts are TSX modules, not markdown.** Each `content/leetcode/<slug>.tsx` default-exports
-   a `post` object: `num`, `date`, `tags`, `languages`, `code[]`, free-form JSX `children`,
-   and optional `title`, `difficulty`, `complexity`, `performance`, `quote`.
-   `content/template.tsx` is the canonical shape; it is not itself loaded.
-3. **One loader, at build time.** `utils/get-leetcode-posts.ts:9-15` reads `content/leetcode/`
-   with `fs.readdirSync` and dynamic-imports each file by template literal, sorted by date
-   descending. `app/blog/leetcode/[slug]/page.tsx:14-17` turns that list into
-   `generateStaticParams`. Adding a post means adding a file — there is no index to update.
-4. **Filename = slug = URL = LeetCode link.** See rule 2 above.
-5. **Two routes opt out of static generation.** `app/not-found.tsx:1` and
-   `app/api/hello/route.ts:3` both `export const runtime = "edge"`, so the build prints a
-   warning that the edge runtime disables static generation for those pages. Expected, not a
-   regression.
-6. **The deploy artifact is not `.next`.** `@cloudflare/next-on-pages` compiles `.next` into
-   `.vercel/output/static`, which `wrangler.jsonc:12` names as `pages_build_output_dir`.
-   Cloudflare Pages project name is `my-next-app` (`wrangler.jsonc:7`).
+1. **Static by default, with exactly two on-demand routes.** Every page is prerendered at build
+   time; only `src/pages/api/profile.ts` and `src/pages/p/[id].ts` set
+   `export const prerender = false`, because both need the KV binding. 65 pages in `dist/client`.
+2. **Posts are MDX, not TSX.** Each `src/content/leetcode/<slug>.mdx` carries frontmatter
+   validated by the zod schema in `src/content.config.ts` (D2). Astro's content layer cannot
+   load TSX, which is why the 61 posts were converted on 2026-09-15.
+3. **Filename = slug = URL = LeetCode link.** See rule 2 above.
+4. **The survey is the only interactive thing on the site.** One Preact island at `/setup`
+   (`client:load`), 30 questions, posting to `/api/profile` and reading back from `/p/<id>`.
+   Everything else ships zero client JavaScript.
+5. **The deploy artifact is `dist/`.** The adapter writes the resolved Worker config to
+   `dist/server/wrangler.json`, filling in `main` and `assets` — that generated file is what
+   `wrangler dev` and `wrangler deploy` read, not `wrangler.jsonc` directly.
+6. **Trailing slashes are the asset server's business, not Astro's.** `wrangler.jsonc` sets
+   `assets.html_handling: "drop-trailing-slash"` so the 61 published URLs are served at their
+   canonical, no-slash form, the way the Pages site served them. Astro's own `trailingSlash`
+   option cannot do this for prerendered pages — its own types say so. Do not simplify that
+   line away; it decides the shape of every indexed URL on the site.
 
 ## Directory map
 
 | Path | Belongs here | Does not |
 |---|---|---|
-| `app/` | App Router route segments, `layout.tsx`, `globals.css`, `not-found.tsx` | Shared components, data loading, post content |
-| `app/blog/components/` | JSX helpers imported *by post content* — `problem-link.tsx` (3 posts), `string-ll-visual.ts` (2 posts) | Anything a route renders directly |
-| `app/lib/` | Nothing. `getLeetcodePosts.ts` here is dead — no importers, superseded by `utils/get-leetcode-posts.ts` | Live code |
-| `components/` | Components shared by routes *and* post content — `slug-helpers.tsx`, `back-arrow-button.tsx` | Route files |
-| `content/leetcode/` | One `.tsx` per solved problem, default-exporting the `post` object. 61 files, 61 distinct `num` values | Components, helpers, drafts |
-| `content/template.tsx` | The shape to copy when adding a post | A published post — the loader reads only `content/leetcode/` |
-| `utils/` | Build-time data loading (`get-leetcode-posts.ts`) | React components |
+| `src/pages/` | Route files, including the two on-demand ones | Shared components, post content |
+| `src/layouts/` | `Base.astro` — takes `title` and `description`, emits the canonical link | Route files |
+| `src/components/` | Shared `.astro` components; `leetcode/` holds helpers imported by post content | Post content |
+| `src/components/survey/` | The Preact island and its CSS — the only `.tsx` in the repo | Anything a static route renders |
+| `src/content/leetcode/` | One `.mdx` per solved problem. 61 files | Components, helpers, drafts |
+| `src/lib/` | Build-time and request-time helpers — the catalog, the profile store, the short id | React components |
+| `src/styles/` | `global.css`, the token system | Component-scoped CSS |
 | `public/` | Static assets served from `/`; post images under `public/leetcode/images/` | Generated output |
-| repo root | `test.go` is orphaned — there is no `go.mod` and nothing compiles it | — |
+| repo root | `env.d.ts` — see *Gates that lie* | Application code |
 
 ## Commands
 
-Every command below was run once in a clean worktree at `f5c6d7a` on 2026-09-15 before it was
+Every command below was run once in a clean worktree at `34175ae` on 2026-09-16 before it was
 written here.
 
 Fresh checkout or new worktree — run this before believing any gate:
 
 ```bash
-bun install --frozen-lockfile && bun run build
+bun install && bun run build
 ```
 
 Gates:
@@ -113,84 +123,93 @@ bunx tsc --noEmit
 ```
 
 ```bash
-bun run pages:build
+bunx wrangler deploy --dry-run -c dist/server/wrangler.json
 ```
 
-Dev server (verified: `/` and `/blog/leetcode/3sum` both returned HTTP 200):
+Dev server — plain Astro, no KV binding:
 
 ```bash
 bun run dev
 ```
 
-**`bun run build` is the real gate.** It compiles *and* runs a full `tsc` pass over the whole
-tsconfig program — including files nothing imports (verified 2026-09-15: a type error planted
-in the dead `app/lib/getLeetcodePosts.ts` failed the build). `bunx tsc --noEmit` is the same
-type check without the compile, and is worth running first because it is seconds rather than a
-minute.
+**A real Worker, with the KV binding**, which is what the two on-demand routes need:
+
+```bash
+bunx wrangler dev -c dist/server/wrangler.json --port 8788 --persist-to ./.wrangler/state
+```
+
+**`bun run build` is the real gate**, and it is a smaller claim than it used to be — see below.
 
 ### Gates that lie
 
-- **`bunx tsc --noEmit` cannot see a missing image.** `next-env.d.ts` declares `*.png` as a
-  wildcard module, so `import image from "@/public/leetcode/images/powx-n.png"` typechecks
-  clean whether or not the file exists. Verified 2026-09-15: with both pngs removed,
-  `bunx tsc --noEmit` exited 0 and `bun run build` exited 1 with `Module not found`. Those two
-  pngs were restored on 2026-09-15, so this is no longer live in the tree — but the lesson is
-  permanent: **only `bun run build` sees a missing asset.**
-- **In a fresh checkout, `bunx tsc --noEmit` fails for a reason that is not yours.**
-  `next-env.d.ts` is gitignored and generated by Next; before it exists, tsc exits 1 on
-  `content/leetcode/powx-n.tsx:8-9` — the same two lines, for the opposite reason. Run
-  `bun run build` once first, then the type check means something.
-- **`bun run lint` does not lint.** There is no ESLint config in the repo, no `eslint`
-  dependency in `package.json`, and no `eslint` in `node_modules`. `next lint` prompts
-  *"How would you like to configure ESLint?"* — with stdin closed it exits 1 having done
-  nothing; in an interactive terminal it installs ESLint and edits `package.json`. The
-  `Linting and checking validity of types ...` line printed by `bun run build` is doing only
-  the type half.
+- **`bun run build` typechecks almost nothing.** It is `astro build`. No `astro check` is
+  installed, so a green build means *it compiled and every content file imported*. That last
+  part is real and worth having: a content file that throws at import fails the build rather
+  than silently 404ing.
+- **`bunx tsc --noEmit` exits 0 over a program that may not contain what you think.** Check with
+  `--listFiles` rather than assuming — a type check that sees nothing also exits 0.
 - **A gate piped into `head`, `tail` or `grep` reports the pipe's exit code.** Verified
   2026-09-15: `bunx tsc --noEmit | head -40` printed two real errors and reported `exit=0`.
-- **"Gates green" is a small claim here.** There are no tests and no runtime checks. It means
-  the site compiled and typechecked — nothing about whether a page looks right. Anything a
-  screen shows needs a runtime entry Zach walks (Part 7 of the standard).
-- **`env.d.ts` is load-bearing, not junk.** It is 237 KB of generated Cloudflare types, it is
-  tracked, and `tsconfig.json:24-25` names it in `types`. Verified 2026-09-15: removing it makes
-  `bunx tsc --noEmit` exit 2 with `TS2688`. Regenerate it only with `bun run cf-typegen`, and
-  only when a binding actually changed — it rewrites the whole file.
+- **`env.d.ts` is no longer load-bearing, and the rule that used to sit here said the opposite.**
+  It is 237 KB of generated Cloudflare types for the retired Pages project. Verified 2026-09-16:
+  `tsconfig.json` **excludes** it, nothing in the program references `CloudflareEnv`, and
+  `bunx tsc --noEmit` exits 0. The live binding types are hand-written in `src/env.d.ts`
+  instead. It survives only because deleting it was outside the cutover's confirmed scope —
+  **raise it rather than deleting it on your own.** If you ever do regenerate it,
+  `bun run cf-typegen` rewrites the whole file and buries the real diff.
+- **A green build says nothing about the URL *shape*.** The cutover found that Workers' default
+  `auto-trailing-slash` inverted the trailing-slash convention against the Pages site — every
+  one of the 61 indexed URLs would have gained a redirect hop, with the build green throughout.
+  Only `curl -sI` against a real `wrangler dev` catches that class of thing.
+- **"Gates green" is a small claim here.** There are no tests and no runtime checks. Anything a
+  screen shows needs a runtime entry walked — and you can walk one yourself: the desktop app's
+  browser drives `wrangler dev` fine.
 
 ### How it ships
 
-**Merged is not shipped.** There is no CI and no deploy workflow in the repo — `.github/` does
-not exist. A deploy is a person running `bun run deploy`
-(`bun pages:build && wrangler pages deploy`). `bunx wrangler whoami` on 2026-09-15 returned an
-authenticated OAuth token, so that command from this machine publishes for real. Whether the
-Cloudflare Pages project `my-next-app` is *also* wired to the GitHub repo for push-to-deploy
-cannot be determined from the checkout — ask Zach before assuming either way.
+**Merged is not shipped.** There is no CI and no deploy workflow — `.github/` does not exist.
+**Verified 2026-09-16 with `bunx wrangler pages project list`: the Pages project was not wired to
+the GitHub repo (`Git Provider: No`)**, so pushing has never published this site. That was an
+open worry from 2026-09-15 and it is now closed.
+
+A deploy is a person running `bun run deploy`, which is now `wrangler deploy`. `bunx wrangler
+whoami` returns an authenticated OAuth token with `workers (write)`, so that command from this
+machine publishes for real.
+
+The site serves from **`www.zacharyshort.com`**. The apex `zacharyshort.com` has no DNS record —
+verified 2026-09-16, `dig` returns only an SOA and `curl` fails to resolve it — so `site` in
+`astro.config.mjs` names the `www` host. Do not "fix" it to the apex; that would point every
+canonical link on the site at a hostname that does not exist.
 
 ## Where work is written down
 
 - `HANDOFF.md` — what is true: environment, settled decisions, the step log. Read first.
 - `PASSOFF.md` — what is next, one standalone prompt per item.
 
+**Both are gitignored globally** (`~/.config/git/ignore:5-6`), so they live only in the main
+working tree — not in any worktree, and never in a commit. Edit them at
+`/Users/zachshort/Projects/portfolio/`, and never list them in a git block.
+
 ## Never do this
 
-- Never run `bun run deploy`, `bun run preview`, or any `wrangler pages deploy` — wrangler is
-  authenticated on this machine and the deploy is real.
+- Never run `bun run deploy` or any `wrangler deploy` without `--dry-run` — wrangler is
+  authenticated on this machine and the deploy is real. Print the command; Zach runs it.
+- Never create, rename or delete a Cloudflare resource — a KV namespace, a Worker, a custom
+  domain. Print the command; Zach runs it.
 - **Never run `npm publish` from this directory, and `"private": true` is not a guard.** npm is
-  logged in as `zach-short` from 2026-09-16. That day a publish meant for `~/Projects/personal-config`
-  was run here instead: npm 11.19.0 ignored `package.json:4`'s `"private": true`, packed **123
-  files, 571.8 kB** of this repo — all 61 `.mdx` posts, `src/`, `wrangler.jsonc`, `test.go` — and
-  sent it to the registry as `my-next-app@0.1.0`. **The only thing that stopped it was a stranger
-  owning that name** (`pavankumar_2211`, 2023-12-10), so the registry refused the version.
-  Reproduced with `npm publish --dry-run`: same rejection, no mention of `private`. Had the name
-  been free, this repo's source would be public. Publish from the package's own directory, in the
-  same command as the `cd`.
-- Never run `bun run lint` — it offers to install ESLint and rewrite `package.json`.
-- Never run `bun run cf-typegen` unless a Cloudflare binding actually changed — it rewrites the
-  tracked 237 KB `env.d.ts` and buries the real diff.
-- Never rename, delete or re-slug a file in `content/leetcode/` — the filename is a live URL.
-- Never restore or delete anything in Zach's uncommitted changes to make a gate go green. The
-  two `public/leetcode/images/powx-n*.png` files were the standing example; he decided them back
-  on 2026-09-15 and they are restored, so they are no longer the live case — the rule is not
-  about those two files.
+  logged in as `zach-short` from 2026-09-16. That day a publish meant for
+  `~/Projects/personal-config` was run here instead: npm 11.19.0 ignored `package.json`'s
+  `"private": true`, packed **123 files, 571.8 kB** of this repo and sent it to the registry as
+  `my-next-app@0.1.0`. **The only thing that stopped it was a stranger owning that name**
+  (`pavankumar_2211`, 2023-12-10), so the registry refused the version. Two consequences, both
+  deliberate: **`package.json`'s `name` is still `my-next-app`** even though nothing here is a
+  Next app — verified 2026-09-16 that `zacharyshort-com` is free on the registry, so renaming to
+  it would delete the collision that saved this repo — and a `prepublishOnly` script now exits 1,
+  which guards regardless of the name. **Do not rename the package and do not remove that
+  script.**
+- Never rename, delete or re-slug a file in `src/content/leetcode/` — the filename is a live URL.
+- Never restore or delete anything in Zach's uncommitted changes to make a gate go green.
 - Never `git checkout --` or `git stash` to undo an experiment — both reach files that are not
-  yours. Copy the file aside and restore it with `cp`.
+  yours, and the stash stack is shared across every worktree. Copy the file aside and restore it
+  with `cp`.
 - Never run `git commit`, `git push`, `git add -A` or `git add .` — print the two blocks instead.

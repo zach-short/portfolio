@@ -9,12 +9,18 @@ import preact from '@astrojs/preact';
 // — every page on the site is still prerendered at build time.
 export default defineConfig({
   // Without this Astro.site is undefined and Base.astro emits no canonical link at all.
-  site: 'https://zacharyshort.com',
+  //
+  // **`www`, not the apex.** Verified 2026-09-16: `dig zacharyshort.com A` returns only an SOA —
+  // the apex has no A/AAAA/CNAME record and does not resolve, and `curl https://zacharyshort.com/`
+  // fails with exit 6 (could not resolve host). The live site is `www.zacharyshort.com`, which is
+  // also the only custom domain on the Pages project. Until this was changed every canonical link
+  // and every `og:url` on the site named a hostname that does not exist.
+  site: 'https://www.zacharyshort.com',
   output: 'static',
 
-  // The Worker config is `wrangler.worker.jsonc`, not `wrangler.jsonc`: the latter still
-  // configures the Pages project that serves the live Next.js site and belongs to board item 7.
-  adapter: cloudflare({ configPath: './wrangler.worker.jsonc' }),
+  // Item 7 promoted the Worker config over `wrangler.jsonc` on 2026-09-16 and retired the Pages
+  // project it used to configure, so the adapter reads the default path and needs no `configPath`.
+  adapter: cloudflare(),
 
   // D5: Preact, not React — one interactive widget on one page should not decide the whole
   // site's runtime, and React is roughly ten times the runtime for it.
@@ -36,14 +42,10 @@ export default defineConfig({
     '/blog/leetcode/roman-to-interger': '/blog/leetcode/roman-to-integer',
   },
 
-  vite: {
-    css: {
-      // PLAN.md BD-6: the rebuilt site has no Tailwind — it is a hand-written token system.
-      // postcss.config.mjs still belongs to the Next app that has not been deleted yet, and
-      // Vite loads it by search and then rejects @tailwindcss/postcss's plugin shape, which
-      // fails the build. An inline empty config stops the search. Drop this block when the
-      // phase that deletes app/ deletes postcss.config.mjs with it.
-      postcss: { plugins: [] },
-    },
-  },
+  // PLAN.md BD-6's `vite.css.postcss: { plugins: [] }` workaround used to sit here. It existed
+  // only because Vite found the Next app's `postcss.config.mjs` by search and then rejected
+  // @tailwindcss/postcss's plugin shape. Item 7 deleted that file on 2026-09-16 — along with
+  // `tailwindcss` and `@tailwindcss/postcss` — so there is no config left to find and the
+  // workaround is removed rather than left as cargo. The site's CSS is a hand-written token
+  // system and uses no PostCSS plugins at all.
 });
