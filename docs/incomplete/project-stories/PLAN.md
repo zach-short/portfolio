@@ -256,7 +256,7 @@ there should be none.
 
 ### P2 — EZHomesteading and E-Money: captures and frames
 
-**Status 2026-09-16: HALF BUILT. EZHomesteading is shipped and walked** — four frames, not five
+**Status 2026-09-16: HALF BUILT, committed `f12cb2d`. EZHomesteading is shipped and walked** — four frames, not five
 (4′ cut; see §5.1 and D4's `As built:` 3), `src/lib/projects.ts` + four captures, all three gates
 green at **67** emitted HTML files, `RUNTIME-PASS.md` P2 entries 1–5 all pass. **E-Money is not
 built.** The room code arrived (`https://www.emoney.club/room/game`) and the room was joined as one
