@@ -48,6 +48,17 @@ const ASKED_COUNT = askedQuestions(defaultAnswers()).length;
  * noun — it does not substitute into "into each ___ it finds") and "repos and folders" (most
  * precise, but reads as a spec, and "folders" means little to the reader this page is for) were
  * both considered and rejected.
+ *
+ * **`lede`, `PHASE_COPY.practices.blurb` and `setupPrompt` stopped naming the conventions file
+ * on 2026-09-17**, ahead of the pin that makes it false rather than after it. personal-config's
+ * track questions (setup-tracks `DESIGN.md` D1, D3, §3.1) mean a visitor whose work is not code
+ * is asked none of the eleven code-convention questions, and the two policy questions they *are*
+ * asked carry `target: 'policy'` — so no conventions file is written for that reader at all.
+ * "The house rules" names what is written without promising a file, and is true of all four
+ * render shapes. Rejected: *"the documents your agent reads"*, true everywhere but giving up the
+ * concreteness that makes the sentence worth reading; and branching the copy on the visitor's
+ * own answers, which this island could do since it holds them, but which is a build of its own
+ * and waits on the `0.3.0` pin.
  */
 export const PAGE = {
   title: 'Set up how you work',
@@ -58,7 +69,7 @@ export const PAGE = {
   // The count is the questions asked before any answer opens a conditional one, so the clause
   // that follows names the rest without promising a second number — "a couple" was true of one
   // catalog and would quietly stop being true of the next.
-  lede: `${ASKED_COUNT} questions about how you like to work, and the odd extra one where your answers call for it. At the end, one click writes the answers into your projects — the CLAUDE.md, the working standard and the conventions file your agent reads before it touches anything.`,
+  lede: `${ASKED_COUNT} questions about how you like to work, and the odd extra one where your answers call for it. At the end, one click writes the answers into your projects — the CLAUDE.md, the working standard and the house rules your agent reads before it touches anything.`,
   reassurance:
     'No account, and nothing is stored until you reach the end. Your answers become a link that only you have.',
   noscript: `The survey needs JavaScript. If you would rather not turn it on, run npx personal-config setup in a terminal — it asks the same ${ASKED_COUNT} questions there.`,
@@ -78,7 +89,7 @@ export const PHASE_COPY: Record<Phase, { eyebrow: string; name: string; blurb: s
   practices: {
     eyebrow: 'PART 3 OF 3',
     name: 'House rules',
-    blurb: 'The conventions your agent reads before it writes a line.',
+    blurb: 'The rules your agent follows without being asked.',
   },
 };
 
@@ -159,7 +170,7 @@ export function setupPrompt(id: string, origin: string): string {
   return [
     `I just answered the personal-config survey on ${host(origin)} and I'd like you to set my projects up from those answers.`,
     `Run: npx personal-config setup --from ${id}`,
-    `— it reads my answers from ${origin}/p/${id} and writes a CLAUDE.md, a working standard and a conventions file into each project it finds.`,
+    `— it reads my answers from ${origin}/p/${id} and writes a CLAUDE.md, a working standard and the house rules I picked into each project it finds.`,
     'It prints a plan before it writes anything, so walk me through that plan first, and stop if it wants to overwrite something I would miss.',
   ].join(' ');
 }
