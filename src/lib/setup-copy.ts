@@ -1,4 +1,4 @@
-import type { Phase } from '@/src/lib/catalog';
+import { askedQuestions, defaultAnswers, type Phase } from '@/src/lib/catalog';
 
 /**
  * Every word a visitor reads on `/setup`, in one file.
@@ -19,33 +19,61 @@ import type { Phase } from '@/src/lib/catalog';
  * works is the friction `0.2.3` exists to remove. Do not "fix" them back to match this repo.
  */
 
-/** DIAL-4 — the `/setup` page. `title` is also the `<title>` and the OG title, via Base.astro. */
+/**
+ * How many questions a visitor is actually asked, counted rather than spelled out.
+ *
+ * It is the same number the survey's own counter shows on screen one — `survey.tsx` derives its
+ * `total` from `askedQuestions(answers)` over the same starting answers — so the sentence and
+ * the counter cannot disagree, whatever the pinned catalog grows into.
+ *
+ * **The hardcoded "Thirty" was already wrong**, which is why this is derivation and not a new
+ * number: 30 is `catalog.questions.length`, and that total counts `commit-policy-practice`,
+ * which is `never: true` and asked nowhere, as well as the tracker question a solo answer skips.
+ * The catalog's total is never the visitor's number, so all three sentences below take this one
+ * (setup-tracks `DESIGN.md` §7.1; it is the second half of that design's hazard 4).
+ */
+const ASKED_COUNT = askedQuestions(defaultAnswers()).length;
+
+/**
+ * DIAL-4 — the `/setup` page. `title` is the `<title>`, suffixed with the site name by
+ * Base.astro; `ogTitle` is the shared-link card's own title, which is why it names the tool
+ * instead. Both are settled copy (`DESIGN.md` §7.1) — "your repo" turned away the visitor this
+ * page was rewritten for (D11) before he had read a question, and "how you work" is true of a
+ * repo and of a folder without hedging.
+ *
+ * The body copy below (`description`, `lede`, the phase blurbs and `setupPrompt`) was settled
+ * the same day, 2026-09-17, alongside that title: "your projects" replaces "your repo(s)"
+ * everywhere a visitor reads it, for the same reason — true of a git repo and of a plain folder,
+ * needing no hedging or slash. "where your work lives" (warmer, but a phrase rather than a
+ * noun — it does not substitute into "into each ___ it finds") and "repos and folders" (most
+ * precise, but reads as a spec, and "folders" means little to the reader this page is for) were
+ * both considered and rejected.
+ */
 export const PAGE = {
-  title: 'Set up your repo',
-  description:
-    'Thirty questions about how you like to work, and a configured repo back in one click.',
+  title: 'Set up how you work',
+  ogTitle: 'Set up how you work — personal-config',
+  description: `${ASKED_COUNT} questions about how you like to work, and a configured project back in one click.`,
   eyebrow: 'PERSONAL-CONFIG',
-  heading: "Let's set up your repo",
-  // "Thirty" is the catalog's count, and a couple of them are conditional — a solo repo never
-  // sees the tracker question — so the sentence says so rather than promising a number the
-  // progress counter then contradicts.
-  lede: 'Thirty questions about how you like to work, and a couple you will only see if they apply to you. At the end, one click writes the answers into your repos — the CLAUDE.md, the working standard and the conventions file your agent reads before it touches anything.',
+  heading: "Let's set up how you work",
+  // The count is the questions asked before any answer opens a conditional one, so the clause
+  // that follows names the rest without promising a second number — "a couple" was true of one
+  // catalog and would quietly stop being true of the next.
+  lede: `${ASKED_COUNT} questions about how you like to work, and the odd extra one where your answers call for it. At the end, one click writes the answers into your projects — the CLAUDE.md, the working standard and the conventions file your agent reads before it touches anything.`,
   reassurance:
     'No account, and nothing is stored until you reach the end. Your answers become a link that only you have.',
-  noscript:
-    'The survey needs JavaScript. If you would rather not turn it on, run npx personal-config setup in a terminal — it asks the same thirty questions there.',
+  noscript: `The survey needs JavaScript. If you would rather not turn it on, run npx personal-config setup in a terminal — it asks the same ${ASKED_COUNT} questions there.`,
 } as const;
 
 export const PHASE_COPY: Record<Phase, { eyebrow: string; name: string; blurb: string }> = {
   you: {
     eyebrow: 'PART 1 OF 3',
     name: 'How you work',
-    blurb: 'Commits, models, docs, hooks. These follow you into every repo.',
+    blurb: 'Commits, models, docs, hooks. These follow you into every project.',
   },
   discover: {
     eyebrow: 'PART 2 OF 3',
     name: 'Where your work lives',
-    blurb: 'Which repos, how work arrives in them, and where it goes once it is done.',
+    blurb: 'Which projects, how work arrives in them, and where it goes once it is done.',
   },
   practices: {
     eyebrow: 'PART 3 OF 3',
@@ -129,9 +157,9 @@ export const RESULT = {
  */
 export function setupPrompt(id: string, origin: string): string {
   return [
-    `I just answered the personal-config survey on ${host(origin)} and I'd like you to set my repos up from those answers.`,
+    `I just answered the personal-config survey on ${host(origin)} and I'd like you to set my projects up from those answers.`,
     `Run: npx personal-config setup --from ${id}`,
-    `— it reads my answers from ${origin}/p/${id} and writes a CLAUDE.md, a working standard and a conventions file into each repo it finds.`,
+    `— it reads my answers from ${origin}/p/${id} and writes a CLAUDE.md, a working standard and a conventions file into each project it finds.`,
     'It prints a plan before it writes anything, so walk me through that plan first, and stop if it wants to overwrite something I would miss.',
   ].join(' ');
 }

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'preact/hooks';
 import {
   askedQuestions,
   catalog,
-  defaultAnswer,
+  defaultAnswers,
   matchesWhen,
   type Answers,
 } from '@/src/lib/catalog';
@@ -25,7 +25,7 @@ import '@/src/components/survey/survey.css';
 type Stage = 'asking' | 'saving' | 'saved' | 'failed';
 
 export function Survey() {
-  const [answers, setAnswers] = useState<Answers>(initialAnswers);
+  const [answers, setAnswers] = useState<Answers>(defaultAnswers);
   const [index, setIndex] = useState(0);
   const [trail, setTrail] = useState<number[]>([]);
   const [moved, setMoved] = useState(false);
@@ -106,14 +106,6 @@ export function Survey() {
       onNext={next}
     />
   );
-}
-
-/**
- * Every question starts on the answer the wizard would offer, so a visitor who agrees with the
- * recommendations can hold `Next` and end up with the profile `setup --yes` produces.
- */
-function initialAnswers(): Answers {
-  return Object.fromEntries(catalog.questions.map((q) => [q.configKey, defaultAnswer(q)]));
 }
 
 /**

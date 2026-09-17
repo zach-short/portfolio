@@ -8,9 +8,16 @@ import '@/src/styles/global.css';
 interface Props {
   title?: string;
   description?: string;
+  /**
+   * The shared-link card's title, where it should differ from the browser tab's. Every page but
+   * `/setup` leaves it alone and gets `fullTitle`, which is the behaviour this prop was added
+   * around: `/setup` is a tool a stranger is sent a link to, so its card names the tool while
+   * its tab keeps the site's own `Title · Zachary Short` shape (setup-tracks `DESIGN.md` §7.1).
+   */
+  ogTitle?: string;
 }
 
-const { title, description = site.description } = Astro.props;
+const { title, description = site.description, ogTitle } = Astro.props;
 const fullTitle = title ? `${title} · ${site.name}` : site.name;
 // `site` in astro.config.mjs; without it there is no canonical link and og:url resolves
 // against the build-time host.
@@ -37,7 +44,7 @@ const canonical = origin ? `${origin}${path}` : undefined;
     {canonical && <link rel="canonical" href={canonical} />}
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />
-    <meta property="og:title" content={fullTitle} />
+    <meta property="og:title" content={ogTitle ?? fullTitle} />
     <meta property="og:description" content={description} />
     {canonical && <meta property="og:url" content={canonical} />}
     <meta name="twitter:card" content="summary" />

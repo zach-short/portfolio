@@ -22,11 +22,23 @@ export type QuestionOption = {
 /**
  * A condition as data rather than a closure — which is why the catalog can carry it at all.
  * `never` marks a question whose value is derived somewhere else.
+ *
+ * `all` is a conjunction, and nesting is allowed: `{ all: [spec, spec] }` holds when every
+ * member holds. It exists because one question can need two conditions — `track-mode` is asked
+ * only when the target is owned *and* git is in play (setup-tracks `DESIGN.md` D14/O3a) — and
+ * `catalog.json` has to carry that as data, since this file is the browser's copy of the rule.
+ *
+ * **Nothing sends an `all:` yet, and that is the point.** D14's lockstep is
+ * *portfolio learns the form → personal-config publishes → the pin moves*, because a site that
+ * meets a spec form it cannot evaluate would over-ask silently — the exact failure `matchesWhen`
+ * exists to prevent. `any:` and `not:` are deliberately not here: every form crossing the npm
+ * pin costs a publish, and neither has a caller.
  */
 export type WhenSpec =
   | { never: true }
   | { key: string; is: AnswerValue }
-  | { key: string; isNot: AnswerValue };
+  | { key: string; isNot: AnswerValue }
+  | { all: WhenSpec[] };
 
 export type Question = {
   id: string;
@@ -59,6 +71,9 @@ export const catalog = catalogJson as Catalog;
 export function matchesWhen(spec: WhenSpec | undefined, answers: Answers): boolean {
   if (spec === undefined) return true;
   if ('never' in spec) return false;
+  // An empty `all` holds — `every` says so, and "no conditions" is the same claim as no `when`
+  // at all. Pinned by `tests/when-all.test.ts` so it stays a decision rather than a side effect.
+  if ('all' in spec) return spec.all.every((inner) => matchesWhen(inner, answers));
   const actual = answers[spec.key];
   return 'is' in spec ? sameAnswer(actual, spec.is) : !sameAnswer(actual, spec.isNot);
 }
@@ -70,6 +85,21 @@ function sameAnswer(actual: AnswerValue | undefined, expected: AnswerValue): boo
     return actual.length === expected.length && actual.every((v, i) => v === expected[i]);
   }
   return actual === expected;
+}
+
+/**
+ * The answers the survey starts on: every question sitting on the option the wizard would
+ * offer, so a visitor who agrees with the recommendations can hold `Next` and end up with the
+ * profile `setup --yes` produces.
+ *
+ * It lives here rather than in the island because two callers need the same starting state and
+ * a second copy of it would drift: `survey.tsx` seeds its `useState` from it, and
+ * `setup-copy.ts` counts it to say how many questions the page promises. Counting the empty
+ * answer set instead would undercount, because a question conditioned on a key whose default
+ * satisfies it is asked on screen one and would not be in that count.
+ */
+export function defaultAnswers(): Answers {
+  return Object.fromEntries(catalog.questions.map((q) => [q.configKey, defaultAnswer(q)]));
 }
 
 /**
