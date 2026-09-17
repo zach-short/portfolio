@@ -43,3 +43,9 @@ next-env.d.ts
 # wrangler files
 .wrangler
 .dev.vars*
+/.personal-config.json
+/PART0-PROMPT.md
+
+# astro
+/dist/
+/.astro/
