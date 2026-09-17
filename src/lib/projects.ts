@@ -7,6 +7,10 @@ import furlough02 from '@/src/assets/projects/furlough/02.png';
 import furlough03 from '@/src/assets/projects/furlough/03.png';
 import furlough04 from '@/src/assets/projects/furlough/04.png';
 import furlough05 from '@/src/assets/projects/furlough/05.png';
+import ezh01 from '@/src/assets/projects/ezhomesteading/01.png';
+import ezh02 from '@/src/assets/projects/ezhomesteading/02.png';
+import ezh03 from '@/src/assets/projects/ezhomesteading/03.png';
+import ezh04 from '@/src/assets/projects/ezhomesteading/04.png';
 
 /** One panel of a story: the copy on the left, the screen that proves it on the phone. */
 export interface Frame {
@@ -74,7 +78,55 @@ const furlough: Project = {
   ],
 };
 
-export const projects: Project[] = [furlough];
+// EZHomesteading ships **four** frames, not five. DESIGN §7.4's fallback 4' — "A neighborhood
+// stand", whose sub-line ends "and whatever the growers around them dropped off" — was cut by
+// Zach on 2026-09-16 after P2 walked all eight store pages reachable from the market feed and
+// found every listing on each one attributed to that store itself: nothing public shows a
+// stand carrying another grower's goods, and PLAN §5 H2 says a claim that fails its check is
+// cut, never softened. The evidence is PLAN.md §5.1; it is not restated here, because G12 bans
+// this file from carrying the two words the stores' own badges use. Recorded as an `As built:`
+// under D4, which already allows a four-frame story. The surviving fallbacks keep their design
+// numbers in the docs (3', 5') and ship here as frames 3 and 4.
+const ezhomesteading: Project = {
+  slug: 'ezhomesteading',
+  title: 'EZHomesteading',
+  blurb:
+    'Food from down the road: a backyard grower drops off surplus, a neighborhood stand sells it, you pick it up on your route. Web and native, on a Go backend.',
+  // DESIGN §7.2's table, which the blurb's "on a Go backend" agrees with. Its note calls these
+  // "the existing ones (src/pages/index.astro:12,18)" and that note is wrong about line 12,
+  // which still reads MongoDB — the table is the copy, so the table wins. Raised, not fixed.
+  tech: ['Next.js', 'Expo', 'Go'],
+  link: 'https://ezhomesteading.com',
+  linkLabel: 'Go to site',
+  frames: [
+    {
+      eyebrow: 'The idea',
+      headline: 'Sold by the hands that grew it.',
+      sub: 'Someone near you has more tomatoes than they can eat. A stand down the road sells them. You pick them up on the way home.',
+      screen: ezh01,
+    },
+    {
+      eyebrow: 'The market',
+      headline: "Set your area. See what's ripe.",
+      sub: "A home base and how far you'll go; the feed shows the stands inside it before anything outside.",
+      screen: ezh02,
+    },
+    {
+      eyebrow: 'The listing',
+      headline: 'It says who grew it.',
+      sub: 'Every listing names the grower and the place. No warehouse, no truck, no distributor between you.',
+      screen: ezh03,
+    },
+    {
+      eyebrow: 'The surplus',
+      headline: 'Got more than you can eat?',
+      sub: 'List it in a minute — a photo, a price, a pickup place — and let the stand do the selling.',
+      screen: ezh04,
+    },
+  ],
+};
+
+export const projects: Project[] = [furlough, ezhomesteading];
 
 export function findProject(slug: string): Project | undefined {
   return projects.find((project) => project.slug === slug);

@@ -401,6 +401,32 @@ and all ten source PNGs are still in place.
 `DAILY BUDGET` with the slider at the 60 stop. The headline's *sixty* stands; the panorama's
 "fifty-five" is the stale reading, exactly as §7.3 predicted.
 
+**As built: EZHomesteading's story runs four frames, and "cut, never mocked" was exercised.**
+2026-09-16, P2. §7.4's fallback **4′ — "A neighborhood stand."** — was cut. Its first two clauses
+hold on any store page (one seller, one town); its third, *"and whatever the growers around them
+dropped off"*, does not. All eight store pages reachable from the market feed were walked signed
+out, and **every listing on every one of them is attributed to that store itself**; nothing public
+shows a stand carrying another grower's goods. PLAN.md §5 H2 says a claim that fails its check is
+cut, not softened, and the copy is frozen (R7), so the choice went to Zach, who chose the cut in
+chat the same day. Frames **1, 2, 3′, 5′** ship as **01–04**; the copy for 4′ stays in §7.4 and in
+PLAN.md §4 with the other reserved rows, against the day a stand's page shows a carried listing.
+
+**As built: the fallback paths are not the ones §7.4 named.** 2026-09-16, P2. 3′ says
+"a public listing page (`/l/<id>`, the deep-link path)"; the live path is
+**`/listings/<uuid>`**, and a store page is **`/stores/<name>-<suffix>`**. Both render fully signed
+out. Nothing in the copy depends on the shape of either URL.
+
+**As built: both *verify at build* items in §7.4 are discharged, and S-6 turned out not to
+apply.** 2026-09-16, P2. Frame 2's check — the feed or its area prompt renders signed out — passes
+twice over: `/market` shows the WHERE/WHAT bar, "311 listings · 79 places" and real listing cards,
+and a first visit also raises an area sheet ("We'll show you what's near"), which was dismissed
+before capture. 5′'s check — the sell entry renders signed out — passes: `/listings/new` is the
+"Snap a Photo" step of a five-step wizard, reachable with no account. **S-6 was written for light
+screens inside a dark phone and EZHomesteading is dark** — `getComputedStyle(document.body)
+.backgroundColor` is `rgb(23, 22, 20)` on every page captured — so no light-screen treatment was
+added. E-Money **is** light (a white player card on black), so S-6 is still live for that half and
+is P2's to judge when it ships.
+
 ### D5 — Furlough joins first; Bocas Adventures leaves the site
 
 **Decision.** The cards are **Furlough, EZHomesteading, E-Money**, in that order. Bocas
@@ -504,7 +530,11 @@ write-ups.**
 | `emoney` | E-Money | Go, WebSocket, Next.js | A Monopoly bank that never runs out of bills — built after a real bank run five hours into a game. One room code, every phone at the table, every payment live. | `https://emoney.club` |
 
 The tech chips for EZHomesteading and E-Money are the existing ones (`src/pages/index.astro:12,18`);
-Furlough's are new. "Web and native" for EZHomesteading is a stack claim, not a distribution
+Furlough's are new. **That sentence is wrong about line 12 and the table is right**
+(P2, 2026-09-16): the live chips for EZHomesteading are `['Next.js', 'Expo', 'MongoDB']`, not the
+table's *Go*. The table is the copy and the blurb's "on a Go backend" agrees with it, so
+`src/lib/projects.ts` ships **Next.js, Expo, Go**; only the explanatory note was ever inaccurate.
+E-Money's three match line 18 as claimed. "Web and native" for EZHomesteading is a stack claim, not a distribution
 one — the native app is not on a store (§1 G11), and no sentence on this site says it is.
 
 ### 7.3 Furlough — five frames, verbatim from `board.html`

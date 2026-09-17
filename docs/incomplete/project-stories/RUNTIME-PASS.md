@@ -221,7 +221,83 @@ which is the wall's grain and pre-dates this work.
 
 ## P2 — `/projects/ezhomesteading`, `/projects/emoney`
 
-*Appended by P2.*
+**Status 2026-09-16: `/projects/ezhomesteading` WALKED — all five entries pass.
+`/projects/emoney` NOT BUILT** — see *E-Money, left open* at the end of this section.
+
+*How it was captured, and why not the way the plan said.* BD-6 puts captures in the desktop app's
+Browser pane. **That pane cannot paint in this session**: `mcp__ccd_view__get_layout` returned
+`{"views":[]}` — the session is not open in any window — which is the exact condition
+`HANDOFF.md` step 17 diagnosed, where a hidden pane reports "nothing happened" rather than "I
+cannot see". So the captures were taken through **BD-6's own reversal, headless Chrome**, driven
+over the DevTools protocol at `Emulation.setDeviceMetricsOverride` 390×844, `deviceScaleFactor: 2`,
+`mobile: true` — S-5 exactly, and every capture is 780×1688 (`sips`). **`--headless --screenshot`
+alone is not enough**: without device-metrics emulation Chrome ignores the page's
+`width=device-width` viewport meta and EZHomesteading lays out wider than 390 and clips. The
+driver lives in the session scratchpad and is not in the repo.
+
+*How it was served.* `bunx wrangler dev -c dist/server/wrangler.json --port 8788` over the built
+output, walked by the same headless Chrome. One build, one server start — no rebuild cycles were
+needed, the page having been built before the walk.
+
+### 1. The four frames advance, and the screen follows
+
+**WALKED 2026-09-16 at 1440×900.** Four frames, tops 792 px apart, document 3885 px. Stepping to
+each frame's midpoint: `data-active` **0 → 1 → 2 → 3**, all four; `--progress` **0 → 0.333 →
+0.667 → 1**; screen opacities exactly one `1` per frame — `[1,0,0,0]`, `[0,1,0,0]`, `[0,0,1,0]`,
+`[0,0,0,1]`; dots lit cumulatively `[1,.22,.22,.22]` → `[1,1,1,1]`; the inactive frames' copy at
+**0.45** and the active one at **1**. `.stage` top held at **96.0 / 96.0 / 96.0 / 95.8** — it
+sticks, and never goes negative. Console clean, no failed requests.
+
+### 2. The tilt sweeps, and the line draws
+
+**WALKED 2026-09-16.** The dash offset falls **1px → 0.6745 → 0.3253 → 0px** as `--progress`
+rises, the path being `pathLength="1"`. `--ry` reads back as its unresolved `calc(12deg - 2 *
+12deg * <progress>)` — it is an unregistered custom property, so the computed value is the
+specified token; the *applied* rotation was read off the phone's own geometry instead, and it
+sweeps: the axis-aligned bounding box is **302×686 at frames 1 and 4** (±12°, the rotated box
+narrower and the perspective taller) against **307×675 at frames 2 and 3** (±4°, nearly flat).
+Corroborated under entry 4's no-JS probe, where `matrix3d`'s m13 is **−0.207912 = sin 12°**.
+
+### 3. The CTA reads *Go to site ↗* and goes to ezhomesteading.com
+
+**VERIFIED IN DIST 2026-09-16.** `href="https://ezhomesteading.com"`, `target="_blank"`,
+`rel="noopener noreferrer"`. Not clicked — it leaves the site. The label is the per-project
+`linkLabel`, which is *Go to site* here and *On the App Store* on Furlough.
+
+### 4. The phone does not eat the copy at 375×812
+
+**WALKED 2026-09-16.** BD-11 holds on a four-frame story as it does on five. Frame 1 activates at
+**scrollY 263** with the phone still unpinned at top **124.8**, and the first-child rule clears it:
+eyebrow **+22.2 px**, headline **+46.5 px**. Frames 2–4 have the phone pinned at **71.4 / 71.4 /
+70.2** against `--stick-top: 72px`. **Pixel room below the phone: 358.7 px on frame 1 and 414.6 /
+414.6 / 413.4 px on frames 2–4**, against ≈ 203 px of copy. A box-intersection test on all three
+text elements of every frame returns **no overlap anywhere**.
+
+### 5. Without JavaScript, nothing is lost but the screens
+
+**WALKED 2026-09-16** with `Emulation.setScriptExecutionDisabled`, styles read through the
+DevTools **CSS** domain so the probe did not need the script it was testing. `[data-story]`
+carries **no `data-active`** attribute; all four frames at opacity **1**; screens `[1,0,0,0]`, so
+frame 1's screen is the one that shows; the phone is `position: relative` in columns and holds the
+start of its arc. BD-5 as written.
+
+### Weight — S-10 and S-11, from the network panel
+
+**WALKED 2026-09-16**, cache cleared, scrolled to the foot so every lazy image loaded. A desktop
+visit is **14 requests, 257.8 KB on the wire** against S-11's 800 KB. **Every request 200, no
+failures.** Largest image on the wire **24.4 KB**; the four screens total 82.3 KB. Largest emitted
+image in `dist/` is **55.1 KB** against S-10's 150 KB. The heaviest asset is again `/noise.png` at
+64.2 KB, which pre-dates this work.
+
+### E-Money, left open
+
+`/projects/emoney` **was not built**, so it has no entries here. The room was reached and joined —
+`https://www.emoney.club/room/game`, one player, no credential typed, no room created — but the
+capture pass stopped on two things that are Zach's, both recorded in `HANDOFF.md` step 19:
+the player this session created cannot be removed from the room by the app's own
+*Delete My Player this Game* control, which **issues no network request at all**, and a fresh join
+now returns **409** from `POST /v1/rooms/game/players` with five players present. Both are named
+in the hand-back; neither is this phase's to fix.
 
 ## P3 — `/`
 

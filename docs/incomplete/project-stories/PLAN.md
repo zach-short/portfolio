@@ -20,18 +20,18 @@ Written the same day as the design, so `DESIGN.md` §1 is this plan's baseline. 
 are the ones that go stale between sessions. **Every phase re-runs them as its first step and
 edits this table**; where the two disagree, this table wins and says so.
 
-| Fact | Value 2026-09-16, **re-run by P1 the same day** | How to re-check |
+| Fact | Value 2026-09-16, **re-run by P2 the same day** | How to re-check |
 |---|---|---|
-| `main` | **`daede6d`** — moved a third time between the hand-off and P1's first command: Zach committed step 14's three owed doc files (`astro-rebuild/DESIGN.md` +30/−2, and this folder's `DESIGN.md` and `PLAN.md`, new). So the design and this plan are **tracked and present in the worktree**, which they were not when P1 was written. `git branch --no-merged main` still empty | `git -C /Users/zachshort/Projects/portfolio log --oneline -1 main` |
-| Live worktrees | `item6-survey` (`ea4feb7`), `item7-cutover` (`6dcafd7`), `item8-registry-pin` (`7e0fbc4`, merged, worktree still present), plus **`item10-stories` (`daede6d`) — this phase's.** `setup-scratch` is gone, pruned by step 15 | `git -C /Users/zachshort/Projects/portfolio worktree list` |
+| `main` | **`daede6d`**, unmoved since P1 re-ran this row — it had moved a third time between the hand-off and P1's first command: Zach committed step 14's three owed doc files (`astro-rebuild/DESIGN.md` +30/−2, and this folder's `DESIGN.md` and `PLAN.md`, new). So the design and this plan are **tracked and present in the worktree**, which they were not when P1 was written. `git branch --no-merged main` still empty | `git -C /Users/zachshort/Projects/portfolio log --oneline -1 main` |
+| Live worktrees | `item6-survey` (`ea4feb7`), `item7-cutover` (`6dcafd7`), `item8-registry-pin` (`7e0fbc4`, merged, worktree still present), plus **`item10-stories` — this phase's, now at `2486da0`**, six commits ahead of `main`. `setup-scratch` is gone, pruned by step 15 | `git -C /Users/zachshort/Projects/portfolio worktree list` |
 | Zach's uncommitted set | **`.gitignore` modified only**; `.claude/worktrees/` untracked. The three doc files left it when `daede6d` landed | `git status --short` — never stage either |
-| Next free `HANDOFF` step | **16** — step 15 (`item8-registry-pin` proved and merged) landed after this plan was written. The cell's own warning held: it said 15 and 15 was taken | `grep -nE '^\*\*[0-9]+\. ' HANDOFF.md \| tail -1`, read it, do not trust this cell |
-| Build baseline | `bun run build` exit 0 in this worktree, **65 emitted HTML files** — the log prints **66** prerender lines, the 66th being D10's `roman-to-interger` redirect, which writes no file (`file not created, response body was empty`). "66 pages" in P1's done-when is the **emitted-file** count, so the target is 66 files / 67 lines | `find dist/client -name '*.html' \| wc -l`, beside the log |
+| Next free `HANDOFF` step | **20** — P2 started believing 18 was free and found it taken mid-session by item 11, so P2 is step **19**. The cell's own warning has now held twice; read the file, do not trust this cell | `grep -nE '^\*\*[0-9]+\. ' HANDOFF.md \| tail -1`, read it, do not trust this cell |
+| Build baseline | **66 emitted files before P2, 67 after** — EZHomesteading's page is the 67th, and E-Money's would have been the 68th the plan's done-when names. Historically: `bun run build` exit 0 in this worktree, **65 emitted HTML files** — the log prints **66** prerender lines, the 66th being D10's `roman-to-interger` redirect, which writes no file (`file not created, response body was empty`). "66 pages" in P1's done-when is the **emitted-file** count, so the target is 66 files / 67 lines | `find dist/client -name '*.html' \| wc -l`, beside the log |
 | Furlough's raw screens | `design/store/raw/01.png` … `10.png` exist | `ls ~/Projects/furlough/design/store/raw` |
 | `sharp` | 0.35.4, transitive | `node -p "require('/Users/zachshort/Projects/portfolio/node_modules/sharp/package.json').version"` |
-| The three sites | all 200; EZH and E-Money both redirect apex → `www`. **Furlough's App Store link is live**: `apps.apple.com/app/id6810006594` → 200 at `apps.apple.com/us/app/furlough/id6810006594` | `curl -sI -L -m 10 <url> -o /dev/null -w '%{http_code} %{url_effective}\n'` |
+| The three sites | all 200, re-checked by P2; EZH and E-Money both redirect apex → `www`. **`https://www.emoney.club/room/<code>` itself returns 500** on a direct server-rendered load, though the room's own API answers 200 and the client route works once entered from `/my-rooms` — found by P2, Zach's, not this phase's. **Furlough's App Store link is live**: `apps.apple.com/app/id6810006594` → 200 at `apps.apple.com/us/app/furlough/id6810006594` | `curl -sI -L -m 10 <url> -o /dev/null -w '%{http_code} %{url_effective}\n'` |
 | Item 7 | **`DONE — HANDOFF 13`**, closed by another session on 2026-09-16 while this was being scoped: the site is **live on the Worker** at `www.zacharyshort.com` (61/61 slugs 200, apex answering too) and the Pages project is gone. Consequence for BD-2: the first deploy of this branch publishes the slugs for good | `PASSOFF.md` row 7; `HANDOFF.md` step 13 |
-| Context7 | **still not available** in P1 — `ToolSearch` returned no `resolve-library-id` / `query-docs`. Astro facts came from `node_modules/astro` again | `ToolSearch` for it; if present, prefer it for `astro:assets` and `transition:*` |
+| Context7 | **still not available** in P2 either, nor in P1 — `ToolSearch` returned no `resolve-library-id` / `query-docs`. Astro facts came from `node_modules/astro` again | `ToolSearch` for it; if present, prefer it for `astro:assets` and `transition:*` |
 
 ---
 
@@ -113,6 +113,18 @@ Each carries a one-line reversal.
   across the five frames. Reversal: drop the rule and accept that frame 1's eyebrow and headline
   are read from behind the phone, or delay frame 1's activation instead by giving it a taller box.
 
+- **BD-12 — captures are taken in headless Chrome over the DevTools protocol, not in the desktop
+  app's Browser pane.** BD-6 puts them in the pane and names headless Chrome as its reversal; this
+  is that reversal, taken for a different reason than the one BD-6 anticipated. **The pane cannot
+  paint when the session is not open in any window** — `mcp__ccd_view__get_layout` returned
+  `{"views":[]}`, the same condition `HANDOFF.md` step 17 diagnosed, where the pane reports
+  "nothing happened" rather than "I cannot see". The recipe is
+  `Emulation.setDeviceMetricsOverride` at 390×844, `deviceScaleFactor: 2`, `mobile: true`, which
+  is S-5 exactly and yields 780×1688 PNGs. **`--headless --screenshot` on its own does not
+  work**: with no device-metrics emulation Chrome ignores `width=device-width` and EZHomesteading
+  lays out wider than 390 px and clips its own hero. Reversal: the pane, from a session that is
+  open in a window.
+
 **Numbering note.** §3 reserved `BD-9` for a lowered *mobile* phone height if H6 failed. The
 aspect deviation took that number first, and **BD-11 is now the H6 entry** — though it lowers
 nothing, for the reason recorded above. Renumbered here rather than leaving a gap.
@@ -142,8 +154,9 @@ No Deep phase, no Deep review.
 
 ### P1 — The story page, on Furlough
 
-**Status: BUILT 2026-09-16, commit `3e2d790`; sticky-phone fix `afab8a7`. RUNTIME PASS DONE
-2026-09-16 — `HANDOFF.md` step 17, all eight `RUNTIME-PASS.md` entries walked and passing.** The
+**Status: BUILT 2026-09-16, commit `3e2d790`; sticky-phone fix `afab8a7`; runtime-pass fixes
+`2486da0`. RUNTIME PASS DONE 2026-09-16 — `HANDOFF.md` step 17, all eight `RUNTIME-PASS.md`
+entries walked and passing.** The
 walk found two defects no gate could see and fixed both in `src/components/ProjectStory.astro`:
 `.phone` never resolved to `position: sticky` at any width (the recipe block's `position:
 relative` won the cascade by source order), so **stacked, the phone did not stick at all** — the
@@ -243,8 +256,14 @@ there should be none.
 
 ### P2 — EZHomesteading and E-Money: captures and frames
 
-**Status: OPEN. Waits on P1, and on Zach's E-Money room code** — ask for it in the first
-message. GATE 2 (2026-09-16) settled the rest: EZHomesteading uses the public fallbacks; a session
+**Status 2026-09-16: HALF BUILT. EZHomesteading is shipped and walked** — four frames, not five
+(4′ cut; see §5.1 and D4's `As built:` 3), `src/lib/projects.ts` + four captures, all three gates
+green at **67** emitted HTML files, `RUNTIME-PASS.md` P2 entries 1–5 all pass. **E-Money is not
+built.** The room code arrived (`https://www.emoney.club/room/game`) and the room was joined as one
+player, but the capture pass stopped on two things that are Zach's — the app's *Delete My Player
+this Game* control issues no network request, so the player this session created is stuck in the
+room, and a fresh join now returns **409** with five players present. `HANDOFF.md` step 19.
+GATE 2 (2026-09-16) settled the rest: EZHomesteading uses the public fallbacks; a session
 may join the room as one player.
 
 Scope:
@@ -399,13 +418,18 @@ proof thresholds, checked, not coded. No number is written twice.
 
 ### 5.1 The H2 table — filled by P2
 
+**Filled for EZHomesteading 2026-09-16 by P2**; E-Money's five rows are still open, that half
+never having been built. Every backing below was read off a **signed-out** capture at 390×844,
+and the *Screen file* column is the shipped frame number, not the design's: with 4′ cut, 3′ ships
+as frame 3 and 5′ as frame 4.
+
 | Frame | Headline | Screen file | Backing: `file:line` or the on-screen element | ✓ / cut |
 |---|---|---|---|---|
-| EZH 1 | Sold by the hands that grew it. | | | |
-| EZH 2 | Set your area. See what's ripe. | | | |
-| EZH 3 | It says who grew it. *(3′)* | | | |
-| EZH 4 | A neighborhood stand. *(4′)* | | | |
-| EZH 5 | Got more than you can eat? *(5′)* | | | |
+| EZH 1 | Sold by the hands that grew it. | `ezhomesteading/01.png` — the home page | The hero itself: **"Food from down the road, sold by the hands that grew it."**, with *See how it works* and *Got a surplus? Sell it* under it | ✓ |
+| EZH 2 | Set your area. See what's ripe. | `ezhomesteading/02.png` — `/market`, signed out | The **WHERE / WHAT** bar, **"311 listings · 79 places"**, and the card **"See what you can actually reach — Set your area and we'll sort every stand by what's pick-up-able from home or your route. Set my area →"** above a real listing. The *verify at build* on this row is discharged: the feed **does** render signed out | ✓ |
+| EZH 3 | It says who grew it. *(3′)* | `ezhomesteading/03.png` — `/listings/0a8f155d-…`, signed out | The listing's own header, **"HARVEST MOON ACRES · WILLIAMSBURG, VA"** above *Homemade Apple Butter*, then **"Independent grower"** and, further down, **"Grown by Harvest Moon Acres · Verified homesteader"**. The grower and the place, on the listing, exactly as the sub-line says | ✓ |
+| EZH 4 | A neighborhood stand. *(4′)* | — | **Cut.** Clauses one and two hold on any store page (one seller, one town). The third — *"and whatever the growers around them dropped off"* — does not: all eight store pages reachable from the market feed were walked, and **every listing on every one of them is attributed to that store itself**. Nothing public shows a stand carrying another grower's goods. H2 says a failing claim is cut, not softened; Zach chose the cut in chat, 2026-09-16 | **cut** |
+| EZH 5 | Got more than you can eat? *(5′)* | `ezhomesteading/04.png` — `/listings/new`, signed out | The sell entry renders signed out, discharging this row's *verify at build*: **"Snap a Photo — Hold your product up, we'll suggest the details"**, and inside it **"One photo, and it's listed. Set out on the porch step, picked up on someone's way. No stand to build, no weekend given up."** — which is the sub-line's *a photo* and its *let the stand do the selling*, in the product's own words. *A price* and *a pickup place* are later steps of the same five-step wizard; they were **not** walked, because advancing it creates a draft listing in the live database | ✓ |
 | EM 1 | One code. Every phone at the table. | | | |
 | EM 2 | A bank that never runs out of bills. | | | |
 | EM 3 | Pay it, or ask for it. | | | |
