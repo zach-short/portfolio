@@ -10,6 +10,13 @@ import type { Phase } from '@/src/lib/catalog';
  *
  * Warm, as the register spec defines it: *"That didn't go through — try again"* — second
  * person, plain, no exclamation marks, no marketing.
+ *
+ * **Every command a visitor is given says `npx`, not `bunx`, and that is deliberate.**
+ * personal-config's bin was TypeScript behind a `#!/usr/bin/env bun` shebang until `0.2.3`
+ * (2026-09-16), which ships a Node bundle and asks for `node >= 20`. This repo runs on Bun, so
+ * `bunx` reads as the house word — but the person reading these strings is a stranger who has
+ * Node and almost certainly not Bun, and a second runtime to install before the first command
+ * works is the friction `0.2.3` exists to remove. Do not "fix" them back to match this repo.
  */
 
 /** DIAL-4 — the `/setup` page. `title` is also the `<title>` and the OG title, via Base.astro. */
@@ -26,7 +33,7 @@ export const PAGE = {
   reassurance:
     'No account, and nothing is stored until you reach the end. Your answers become a link that only you have.',
   noscript:
-    'The survey needs JavaScript. If you would rather not turn it on, run bunx personal-config setup in a terminal — it asks the same thirty questions there.',
+    'The survey needs JavaScript. If you would rather not turn it on, run npx personal-config setup in a terminal — it asks the same thirty questions there.',
 } as const;
 
 export const PHASE_COPY: Record<Phase, { eyebrow: string; name: string; blurb: string }> = {
@@ -106,7 +113,7 @@ export const RESULT = {
   threeLabel: 'Skip Claude Code entirely',
   threeDownload: 'Download profile.json',
   threeNote:
-    'Run this next to the file you just downloaded. It needs Bun, and nothing else — the survey answers travel in the file.',
+    'Run this next to the file you just downloaded. It needs Node 20 or newer, and nothing else — the survey answers travel in the file.',
 } as const;
 
 /**
@@ -123,7 +130,7 @@ export const RESULT = {
 export function setupPrompt(id: string, origin: string): string {
   return [
     `I just answered the personal-config survey on ${host(origin)} and I'd like you to set my repos up from those answers.`,
-    `Run: bunx personal-config setup --from ${id}`,
+    `Run: npx personal-config setup --from ${id}`,
     `— it reads my answers from ${origin}/p/${id} and writes a CLAUDE.md, a working standard and a conventions file into each repo it finds.`,
     'It prints a plan before it writes anything, so walk me through that plan first, and stop if it wants to overwrite something I would miss.',
   ].join(' ');

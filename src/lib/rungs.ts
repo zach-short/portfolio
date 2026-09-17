@@ -32,7 +32,8 @@ export function rungsFor(id: string, origin: string): Rungs {
   return {
     deepLink: `claude-cli://open?q=${encodeURIComponent(prompt)}`,
     claudeCommand: `claude "${prompt}"`,
-    setupCommand: 'bunx personal-config setup --from ./profile.json',
+    // `npx`, not `bunx` — the reason is in `setup-copy.ts`'s module comment.
+    setupCommand: 'npx personal-config setup --from ./profile.json',
     promptLength: prompt.length,
     profileUrl: `${origin}/p/${id}`,
   };

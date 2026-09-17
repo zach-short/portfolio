@@ -229,6 +229,15 @@ Ratified 2026-09-15. A new `bun run catalog` script in personal-config produces 
 28 long forms + a catalog version, committed there with a freshness test; the portfolio pins it
 as a git dependency. Not a TS-source import.
 
+**As built: the pin is an exact registry version, not a git dependency** (item 8, 2026-09-16,
+`HANDOFF` step 12; moved from `0.2.0` to `0.2.3` by item 11, step 18). The decision's shape is
+unchanged — a pinned generated artifact, bumped deliberately with a diff — and only the source
+moved, from `github:zach-short/personal-config#<sha>` to npm, once I7's publish existed. Both
+bumps were checked the same way rather than assumed: `npm pack` each version and diff its
+`catalog.json`. `0.2.0` → `0.2.3` differs on exactly one line, the `catalogVersion` stamp
+(`0.2.0+39bbcb0e` → `0.2.3+39bbcb0e`), so all 30 questions are byte-identical and the survey does
+not change.
+
 *Defense.* Two hard facts force a build step: `src/phases/run.ts` is not browser-safe (P3), and
 the 28 long forms are markdown files on disk (P2) that no browser import reaches. A committed
 artifact with a freshness test also makes drift a failing test in the repo that owns the
@@ -256,6 +265,16 @@ for rung 1 either. And **`repo=` resolves only against clones Claude Code has al
 on that machine** — otherwise the session opens in the home directory. A stranger's repo is the
 one thing this page cannot know, so `repo=` and `cwd=` are both omitted and the session opens at
 home, which is where `setup` scans from anyway. Measured: the prompt is **453 characters**.
+
+**As built: every command a visitor is given says `npx`, not `bunx`** (item 11, 2026-09-16,
+`HANDOFF` step 18). This decision said `bunx` because personal-config's bin was TypeScript behind
+a `#!/usr/bin/env bun` shebang, so nothing else ran it. `0.2.3` ships a `dist/cli.js` Node bundle
+and asks for `node >= 20`, and the person reading this page has Node and almost certainly not
+Bun. Four strings changed — rung 3's command, rung 3's note (*"It needs Bun"* → *"It needs Node
+20 or newer"*), the prompt rungs 1 and 2 share, and the `<noscript>` fallback on `/setup`.
+Re-measured, since the prompt is one character shorter: **452** at `localhost:8790` — which is
+where the 453 above was measured, the same string with `bunx` — and **465** at
+`https://www.zacharyshort.com`, both far under the 1,000 that escalates the warning.
 
 *Defense.* The whole product claim is "one click to a configured repo", and the deep link is the
 only rung that delivers it. **Against: the deep-link handler registers only after the person's
