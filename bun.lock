@@ -9,7 +9,7 @@
         "@astrojs/preact": "6.0.5",
         "astro": "7.3.2",
         "date-fns": "^4.1.0",
-        "personal-config": "0.2.3",
+        "personal-config": "0.3.0",
         "preact": "10.29.8",
       },
       "devDependencies": {
@@ -627,7 +627,7 @@
 
     "pathe": ["pathe@2.0.3", "", {}, "sha512-WUjGcAqP1gQacoQe+OBJsFA7Ld4DyXuUIjZ5cc75cLHvJ7dtNsTugphxIADwspS+AraAUePCKrSVtPLFj/F88w=="],
 
-    "personal-config": ["personal-config@0.2.3", "", { "dependencies": { "@clack/prompts": "1.8.1" }, "bin": { "personal-config": "dist/cli.js" } }, "sha512-ReEBYxdTr6XTzf8wgd9jXSAOlwcdbkWP0YLaCzuLBsCLGY7Q4MVu/XP89efSbA9gc+Yx5mOG3S3NbonUTCjmew=="],
+    "personal-config": ["personal-config@0.3.0", "", { "dependencies": { "@clack/prompts": "1.8.1" }, "bin": { "personal-config": "dist/cli.js" } }, "sha512-2VFUAWv01N9N3QQqXa+Njs098zn09HgReS3/FhkOe5n9GG+gkMSNZZHabwOJ/M9+VxWQFVWWUHrpP3uSKjnCNw=="],
 
     "piccolore": ["piccolore@0.1.3", "", {}, "sha512-o8bTeDWjE086iwKrROaDf31K0qC/BENdm15/uH9usSC/uZjJOKb2YGiVHfLY4GhwsERiPI1jmwI2XrA7ACOxVw=="],
 
