@@ -1,4 +1,4 @@
-import { askedQuestions, defaultAnswers, type Phase } from '@/src/lib/catalog';
+import type { Phase } from '@/src/lib/catalog';
 
 /**
  * Every word a visitor reads on `/setup`, in one file.
@@ -20,19 +20,27 @@ import { askedQuestions, defaultAnswers, type Phase } from '@/src/lib/catalog';
  */
 
 /**
- * How many questions a visitor is actually asked, counted rather than spelled out.
+ * `ASKED_COUNT` lived here and is gone, removed 2026-09-22 (`personal-config` PASSOFF row 57).
  *
- * It is the same number the survey's own counter shows on screen one — `survey.tsx` derives its
- * `total` from `askedQuestions(answers)` over the same starting answers — so the sentence and
- * the counter cannot disagree, whatever the pinned catalog grows into.
+ * It counted the questions asked from one fixed starting point (`askedQuestions(
+ * defaultAnswers())`), computed once at module scope. `survey.tsx`'s own counter
+ * (`total={askedQuestions(answers).length}`, `:101`) is computed the same way but over *live*
+ * answers, so the two diverge the moment a track question is answered — the derivation this
+ * comment used to defend ("the sentence and the counter cannot disagree") stopped being true
+ * the day the catalog grew track questions, and nobody caught it because nothing re-ran the
+ * comparison. Observed live 2026-09-22: `1 / 33` on screen one, `2 / 22` after "Other work",
+ * `4 / 21` after also "No, just folders" — three different truths for one module-scope number.
  *
- * **The hardcoded "Thirty" was already wrong**, which is why this is derivation and not a new
- * number: 30 is `catalog.questions.length`, and that total counts `commit-policy-practice`,
- * which is `never: true` and asked nowhere, as well as the tracker question a solo answer skips.
- * The catalog's total is never the visitor's number, so all three sentences below take this one
- * (setup-tracks `DESIGN.md` §7.1; it is the second half of that design's hazard 4).
+ * A range was rejected too, not just a fixed count: the pinned `0.3.0` catalog's own spread is
+ * 21–34 depending on track, and HEAD's unpublished catalog at the time moves that to 18–35 — a
+ * range is exactly as fragile as a fixed number, just on a longer timescale.
+ *
+ * **Do not reintroduce a count or a range here.** If a screen ever needs a live number again,
+ * take it from `askedQuestions(answers)` inside the survey island the way `survey.tsx:101`
+ * already does — never from a module-scope constant, and never for `PAGE.lede`, `.description`
+ * or `.noscript`, which render in the static Astro shell (`src/pages/setup.astro:11-16,24`),
+ * outside `<Survey client:load />`, and so can never read live answer state at all.
  */
-const ASKED_COUNT = askedQuestions(defaultAnswers()).length;
 
 /**
  * DIAL-4 — the `/setup` page. `title` is the `<title>`, suffixed with the site name by
@@ -57,29 +65,52 @@ const ASKED_COUNT = askedQuestions(defaultAnswers()).length;
  * "The house rules" names what is written without promising a file, and is true of all four
  * render shapes. Rejected: *"the documents your agent reads"*, true everywhere but giving up the
  * concreteness that makes the sentence worth reading; and branching the copy on the visitor's
- * own answers, which this island could do since it holds them, but which is a build of its own
- * and waits on the `0.3.0` pin.
+ * own answers — corrected below, 2026-09-22, on why that one actually loses.
+ *
+ * **A second correction, 2026-09-22 (`personal-config` PASSOFF row 57).** `lede`, `description`
+ * and `noscript` stopped naming a question count at all, for the same reason `ASKED_COUNT` was
+ * removed (see the note above `PAGE`, where it used to live). Two alternatives were considered
+ * and both lose:
+ *
+ * - **A range** ("21 to 34 questions") reads honestly today, but it is exactly as fragile as the
+ *   fixed count it would replace, just on a longer timescale — the pinned `0.3.0` catalog's own
+ *   spread is 21–34 depending on track, and it moved to 18–35 under a catalog change already
+ *   sitting unpublished at the time this was fixed. A range is a number with a shorter
+ *   expiration date, not a fix.
+ * - **Branching the copy on the visitor's own answers** was previously recorded here as
+ *   "considered and deferred, blocked on the `0.3.0` pin" — that blocker is gone, and the note
+ *   was wrong regardless of the pin. `lede`, `description` and `noscript` all render in the
+ *   static Astro shell (`src/pages/setup.astro:11-16,24`), **outside**
+ *   `<Survey client:load />` (`:22`). Branching them on live answers would mean moving that
+ *   paragraph into the island itself — a different page structure, not a copy edit — and even
+ *   then, `description` is a `<meta>` tag read by crawlers that never run JS and `noscript` is
+ *   read only when JS is off: neither can execute the island's branching logic under any
+ *   circumstance, so branching would not fix those two consumers at all, no matter where the
+ *   lede itself moved.
+ *
+ * The number-free phrasing below is what survives both rejections: true of every track, without
+ * a number that drifts or a fallback that two of the three consumers could never run.
  */
 export const PAGE = {
   title: 'Set up how you work',
   ogTitle: 'Set up how you work — personal-config',
-  description: `${ASKED_COUNT} questions about how you like to work, and a configured project back in one click.`,
+  description:
+    'A short survey about how you like to work, then one click writes a CLAUDE.md, a working standard and the house rules into your project.',
   eyebrow: 'PERSONAL-CONFIG',
   heading: "Let's set up how you work",
-  // The count is the questions asked before any answer opens a conditional one, so the clause
-  // that follows names the rest without promising a second number — "a couple" was true of one
-  // catalog and would quietly stop being true of the next.
-  lede: `${ASKED_COUNT} questions about how you like to work, and the odd extra one where your answers call for it. At the end, one click writes the answers into your projects — the CLAUDE.md, the working standard and the house rules your agent reads before it touches anything.`,
+  lede: 'A short survey about how you like to work, and a configured project back in one click.',
   reassurance:
     'No account, and nothing is stored until you reach the end. Your answers become a link that only you have.',
-  noscript: `The survey needs JavaScript. If you would rather not turn it on, run npx personal-config setup in a terminal — it asks the same ${ASKED_COUNT} questions there.`,
+  noscript:
+    'The survey needs JavaScript. If you would rather not turn it on, run npx personal-config setup in a terminal — it walks the same questions there.',
 } as const;
 
 export const PHASE_COPY: Record<Phase, { eyebrow: string; name: string; blurb: string }> = {
   you: {
     eyebrow: 'PART 1 OF 3',
     name: 'How you work',
-    blurb: 'Commits, models, docs, hooks. These follow you into every project.',
+    blurb:
+      "What's true of you, in every project: how commits happen, which models do what, and what gets enforced automatically.",
   },
   discover: {
     eyebrow: 'PART 2 OF 3',
