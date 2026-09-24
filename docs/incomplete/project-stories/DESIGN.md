@@ -14,27 +14,33 @@ project along the red line that connects the images."*
 Process standard: `docs/AGENT-PRACTICES.md` (Profile P, §2.2). Code standard:
 `docs/conventions-typescript.md`. Board row: `PASSOFF.md` item 10.
 
-**Read this first.** The rebuild's design (`docs/incomplete/astro-rebuild/DESIGN.md`) is frozen
+**Read this first.** The rebuild's design (`~/Projects/archive/portfolio/astro-rebuild/DESIGN.md`) is frozen
 and this effort sits *on top of* it: D3 (the token system on a sibling accent), D4 (`ClientRouter`),
 DIAL-1/DIAL-9 (the teal pair) and DIAL-8 (one link per card, to the real domain) are the decisions
 this work touches. Where an option below would change one, it says so and the change is a dated
 supersession in that file, never a quiet edit.
+
+**Editorial note, 2026-09-24.** `docs/incomplete/astro-rebuild/` closed and moved out of the repo
+to `~/Projects/archive/portfolio/astro-rebuild/` — item 7's overdue close-out, finished this date
+(`HANDOFF` step 27). Every citation below that used to read `astro-rebuild/DESIGN.md` or
+`astro-rebuild/PLAN.md` now points at that archived path; section numbers (§2, §4.3, §4.4, §5.1,
+§6 S1–S3) are unchanged, since only the file moved, not its content.
 
 ---
 
 ## 1. What exists, verified 2026-09-16
 
 Every row was checked this session. `~/Projects/furlough/…` paths are read-only reference
-(`astro-rebuild/DESIGN.md` §2).
+(`~/Projects/archive/portfolio/astro-rebuild/DESIGN.md` §2).
 
 | # | Claim | Verified state | Citation |
 |---|---|---|---|
-| G1 | The home page is a hero and three project cards, copy carried verbatim from the Next app; each card has one link, to the real domain | `projects[]` at `src/pages/index.astro:7-26`; one `Go to Site →` per card at `:57-59`; hero at `:33-40` | `src/pages/index.astro`; DIAL-8 in `astro-rebuild/DESIGN.md` §4.3 |
-| G2 | The hero copy has never been re-picked; it was carried under R7 | *"Copy is never re-picked silently (R7)"*, and Phase 1 recorded *"No copy was re-picked"*. **Zach reopened it himself on 2026-09-16** (the quote at the top), which is the new evidence R8 requires — re-picking it now is a supersession, not a re-litigation | `astro-rebuild/DESIGN.md` §4.4; `HANDOFF.md` step 4 |
+| G1 | The home page is a hero and three project cards, copy carried verbatim from the Next app; each card has one link, to the real domain | `projects[]` at `src/pages/index.astro:7-26`; one `Go to Site →` per card at `:57-59`; hero at `:33-40` | `src/pages/index.astro`; DIAL-8 in `~/Projects/archive/portfolio/astro-rebuild/DESIGN.md` §4.3 |
+| G2 | The hero copy has never been re-picked; it was carried under R7 | *"Copy is never re-picked silently (R7)"*, and Phase 1 recorded *"No copy was re-picked"*. **Zach reopened it himself on 2026-09-16** (the quote at the top), which is the new evidence R8 requires — re-picking it now is a supersession, not a re-litigation | `~/Projects/archive/portfolio/astro-rebuild/DESIGN.md` §4.4; `HANDOFF.md` step 4 |
 | G3 | The home page carries **no image at all**; the site's only images are the fonts, the grain and two post PNGs | `find public -maxdepth 2` → `fonts/`, `noise.png`, `leetcode/images/` (2 files) | `find`, `ls public/leetcode/images \| wc -l` → 2 |
-| G4 | `/projects/<slug>` is a **reserved, unbuilt seam**; the `localLink` data that fed it was dropped | `find src/pages -iname 'projects*'` → nothing; the comment at `index.astro:5-6` says `localLink` was dropped | `astro-rebuild/PLAN.md` §4 (line 601); `HANDOFF.md` step 11 |
+| G4 | `/projects/<slug>` is a **reserved, unbuilt seam**; the `localLink` data that fed it was dropped | `find src/pages -iname 'projects*'` → nothing; the comment at `index.astro:5-6` says `localLink` was dropped | `~/Projects/archive/portfolio/astro-rebuild/PLAN.md` §4 (line 601); `HANDOFF.md` step 11 |
 | G5 | The reference is `board.html`: ten `.frame`s, each an eyebrow + `h1` + `.sub` over a CSS `.device` holding `raw/NN.png`; each frame tilts its device (`--ry` 18° → −18°, plus `--rx`, `--rz`, `--ty`) so the row reads as one arc; **one SVG path** (`.stream`) runs behind all ten, stroked with a gradient, blurred (`feGaussianBlur stdDeviation=26`) under a 5 px sharp line; a `feTurbulence` grain overlay | Read in full 2026-09-16. Rendered by headless Chrome at 1320×2868 per frame and 13200×2868 for the panorama (`sips -g pixelWidth panorama.png` → 13200) | `~/Projects/furlough/design/store/board.html`; `scripts/store-shots.sh:14-24` |
-| G6 | The "red line" is Furlough's **sand stream**: gradient stops `#E5563D` → `#F59E4A` → `#FFD59A` (ember → amber → sand). This site's accent is **teal**, `#0FA79A` / `#7DE8D0`, and that pair is settled | `board.html` `<linearGradient id="sand">`; `src/styles/global.css:18-19`; D3, DIAL-1, DIAL-9 ratified 2026-09-15 | `astro-rebuild/DESIGN.md` §5.1 |
+| G6 | The "red line" is Furlough's **sand stream**: gradient stops `#E5563D` → `#F59E4A` → `#FFD59A` (ember → amber → sand). This site's accent is **teal**, `#0FA79A` / `#7DE8D0`, and that pair is settled | `board.html` `<linearGradient id="sand">`; `src/styles/global.css:18-19`; D3, DIAL-1, DIAL-9 ratified 2026-09-15 | `~/Projects/archive/portfolio/astro-rebuild/DESIGN.md` §5.1 |
 | G7 | **Furlough is live on the App Store since 2026-09-15**, has ten real screenshots and ten frames of copy already written by Zach, and is **not one of the three cards** | `appStoreURL: 'https://apps.apple.com/app/id6810006594'` with the comment *"Live on the App Store since 15 September 2026"*; `ls design/store/raw` → `01.png`…`10.png`; `index.astro:7-26` names EZHomesteading, E-Money, Bocas only | `~/Projects/furlough/site/src/site.ts`; `~/Projects/furlough/design/store/raw/`, `LISTING.md` |
 | G8 | Furlough's phone recipe exists in CSS: `.phone` 350×672, radius 44, 1 px 16 % white border, ground fill, two radial glows, deep shadow; the hero tilts it `rotateY(-7deg) rotateX(2.5deg)` with a 9 s float, and turns both off under reduced motion | Read 2026-09-16 | `~/Projects/furlough/site/src/components/HeroPage.astro:244-253`; `…/pages/index.astro:913-921` |
 | G9 | **EZHomesteading** is live, redirects apex → `www`, and its home renders at 375×812 with no sign-in (headline *"Food from down the road, sold by the hands that grew it."*, a where/what search, a diorama) | `curl -sI -L` → 200, final `https://www.ezhomesteading.com/`; browser screenshot at 375×812, 2026-09-16 | curl; Browser pane |
@@ -77,7 +83,7 @@ plain: the hero, the card blurbs and the head description, re-picked with him (G
 - **Bocas's testimonials.** Three first-name-and-initial quotes on a site with no repo (G16) are
   not repeated here.
 - **The blog, the survey, the footer line, the About seam, RSS, per-page OG images.** All reserved
-  or settled elsewhere (`astro-rebuild/PLAN.md` §4).
+  or settled elsewhere (`~/Projects/archive/portfolio/astro-rebuild/PLAN.md` §4).
 - **Restoring, deleting or staging anything in Zach's uncommitted set** — `.gitignore` included.
 
 ---
@@ -91,7 +97,7 @@ decided.
 
 | | Option | For | Strongest argument against |
 |---|---|---|---|
-| **A1, recommended** | **A page per project at `/projects/<slug>`** — the seam the rebuild reserved (G4). The card links to it; the card's title carries `transition:name` so it morphs into the page's `h1` under `ClientRouter` (G18, D4). The page keeps its own *Go to site ↗*. | The URL is shareable and crawlable; the home page stays a static list; D4 was wired for exactly this and has never had a second page to fade to. | One more click before the real product. Mitigation: the card keeps a small *Site ↗* beside its title. **This partially supersedes DIAL-8** (one link per card) — the card gets two targets again, both live this time; the supersession is recorded in `astro-rebuild/DESIGN.md` §6 if ratified. |
+| **A1, recommended** | **A page per project at `/projects/<slug>`** — the seam the rebuild reserved (G4). The card links to it; the card's title carries `transition:name` so it morphs into the page's `h1` under `ClientRouter` (G18, D4). The page keeps its own *Go to site ↗*. | The URL is shareable and crawlable; the home page stays a static list; D4 was wired for exactly this and has never had a second page to fade to. | One more click before the real product. Mitigation: the card keeps a small *Site ↗* beside its title. **This partially supersedes DIAL-8** (one link per card) — the card gets two targets again, both live this time; the supersession is recorded in `~/Projects/archive/portfolio/astro-rebuild/DESIGN.md` §6 if ratified. |
 | A2 | An overlay sheet on the home page | No navigation; feels like a native "peek". | Scroll-trapping inside a modal, focus management, URL state, `Escape`, and all of it is client JS on the one page that is meant to be lightest. Worst on phones. |
 | A3 | Inline expansion under the grid | Nothing leaves the page. | Layout jump; the other cards vanish below the fold; on a 375 px screen the expansion is the whole viewport. |
 
@@ -197,7 +203,7 @@ Every number the design leaves open, each with a recommended default, destined f
   (`5b64d57`) into its own worktree; the git block carries its own `cd` (`CLAUDE.md` rule 7);
   `.gitignore` is never in the `git add` block.
 - **H9 — DIAL-8 is partially superseded by A1.** The card gets a story link *and* a site link.
-  Both live; the supersession is recorded under DIAL-8 in `astro-rebuild/DESIGN.md` §6, dated.
+  Both live; the supersession is recorded under DIAL-8 in `~/Projects/archive/portfolio/astro-rebuild/DESIGN.md` §6, dated.
 - **H10 — Firefox gets the stepped line.** `animation-timeline` is preview-only there (G20). The
   baseline must look finished, not degraded.
 - **H11 — Creating an E-Money room on the live site writes to Zach's production data.** Not done
@@ -251,7 +257,7 @@ because the click is the point — the story is what makes the visitor *want* th
 because the site link never leaves the card.
 
 **Supersedes.** Rebuild DIAL-8, partially — recorded as S1 in
-`docs/incomplete/astro-rebuild/DESIGN.md` §6, which says which half dies.
+`~/Projects/archive/portfolio/astro-rebuild/DESIGN.md` §6, which says which half dies.
 
 Ratified 2026-09-16.
 
@@ -340,7 +346,7 @@ screens are the one warm thing on the page and read as its product. **The remova
 URL:** no `/projects/bocas*` route ever existed (§1 G4), so nothing indexed breaks.
 
 **Supersedes.** Rebuild §4.3 (the three project cards) — recorded as S2 in
-`docs/incomplete/astro-rebuild/DESIGN.md` §6.
+`~/Projects/archive/portfolio/astro-rebuild/DESIGN.md` §6.
 
 Ratified 2026-09-16.
 
@@ -361,7 +367,7 @@ for a headline and two lines (H6). It lost because the constraint is applied to 
 themselves: every sub-line in §7 is at most two sentences.
 
 **Supersedes.** Rebuild §4.4 (the hero copy, verbatim) — recorded as S3 in
-`docs/incomplete/astro-rebuild/DESIGN.md` §6.
+`~/Projects/archive/portfolio/astro-rebuild/DESIGN.md` §6.
 
 Ratified 2026-09-16.
 
@@ -511,9 +517,9 @@ What this design changes elsewhere, so the next reader of *those* files finds it
 
 | This decision | Changes | Recorded at |
 |---|---|---|
-| D1 | Rebuild DIAL-8, partially | `docs/incomplete/astro-rebuild/DESIGN.md` §6 S1, 2026-09-16 |
-| D5 | Rebuild §4.3, the three project cards | `docs/incomplete/astro-rebuild/DESIGN.md` §6 S2, 2026-09-16 |
-| D6 | Rebuild §4.4, the hero copy and `site.description` | `docs/incomplete/astro-rebuild/DESIGN.md` §6 S3, 2026-09-16 |
+| D1 | Rebuild DIAL-8, partially | `~/Projects/archive/portfolio/astro-rebuild/DESIGN.md` §6 S1, 2026-09-16 |
+| D5 | Rebuild §4.3, the three project cards | `~/Projects/archive/portfolio/astro-rebuild/DESIGN.md` §6 S2, 2026-09-16 |
+| D6 | Rebuild §4.4, the hero copy and `site.description` | `~/Projects/archive/portfolio/astro-rebuild/DESIGN.md` §6 S3, 2026-09-16 |
 
 Nothing here changes `HANDOFF.md`'s invariants. Invariant 3 (zero client JS) was already retired
 by the rebuild; this effort adds one more small script under the same posture.
