@@ -1,10 +1,10 @@
 ---
 import Base from '@/src/layouts/Base.astro';
 import ProjectStory from '@/src/components/ProjectStory.astro';
-import { projects, type Project } from '@/src/lib/projects';
+import { hasStory, projects, type Project } from '@/src/lib/projects';
 
 export function getStaticPaths() {
-  return projects.map((project) => ({
+  return projects.filter(hasStory).map((project) => ({
     params: { slug: project.slug },
     props: { project },
   }));

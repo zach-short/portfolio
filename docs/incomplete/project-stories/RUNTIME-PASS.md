@@ -302,3 +302,40 @@ in the hand-back; neither is this phase's to fix.
 ## P3 — `/`
 
 *Appended by P3.*
+
+### 1. Three cards, in D5's order, and only two of them are stories
+
+- **Goal:** the home page shows Furlough, EZHomesteading and E-Money in that order. The first two
+  each have a tilted phone thumbnail, and their title opens the story. E-Money has neither until
+  its frames exist (BD-13).
+- **Where:** `/`, then *Explore Projects*, at desktop and at 375×812.
+- **Right answer:** Furlough's thumbnail shows its budgets list and EZHomesteading's shows its hero.
+  E-Money's title is plain text. Each card's bottom link reads *On the App Store ↗* / *Go to site ↗*
+  / *Go to site ↗*, points to `apps.apple.com/app/id6810006594` / `ezhomesteading.com` /
+  `emoney.club`, and opens a new tab. `/projects/emoney` is a 404. No horizontal scroll at 375 px.
+
+**WALKED 2026-09-25** in the Browser pane at 1024 px and 375×812: all of the above, and
+`scrollWidth` 375 = `innerWidth`. The site links were read, not clicked.
+
+### 2. The title morphs from card to story
+
+- **Goal:** clicking a card's title or thumbnail moves the title from the card into the story's
+  heading (D1, `transition:name`).
+- **Where:** `/` in Chrome, then click *Furlough*, then back, then *EZHomesteading*.
+- **Right answer:** the title visibly slides and scales into the story's big `h1` rather than the
+  page cutting over. With reduced motion on, Astro's own CSS turns the animation off, and that is
+  correct too.
+
+**MECHANISM VERIFIED 2026-09-25, NOT SEEN.** The navigation ran as a view transition, and both ends
+carry `view-transition-name: project-furlough`. The pane cannot show the animation itself. **This
+one is Zach's to watch.**
+
+### 3. The hero and the description are §7.1's
+
+- **Goal:** the new warm copy is live, and search and link previews carry the new description.
+- **Where:** `/`, the hero. View-source for `<meta name="description">` and `og:description`.
+- **Right answer:** *Hi, I'm Zach. I build things people actually use.* over *An app blocker with no
+  unblock button. … All three are live, and all three are below.* Both metas read *Hi, I'm Zach.
+  Apps people actually use, and my LeetCode write-ups.*
+
+**VERIFIED IN DIST 2026-09-25** by `grep` on `dist/client/index.html`, and seen in the pane.

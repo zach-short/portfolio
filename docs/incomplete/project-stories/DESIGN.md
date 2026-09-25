@@ -449,6 +449,15 @@ URL:** no `/projects/bocas*` route ever existed (§1 G4), so nothing indexed bre
 
 Ratified 2026-09-16.
 
+**As built: E-Money ships as a card with no story.** 2026-09-25, P3, Zach's call in chat, the same
+day. P2 stopped before capturing E-Money (PLAN §2 P2), and Zach is adding its frames himself. The
+home page therefore renders **all three cards in D5's order**, but E-Money's card has **no
+thumbnail and no story link**: its title is plain text, and it links out through its site link
+only. That keeps the hero's *"all three are below"* true without building a story on screens that
+do not exist. The mechanism is PLAN BD-13: an empty `frames` array means "no story yet", and
+`getStaticPaths` skips it, so **no `/projects/emoney` is published** before it is real. The slug
+stays unpublished until then (BD-2).
+
 ### D6 — Every word is warm, and the words are §7
 
 **Decision.** The hero, the head description, the three card blurbs and the ten new frames
@@ -470,6 +479,12 @@ themselves: every sub-line in §7 is at most two sentences.
 
 Ratified 2026-09-16.
 
+**As built: shipped verbatim.** 2026-09-25, P3. The hero headline, the lede and `site.description`
+are §7.1's strings byte for byte, checked by `grep` against this file and in
+`dist/client/index.html`. `description` also reaches `<meta name="description">` and
+`og:description` through `Base.astro`. The comment on `src/site.ts` that recorded D9's trimmed
+sentence now cites this decision, because the sentence it explained is gone.
+
 ### D7 — Each card carries a phone thumbnail
 
 **Decision.** Each home-page card shows its story's first screen as a small tilted phone beside
@@ -483,6 +498,15 @@ to a byte budget rather than to an argument: S-7 caps the three thumbnails at 12
 measured in `dist/`.
 
 Ratified 2026-09-16.
+
+**As built: the thumbnail, measured.** 2026-09-25, P3. Frame 1's screen at `widths={[180, 360]}`,
+drawn 120 px wide (88 px at ≤ 640 px) at the captures' own 1206:2622 aspect, so nothing is cropped
+(BD-9). The fixed tilt is `rotateY(8deg)`, the story's own starting direction, and it flattens on
+hover. **No ember glow**: the story phone's glow is withheld from light screens by S-6, and a
+thumbnail row that glows for Furlough and not for EZHomesteading reads as a bug, so neither
+thumbnail glows. The two 360 w variants a 2× screen fetches are **14.8 KB + 25.5 KB = 40.3 KB**
+in `dist/client/_astro/`, against S-7's 120 KB. E-Money has no thumbnail until it has a frame 1
+(D5's `As built:`).
 
 ### D8 — Five frames per project
 

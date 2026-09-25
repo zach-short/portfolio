@@ -22,16 +22,16 @@ edits this table**; where the two disagree, this table wins and says so.
 
 | Fact | Value 2026-09-16, **re-run by P2 the same day** | How to re-check |
 |---|---|---|
-| `main` | **`daede6d`**, unmoved since P1 re-ran this row — it had moved a third time between the hand-off and P1's first command: Zach committed step 14's three owed doc files (`astro-rebuild/DESIGN.md` +30/−2, and this folder's `DESIGN.md` and `PLAN.md`, new). So the design and this plan are **tracked and present in the worktree**, which they were not when P1 was written. `git branch --no-merged main` still empty | `git -C /Users/zachshort/Projects/portfolio log --oneline -1 main` |
-| Live worktrees | `item6-survey` (`ea4feb7`), `item7-cutover` (`6dcafd7`), `item8-registry-pin` (`7e0fbc4`, merged, worktree still present), plus **`item10-stories` — this phase's, now at `2486da0`**, six commits ahead of `main`. `setup-scratch` is gone, pruned by step 15 | `git -C /Users/zachshort/Projects/portfolio worktree list` |
-| Zach's uncommitted set | **`.gitignore` modified only**; `.claude/worktrees/` untracked. The three doc files left it when `daede6d` landed | `git status --short` — never stage either |
-| Next free `HANDOFF` step | **20** — P2 started believing 18 was free and found it taken mid-session by item 11, so P2 is step **19**. The cell's own warning has now held twice; read the file, do not trust this cell | `grep -nE '^\*\*[0-9]+\. ' HANDOFF.md \| tail -1`, read it, do not trust this cell |
+| `main` | **`25f74d7`** — moved once since P2's first sitting: item 11's npx fix landed, pushed and deployed (`HANDOFF` 18, 20). `git branch --no-merged main` is **no longer empty**: it returns `item10-stories` (this phase's, 8 ahead) and two detached `claude/*` scratch worktrees | `git -C /Users/zachshort/Projects/portfolio log --oneline -1 main` |
+| Live worktrees | `item6-survey` (`ea4feb7`), `item7-cutover` (`6dcafd7`, **holds a staged, uncommitted `astro-rebuild/PLAN.md` edit** that is now stale — it stamps Phase 4 "SHIPPING OWED" and the branch unmerged, both untrue since `HANDOFF` 13), `item8-registry-pin` (`7e0fbc4`), `item11-npx` (`25f74d7`), plus **`item10-stories` — this phase's, now at `68462ce`**, 8 commits ahead of `main`, and two detached `claude/*` worktrees at the same commit | `git -C /Users/zachshort/Projects/portfolio worktree list` |
+| Zach's uncommitted set | **Much larger than P2 found it.** Modified: `.gitignore`, `bun.lock`, `package.json`, `src/components/survey/survey.tsx`, `src/layouts/Base.astro`, `src/lib/catalog.ts`, `src/lib/setup-copy.ts`, `src/pages/setup.astro`; untracked: `tests/`. That is `HANDOFF` steps 21–22's off-board `/setup` work, still uncommitted. **None of it is this phase's; this phase stages none of it** (`CLAUDE.md` rule 1) | `git status --short` — never stage any of it |
+| Next free `HANDOFF` step | **23** — 21 and 22 were taken on 2026-09-17 by the off-board `/setup` copy work while this item sat blocked. The cell's own warning has now held **three** times; read the file, do not trust this cell | `grep -nE '^\*\*[0-9]+\. ' HANDOFF.md \| tail -1`, read it, do not trust this cell |
 | Build baseline | **66 emitted files before P2, 67 after** — EZHomesteading's page is the 67th, and E-Money's would have been the 68th the plan's done-when names. Historically: `bun run build` exit 0 in this worktree, **65 emitted HTML files** — the log prints **66** prerender lines, the 66th being D10's `roman-to-interger` redirect, which writes no file (`file not created, response body was empty`). "66 pages" in P1's done-when is the **emitted-file** count, so the target is 66 files / 67 lines | `find dist/client -name '*.html' \| wc -l`, beside the log |
 | Furlough's raw screens | `design/store/raw/01.png` … `10.png` exist | `ls ~/Projects/furlough/design/store/raw` |
 | `sharp` | 0.35.4, transitive | `node -p "require('/Users/zachshort/Projects/portfolio/node_modules/sharp/package.json').version"` |
-| The three sites | all 200, re-checked by P2; EZH and E-Money both redirect apex → `www`. **`https://www.emoney.club/room/<code>` itself returns 500** on a direct server-rendered load, though the room's own API answers 200 and the client route works once entered from `/my-rooms` — found by P2, Zach's, not this phase's. **Furlough's App Store link is live**: `apps.apple.com/app/id6810006594` → 200 at `apps.apple.com/us/app/furlough/id6810006594` | `curl -sI -L -m 10 <url> -o /dev/null -w '%{http_code} %{url_effective}\n'` |
+| The three sites | **Re-run 2026-09-17: all four still 200** (`zacharyshort.com`, `ezhomesteading.com` → `www`, `emoney.club` → `www`, and the App Store id). Previously: all 200, re-checked by P2; EZH and E-Money both redirect apex → `www`. **`https://www.emoney.club/room/<code>` itself returns 500** on a direct server-rendered load, though the room's own API answers 200 and the client route works once entered from `/my-rooms` — found by P2, Zach's, not this phase's. **Furlough's App Store link is live**: `apps.apple.com/app/id6810006594` → 200 at `apps.apple.com/us/app/furlough/id6810006594` | `curl -sI -L -m 10 <url> -o /dev/null -w '%{http_code} %{url_effective}\n'` |
 | Item 7 | **`DONE — HANDOFF 13`**, closed by another session on 2026-09-16 while this was being scoped: the site is **live on the Worker** at `www.zacharyshort.com` (61/61 slugs 200, apex answering too) and the Pages project is gone. Consequence for BD-2: the first deploy of this branch publishes the slugs for good | `PASSOFF.md` row 7; `HANDOFF.md` step 13 |
-| Context7 | **still not available** in P2 either, nor in P1 — `ToolSearch` returned no `resolve-library-id` / `query-docs`. Astro facts came from `node_modules/astro` again | `ToolSearch` for it; if present, prefer it for `astro:assets` and `transition:*` |
+| Context7 | **AVAILABLE, 2026-09-17** — a change from P1 and P2's first sitting, where `ToolSearch` returned nothing. `resolve-library-id` and `query-docs` both load. Prefer it over reading `node_modules/astro` for `astro:assets` and `transition:*` | `ToolSearch` for it; if present, prefer it for `astro:assets` and `transition:*` |
 
 ---
 
@@ -124,6 +124,20 @@ Each carries a one-line reversal.
   work**: with no device-metrics emulation Chrome ignores `width=device-width` and EZHomesteading
   lays out wider than 390 px and clips its own hero. Reversal: the pane, from a session that is
   open in a window.
+
+- **BD-13: a project with no frames is a card and not a story.** Taken 2026-09-25 by P3, on
+  Zach's word in chat (*"Link-only card"*), because he is building E-Money's frames himself and
+  wanted this branch merged first. `Frame[]` may be empty, `hasStory()` in `src/lib/projects.ts`
+  says so, and `src/pages/projects/[slug].astro` maps `projects.filter(hasStory)`. The home card
+  drops its thumbnail and its title link when there is no story. It keeps its blurb, its chips
+  and its site link. Adding the five frames to `emoney` is the whole change that turns on both
+  the card's story link and `/projects/emoney`. Reversal: once E-Money has frames, nothing uses
+  the empty case, so delete `hasStory` and the filter.
+- **BD-14: the card's site link reads `linkLabel ↗`, not P3's `Site ↗`.** The plan's scope line
+  predates the answer recorded under D1's `As built:` (2026-09-16): Furlough's link is a store
+  page, so a card saying *Site ↗* over an App Store URL is the wording Zach already corrected once.
+  The link also opens a new tab with `rel="noopener noreferrer"`, like the story's CTA, which the
+  old card's same-tab *Go to Site →* did not. Reversal: a literal `Site ↗` in `index.astro`.
 
 **Numbering note.** §3 reserved `BD-9` for a lowered *mobile* phone height if H6 failed. The
 aspect deviation took that number first, and **BD-11 is now the H6 entry** — though it lowers
@@ -309,7 +323,24 @@ batch.
 
 ### P3 — The home page: cards, thumbnails, copy
 
-**Status: OPEN. Waits on P2** (three complete entries in the data module).
+**Status: BUILT 2026-09-25, uncommitted at the time of writing (Zach commits). Built on two
+entries plus E-Money as a card only (BD-13)**, because Zach took E-Money's story out of this
+phase's hands (*"complete the next item except for emoney related work. ill stitch that in
+later"*). `HANDOFF.md` step 28. Gates in the worktree: `bun run build` exit 0 at **67** emitted
+HTML files, which is P2's 67 because this phase adds no page; `bunx tsc --noEmit` exit 0, with
+`--listFiles` naming `projects.ts` and `site.ts`; `wrangler deploy --dry-run` exit 0. **The same
+three passed on this branch applied to `main` at `cbd7886`** in a scratch worktree, along with
+`main`'s own `bun test` (11 pass). Done-when, item by item: `bocas` grep over `src dist` returns
+nothing (exit 1). The hero and description match §7.1 byte for byte in
+`dist/client/index.html`. **Walked `/` in the Browser pane** at 1024 px and at 375×812 with no
+horizontal scroll: three cards in order, two thumbnails rendered, the three site hrefs are the
+real domains. Clicking Furlough's title landed on `/projects/furlough` **through a view
+transition**: `astro:before-swap` carried a `viewTransition`, and both the card's `h3` and the
+story's `h1` compute `view-transition-name: project-furlough`. **The morph was not seen with the
+eye.** The pane's screenshot fires after the swap, so this is a mechanism proof and not the
+sighting the done-when asks for. It is left in RUNTIME-PASS for Zach. S-7 comes to **40.3 KB**
+from `dist/` (D7's `As built:`), not measured from the network panel. Console clean apart from the
+deliberate `/projects/emoney` 404.
 
 Scope:
 

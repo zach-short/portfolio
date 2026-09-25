@@ -30,12 +30,15 @@ export interface Project {
   link: string;
   /** Per project, because Furlough's link is a store page and not a site — Zach, 2026-09-16. */
   linkLabel: string;
-  /** Five (D8); S-1 is this array's length and is written nowhere else. */
+  /**
+   * Five (D8); S-1 is this array's length and is written nowhere else. Empty means the story
+   * is not built yet: the project gets a home-page card and no `/projects/<slug>` page.
+   */
   frames: Frame[];
 }
 
 // Furlough's five are frames 1, 2, 6, 8 and 10 of its ten (D8), renumbered 01–05 in source
-// order. P2 adds EZHomesteading and E-Money to this array.
+// order.
 const furlough: Project = {
   slug: 'furlough',
   title: 'Furlough',
@@ -126,7 +129,28 @@ const ezhomesteading: Project = {
   ],
 };
 
-export const projects: Project[] = [furlough, ezhomesteading];
+// E-Money's story is owed: P2 stopped short of its captures (HANDOFF step 19), and Zach is
+// adding them himself. Until then it is a card with no frames, so the home page still shows
+// all three the hero promises, and no half-built story page is published under a slug that
+// becomes permanent on the first deploy (BD-2). Adding its five frames here is the whole
+// change that turns the card into a full one and builds `/projects/emoney`.
+const emoney: Project = {
+  slug: 'emoney',
+  title: 'E-Money',
+  blurb:
+    'A Monopoly bank that never runs out of bills — built after a real bank run five hours into a game. One room code, every phone at the table, every payment live.',
+  tech: ['Go', 'WebSocket', 'Next.js'],
+  link: 'https://emoney.club',
+  linkLabel: 'Go to site',
+  frames: [],
+};
+
+// Module order is card order (D5).
+export const projects: Project[] = [furlough, ezhomesteading, emoney];
+
+export function hasStory(project: Project): boolean {
+  return project.frames.length > 0;
+}
 
 export function findProject(slug: string): Project | undefined {
   return projects.find((project) => project.slug === slug);
