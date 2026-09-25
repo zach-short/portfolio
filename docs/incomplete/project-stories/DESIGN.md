@@ -261,6 +261,13 @@ because the site link never leaves the card.
 
 Ratified 2026-09-16.
 
+**As built: the CTA label is per project, and Furlough's is not "Go to site".** 2026-09-16, P1.
+This decision names the button *Go to site ↗* for all three, but Furlough's link is an App Store
+page (`apps.apple.com/app/id6810006594`, 200 → `/us/app/furlough/id6810006594`, curl 2026-09-16),
+not a site. Asked in chat and answered the same day: **"On the App Store ↗"**. `linkLabel` is
+therefore a field on `Project` rather than a constant, and EZHomesteading and E-Money still read
+*Go to site ↗* when P2 adds them.
+
 ### D2 — Vertical scroll, a sticky phone, and the tilt sweep is the "rotating"
 
 **Decision.** On screens ≥ 860 px the story is two columns: the phone sticks in one while the
@@ -292,6 +299,58 @@ the mobile room is handled by S-2 and by keeping each frame's copy to a headline
 
 Ratified 2026-09-16. Builds on rebuild D4; supersedes nothing.
 
+**As built, 2026-09-16, P1 — six deviations.** The first four are mechanism only, invisible to a
+reader. **Numbers 4 and 6 are not**: they were added by the runtime pass, and each is a thing a
+reader would have seen. The heading used to end "none of them to what a reader sees" — that was
+true of what a green build could show, which is exactly the claim the pass was there to test.
+
+1. **The stacked layout begins at 860 px, not 640 px.** This decision names ≥ 860 px for two
+   columns and < 640 px for the stacked phone, and says nothing about the band between. There is
+   no sensible third layout for it: at 700 px wide the columns have collapsed, and a 672 px phone
+   sticking above its own copy leaves nothing to read. So the one breakpoint is 860 px, and S-2's
+   mobile height (40 vh) applies from there down.
+2. **The observer's threshold is 0, not the plan's 0.5.** The active frame is "the one nearest
+   the middle", which is a zero-height root band (`rootMargin: -50% 0px -50% 0px`). Against a
+   zero-height root the intersection ratio never approaches 0.5, so a 0.5 threshold would never
+   fire. The rootMargin is what carries the intent; the threshold had to give way.
+3. **The dots are HTML elements, not SVG `<circle>`s.** The line's SVG is stretched with
+   `preserveAspectRatio="none"` so one path can span a column of unknown height. A filled circle
+   inside a non-uniformly scaled SVG renders as an ellipse, and nothing in CSS can undo a scale
+   it cannot read. The path stays one `<path>`; the five dots are absolutely positioned
+   elements on the same rail.
+4. **`position` belongs to the layout rules, not to the phone's recipe.** Added 2026-09-16 by
+   P1's runtime pass (`HANDOFF.md` step 17), which is when this decision was first *seen* rather
+   than built. The phone's look is written in one block after the two layout rules, and that block
+   declared `position: relative` — same specificity, later in source, so **it won the cascade at
+   every width**. The consequences were the two things this decision is most about. Stacked, the
+   phone was `relative` instead of `sticky`, so **it did not stick at all**: measured at 375×812,
+   its top ran 224 → **−781** → **−1790** across frames 1, 3 and 5. That is the same symptom
+   `afab8a7` was committed to fix; that fix's reasoning about grid areas was correct and simply
+   could never take effect, which is why "built green but never seen" is not a small gap. In
+   columns the phone was `relative` while still inheriting the stacked rule's `top: 96px`, so it
+   hung 96 px below its own flex slot and **the CTA that is supposed to sit under it ended up
+   under it in the other sense** — covered by the phone's lower third. The rule that replaces it:
+   the phone's `position` is stated once per layout — `sticky` stacked, `relative` in columns,
+   both positioned so `.screen`'s `inset: 0` still resolves against the phone — and `top` is reset
+   in the same breath as `position`. The recipe block carries no `position` at all, and says why.
+
+5. **The script writes one custom property the plan did not list.** Plan step 7 has it write
+   `root.dataset.active` and `--progress`. CSS cannot read a data attribute as a number, so it
+   also writes `--active`. `data-active` is kept and earns its place independently: its presence
+   is how the stylesheet distinguishes a scripted visit from a scriptless one, which is what
+   keeps BD-5's "every frame's copy is readable" true rather than lucky.
+
+6. **The first frame's copy offset is derived differently from the other four — PLAN.md BD-11.**
+   Added 2026-09-16 by the runtime pass. This decision's stacked half says the frames scroll under
+   a phone stuck at the top, and the offset that keeps a frame's copy clear of it assumes the
+   phone has already reached that stuck position. Frame 1 activates before it has: at 375×812 it
+   crosses the middle of the viewport at scrollY 261 and the phone does not pin until 341, so its
+   eyebrow and headline were sitting **behind** the phone (−60.1 px and −35.8 px of clearance).
+   §3 had reserved a number for "lower the mobile phone height if H6 fails", and the measurement
+   killed that remedy: unpinned, the phone's bottom and the copy move down together, so the
+   shortfall is −56.28 px at *every* phone height. The first frame gets `--phone-h + 24px`
+   instead — the clearance for a phone that shares its top edge. Full working in `PLAN.md` BD-11.
+
 ### D3 — The line is the site's accent
 
 **Decision.** The line's gradient is `--accent` → `--accent-2` → `--accent-glint` — the three
@@ -308,6 +367,15 @@ palette on the one element that runs the length of every story page; Furlough's 
 the phone carry the warmth instead, and read as *the product*, not the site.
 
 Ratified 2026-09-16. Explicitly **not** a supersession of rebuild D3 / DIAL-1 / DIAL-9.
+
+**As built: the halo is a filter on the line, not a second line under it.** 2026-09-16, P1. S-8
+asks for "3 px sharp over a 40 px halo at 35 %", which reads as two strokes; it is one `<path>`
+with `filter: drop-shadow(0 0 20px color-mix(in srgb, var(--accent) 35%, transparent))` on the
+SVG element. Two reasons: the plan's step 6 asks for exactly one path, and a CSS filter on the
+element resolves in CSS pixels, so the halo stays round under the `preserveAspectRatio="none"`
+y-stretch that lets the line span a column of unknown height. A second SVG path would have been
+stretched into an oval. **No new colour literal**: the three stops are `var(--accent)`,
+`var(--accent-2)` and `var(--accent-glint)`, and the halo `color-mix`es off `--accent`.
 
 ### D4 — Real captures only, through `astro:assets`
 
@@ -327,6 +395,43 @@ a portfolio; the stateful screens are supplied by Zach or replaced by a public s
 choice per frame is PLAN.md's first job (§5 H1).
 
 Ratified 2026-09-16.
+
+**As built: "through `astro:assets`" needed a config change to be true.** 2026-09-16, P1. The
+Cloudflare adapter's default image service does no build-time transform, so `<Image>` shipped the
+source PNGs untouched at 172–978 KB. `imageService: 'compile'` (PLAN.md BD-10) is what makes this
+decision's "sized WebP/AVIF, with `width` and `height` set" actually happen. Furlough's five are
+copied byte-identical out of `design/store/raw/` — `shasum -a 256` matched on all five pairs,
+and all ten source PNGs are still in place.
+
+**Verify at build, discharged.** §7.3's check on frame 3: `raw/06.png` shows **`60 MIN`** under
+`DAILY BUDGET` with the slider at the 60 stop. The headline's *sixty* stands; the panorama's
+"fifty-five" is the stale reading, exactly as §7.3 predicted.
+
+**As built: EZHomesteading's story runs four frames, and "cut, never mocked" was exercised.**
+2026-09-16, P2. §7.4's fallback **4′ — "A neighborhood stand."** — was cut. Its first two clauses
+hold on any store page (one seller, one town); its third, *"and whatever the growers around them
+dropped off"*, does not. All eight store pages reachable from the market feed were walked signed
+out, and **every listing on every one of them is attributed to that store itself**; nothing public
+shows a stand carrying another grower's goods. PLAN.md §5 H2 says a claim that fails its check is
+cut, not softened, and the copy is frozen (R7), so the choice went to Zach, who chose the cut in
+chat the same day. Frames **1, 2, 3′, 5′** ship as **01–04**; the copy for 4′ stays in §7.4 and in
+PLAN.md §4 with the other reserved rows, against the day a stand's page shows a carried listing.
+
+**As built: the fallback paths are not the ones §7.4 named.** 2026-09-16, P2. 3′ says
+"a public listing page (`/l/<id>`, the deep-link path)"; the live path is
+**`/listings/<uuid>`**, and a store page is **`/stores/<name>-<suffix>`**. Both render fully signed
+out. Nothing in the copy depends on the shape of either URL.
+
+**As built: both *verify at build* items in §7.4 are discharged, and S-6 turned out not to
+apply.** 2026-09-16, P2. Frame 2's check — the feed or its area prompt renders signed out — passes
+twice over: `/market` shows the WHERE/WHAT bar, "311 listings · 79 places" and real listing cards,
+and a first visit also raises an area sheet ("We'll show you what's near"), which was dismissed
+before capture. 5′'s check — the sell entry renders signed out — passes: `/listings/new` is the
+"Snap a Photo" step of a five-step wizard, reachable with no account. **S-6 was written for light
+screens inside a dark phone and EZHomesteading is dark** — `getComputedStyle(document.body)
+.backgroundColor` is `rgb(23, 22, 20)` on every page captured — so no light-screen treatment was
+added. E-Money **is** light (a white player card on black), so S-6 is still live for that half and
+is P2's to judge when it ships.
 
 ### D5 — Furlough joins first; Bocas Adventures leaves the site
 
@@ -350,6 +455,15 @@ URL:** no `/projects/bocas*` route ever existed (§1 G4), so nothing indexed bre
 
 Ratified 2026-09-16.
 
+**As built: E-Money ships as a card with no story.** 2026-09-25, P3, Zach's call in chat, the same
+day. P2 stopped before capturing E-Money (PLAN §2 P2), and Zach is adding its frames himself. The
+home page therefore renders **all three cards in D5's order**, but E-Money's card has **no
+thumbnail and no story link**: its title is plain text, and it links out through its site link
+only. That keeps the hero's *"all three are below"* true without building a story on screens that
+do not exist. The mechanism is PLAN BD-13: an empty `frames` array means "no story yet", and
+`getStaticPaths` skips it, so **no `/projects/emoney` is published** before it is real. The slug
+stays unpublished until then (BD-2).
+
 ### D6 — Every word is warm, and the words are §7
 
 **Decision.** The hero, the head description, the three card blurbs and the ten new frames
@@ -371,6 +485,12 @@ themselves: every sub-line in §7 is at most two sentences.
 
 Ratified 2026-09-16.
 
+**As built: shipped verbatim.** 2026-09-25, P3. The hero headline, the lede and `site.description`
+are §7.1's strings byte for byte, checked by `grep` against this file and in
+`dist/client/index.html`. `description` also reaches `<meta name="description">` and
+`og:description` through `Base.astro`. The comment on `src/site.ts` that recorded D9's trimmed
+sentence now cites this decision, because the sentence it explained is gone.
+
 ### D7 — Each card carries a phone thumbnail
 
 **Decision.** Each home-page card shows its story's first screen as a small tilted phone beside
@@ -384,6 +504,15 @@ to a byte budget rather than to an argument: S-7 caps the three thumbnails at 12
 measured in `dist/`.
 
 Ratified 2026-09-16.
+
+**As built: the thumbnail, measured.** 2026-09-25, P3. Frame 1's screen at `widths={[180, 360]}`,
+drawn 120 px wide (88 px at ≤ 640 px) at the captures' own 1206:2622 aspect, so nothing is cropped
+(BD-9). The fixed tilt is `rotateY(8deg)`, the story's own starting direction, and it flattens on
+hover. **No ember glow**: the story phone's glow is withheld from light screens by S-6, and a
+thumbnail row that glows for Furlough and not for EZHomesteading reads as a bug, so neither
+thumbnail glows. The two 360 w variants a 2× screen fetches are **14.8 KB + 25.5 KB = 40.3 KB**
+in `dist/client/_astro/`, against S-7's 120 KB. E-Money has no thumbnail until it has a frame 1
+(D5's `As built:`).
 
 ### D8 — Five frames per project
 
@@ -431,7 +560,11 @@ write-ups.**
 | `emoney` | E-Money | Go, WebSocket, Next.js | A Monopoly bank that never runs out of bills — built after a real bank run five hours into a game. One room code, every phone at the table, every payment live. | `https://emoney.club` |
 
 The tech chips for EZHomesteading and E-Money are the existing ones (`src/pages/index.astro:12,18`);
-Furlough's are new. "Web and native" for EZHomesteading is a stack claim, not a distribution
+Furlough's are new. **That sentence is wrong about line 12 and the table is right**
+(P2, 2026-09-16): the live chips for EZHomesteading are `['Next.js', 'Expo', 'MongoDB']`, not the
+table's *Go*. The table is the copy and the blurb's "on a Go backend" agrees with it, so
+`src/lib/projects.ts` ships **Next.js, Expo, Go**; only the explanatory note was ever inaccurate.
+E-Money's three match line 18 as claimed. "Web and native" for EZHomesteading is a stack claim, not a distribution
 one — the native app is not on a store (§1 G11), and no sentence on this site says it is.
 
 ### 7.3 Furlough — five frames, verbatim from `board.html`

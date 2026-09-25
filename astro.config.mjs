@@ -20,7 +20,17 @@ export default defineConfig({
 
   // Item 7 promoted the Worker config over `wrangler.jsonc` on 2026-09-16 and retired the Pages
   // project it used to configure, so the adapter reads the default path and needs no `configPath`.
-  adapter: cloudflare(),
+  //
+  // `imageService: 'compile'` is item 10's BD-10, and it is load-bearing rather than cosmetic.
+  // @astrojs/cloudflare 14.3.1 defaults this to `'cloudflare-binding'`, whose `transformAtBuild`
+  // is false (`dist/utils/image-config.js:3-12`): `<Image>` then copies the original file
+  // untouched and defers every resize to the Images binding at request time. Measured
+  // 2026-09-16 on the five Furlough captures, that emitted the source PNGs byte for byte —
+  // 172–978 KB each, against PLAN.md S-10's 150 KB cap. `'compile'` runs sharp at build time
+  // and leaves the runtime service as passthrough, which is what BD-1 assumed all along. Every
+  // page here is prerendered, so nothing needs the runtime path. Safe to set now because
+  // nothing else on the site uses `astro:assets` (grep over `src/`, 2026-09-16).
+  adapter: cloudflare({ imageService: 'compile' }),
 
   // D5: Preact, not React — one interactive widget on one page should not decide the whole
   // site's runtime, and React is roughly ten times the runtime for it.

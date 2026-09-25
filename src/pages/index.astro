@@ -1,38 +1,17 @@
 ---
+import { Image } from 'astro:assets';
 import Base from '@/src/layouts/Base.astro';
-
-// The same three, in the same order, with the same copy as app/page.tsx:63-87. `link` now
-// carries the scheme because it is rendered: DIAL-8 collapsed each card's two dead
-// `projects/<slug>` buttons into one link to the real domain, and dropped `localLink`.
-const projects = [
-  {
-    title: 'EZHomesteading',
-    description:
-      'A peer-to-peer marketplace connecting small organic farms & gardens with locals.',
-    tech: ['Next.js', 'Expo', 'MongoDB'],
-    link: 'https://ezhomesteading.com',
-  },
-  {
-    title: 'E-Money',
-    description: 'A minimal real time monopoly funds & properties tracker.',
-    tech: ['Go', 'WebSocket', 'Next.js'],
-    link: 'https://emoney.club',
-  },
-  {
-    title: 'Bocas Adventures',
-    description:
-      'A site exposing travellers to the beauty of island life in Bocas del Toro & connecting them to local attractions.',
-    tech: ['Next.js'],
-    link: 'https://bocasadventures.com',
-  },
-];
+import { hasStory, projects } from '@/src/lib/projects';
 ---
 
 <Base>
   <section class="hero wrap">
     <div class="hero-text" data-reveal>
-      <h1 class="display">Hi, I'm Zach</h1>
-      <p class="lede">Tired of slow devs, sluggish sites, and overcomplicated apps? Me too.</p>
+      <h1 class="display">Hi, I'm Zach. I build things people actually use.</h1>
+      <p class="lede">
+        An app blocker with no unblock button. A marketplace for backyard growers. A Monopoly bank
+        that never runs dry. All three are live, and all three are below.
+      </p>
       <div class="actions">
         <a class="glass large prominent" href="#projects">Explore Projects</a>
         <a class="glass large" href="/blog">Blog</a>
@@ -44,20 +23,44 @@ const projects = [
     <h2 class="display heading" data-reveal>Featured Works</h2>
     <div class="grid">
       {
-        projects.map((project, i) => (
-          <article class="card project" data-reveal style={`--d: ${i * 0.08}s`}>
-            <h3 class="display">{project.title}</h3>
-            <p class="muted blurb">{project.description}</p>
-            <div class="tech">
-              {project.tech.map((t) => (
-                <span class="chip">{t}</span>
-              ))}
-            </div>
-            <a class="go" href={project.link} rel="noopener">
-              Go to Site →
-            </a>
-          </article>
-        ))
+        projects.map((project, i) => {
+          const story = hasStory(project) ? `/projects/${project.slug}` : undefined;
+          return (
+            <article class:list={['card', 'project', { 'has-thumb': story }]} data-reveal style={`--d: ${i * 0.08}s`}>
+              {/* The title carries the story link for keyboards and screen readers; the
+                  thumbnail repeats it for the pointer only, so the card is one tab stop, not two
+                  to the same place. Two sibling links rather than one wrapping the card, because
+                  a link inside a link is invalid HTML. */}
+              {story && (
+                <a class="thumb" href={story} tabindex="-1" aria-hidden="true">
+                  <Image
+                    class="thumb-screen"
+                    src={project.frames[0].screen}
+                    alt={project.frames[0].headline}
+                    width={180}
+                    widths={[180, 360]}
+                    sizes="(max-width: 640px) 88px, 120px"
+                  />
+                </a>
+              )}
+              <div class="body">
+                {/* The same name as the story's h1, so the title morphs across the navigation. */}
+                <h3 class="display" transition:name={`project-${project.slug}`}>
+                  {story ? <a href={story}>{project.title}</a> : project.title}
+                </h3>
+                <p class="muted blurb">{project.blurb}</p>
+                <div class="tech">
+                  {project.tech.map((t) => (
+                    <span class="chip">{t}</span>
+                  ))}
+                </div>
+                <a class="go" href={project.link} target="_blank" rel="noopener noreferrer">
+                  {project.linkLabel} &#8599;
+                </a>
+              </div>
+            </article>
+          );
+        })
       }
     </div>
   </section>
@@ -72,12 +75,42 @@ const projects = [
   .work { padding-bottom: 24px; }
   .heading { text-align: center; margin-bottom: clamp(36px, 6vh, 64px); }
   .grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
-  .project { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; padding: 26px 28px 24px; }
+  .project { display: grid; grid-template-columns: 1fr; gap: 22px; padding: 26px 28px 24px; }
+  .project.has-thumb { grid-template-columns: var(--thumb-w) 1fr; }
+  .body { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; min-width: 0; }
+  .body h3 a { color: inherit; }
   .blurb { font-size: 15px; line-height: 1.6; }
   .tech { display: flex; flex-wrap: wrap; gap: 8px; }
   /* The link sits on the card's bottom edge however tall the blurb runs. */
   .go { margin-top: auto; padding-top: 6px; font-size: 14px; font-weight: 600; }
+
+  /* D7: the story's first screen in a small phone at a fixed tilt — the story page's bezel scaled
+     down, without its ember glow, which S-6 already withholds from EZHomesteading's light screens.
+     The aspect is the captures' own (BD-9), so nothing is cropped. */
+  .project { --thumb-w: 120px; }
+  .thumb {
+    display: block;
+    align-self: start;
+    width: var(--thumb-w);
+    aspect-ratio: 1206 / 2622;
+    overflow: hidden;
+    border-radius: 18px;
+    border: 1px solid var(--edge);
+    background: var(--ground);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(0, 0, 0, 0.6);
+    transform: perspective(700px) rotateY(8deg);
+    transition: transform 0.4s var(--ease);
+  }
+  .thumb:hover { transform: perspective(700px) rotateY(0deg); }
+  .thumb-screen { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+  @media (max-width: 640px) {
+    .project { --thumb-w: 88px; gap: 18px; padding: 22px 20px 20px; }
+  }
   @media (min-width: 860px) {
     .grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .thumb, .thumb:hover { transition: none; }
   }
 </style>
