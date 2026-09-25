@@ -1,0 +1,113 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+
+# name:one-line description — single source of truth for both the menu and completion
+COMMANDS=(
+  "dev:Run the plain Astro dev server (no KV binding)"
+  "worker:Run a real Worker dev server with the KV binding the on-demand routes need"
+  "build:Production build to dist/"
+  "typecheck:Typecheck with tsc --noEmit"
+  "test:Run the bun test suite (there are currently no test files)"
+  "deploy:Deploy to Cloudflare Workers — this is real, not a dry run"
+  "gates:Run every gate, in the order CLAUDE.md verifies them"
+  "shell:Print the ~/.zshrc snippet for the portfolio function + completion"
+  "help:List commands"
+)
+
+cmd_dev() {
+  bun run dev
+}
+
+cmd_worker() {
+  # The adapter writes the resolved Worker config to dist/server/wrangler.json — that file,
+  # not wrangler.jsonc, is what wrangler dev/deploy actually read (CLAUDE.md, Architecture).
+  bunx wrangler dev -c dist/server/wrangler.json --port 8788 --persist-to ./.wrangler/state
+}
+
+cmd_build() {
+  bun run build
+}
+
+cmd_typecheck() {
+  bunx tsc --noEmit
+}
+
+cmd_test() {
+  bun run test
+}
+
+cmd_deploy() {
+  # "A deploy is a person running `bun run deploy`, which is now `wrangler deploy`"
+  # (CLAUDE.md, How it ships) — wrangler is authenticated on this machine, so this publishes
+  # for real. Build first so dist/server/wrangler.json exists for it to read.
+  cmd_build
+  bun run deploy
+}
+
+cmd_gates() {
+  # The three fenced commands CLAUDE.md lists as Gates, in order, plus test.
+  cmd_build
+  cmd_typecheck
+  bunx wrangler deploy --dry-run -c dist/server/wrangler.json
+  cmd_test
+}
+
+cmd_help() {
+  echo "usage: portfolio <command>"
+  echo
+  for entry in "${COMMANDS[@]}"; do
+    printf "  %-10s %s\n" "${entry%%:*}" "${entry#*:}"
+  done
+}
+
+cmd_shell() {
+  cat <<'EOF'
+portfolio() { "$HOME/Projects/portfolio/scripts/portfolio" "$@"; }
+
+_portfolio_complete() {
+  local -a subcmds
+  subcmds=("${(@f)$(portfolio --complete)}")
+  _describe 'command' subcmds
+}
+compdef _portfolio_complete portfolio
+EOF
+}
+
+cmd___complete() {
+  for entry in "${COMMANDS[@]}"; do
+    echo "$entry"
+  done
+}
+
+# Same table drives an fzf picker on bare invocation — only when it'd actually be
+# interactive, so a cron job or `portfolio build | something` never gets asked anything.
+interactive_pick() {
+  local lines
+  lines="$(for entry in "${COMMANDS[@]}"; do
+    printf "%-10s %s\n" "${entry%%:*}" "${entry#*:}"
+  done)"
+  echo "$lines" | fzf --prompt='portfolio> ' --height='~70%' --reverse --no-info \
+    --header='select a command' | awk '{print $1}'
+}
+
+if [[ $# -eq 0 && -t 0 && -t 1 ]] && command -v fzf >/dev/null 2>&1; then
+  picked="$(interactive_pick || true)"
+  [[ -n "$picked" ]] || exit 0
+  set -- "$picked"
+fi
+
+case "${1:-help}" in
+  dev) cmd_dev ;;
+  worker) cmd_worker ;;
+  build) cmd_build ;;
+  typecheck) cmd_typecheck ;;
+  test) cmd_test ;;
+  deploy) cmd_deploy ;;
+  gates) cmd_gates ;;
+  shell) cmd_shell ;;
+  --complete) cmd___complete ;;
+  help|*) cmd_help ;;
+esac
