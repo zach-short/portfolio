@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config';
 import cloudflare from '@astrojs/cloudflare';
 import mdx from '@astrojs/mdx';
 import preact from '@astrojs/preact';
+import { ogCards } from './src/lib/og/integration.ts';
 
 // Still static. Phase 3 added the adapter for D7's profile store, and only the two routes that
 // need the KV binding opt out with `export const prerender = false` (I3, confirmed 2026-09-15)
@@ -34,7 +35,8 @@ export default defineConfig({
 
   // D5: Preact, not React — one interactive widget on one page should not decide the whole
   // site's runtime, and React is roughly ten times the runtime for it.
-  integrations: [mdx(), preact()],
+  // ogCards renders the share image for every page once the build has finished (src/lib/og).
+  integrations: [mdx(), preact(), ogCards()],
 
   // D10: the typo slug redirects to the corrected one. Empirically tested 2026-09-15 against
   // this repo, not assumed from docs — and the first result was a false positive (a stale

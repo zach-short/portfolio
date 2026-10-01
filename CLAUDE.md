@@ -58,8 +58,8 @@ Verified 2026-09-16 from `package.json` and `bun install` output in a clean work
   PostCSS plugins** — both were deleted 2026-09-16. `--accent` / `--accent-2` at the head of
   `:root` are the only two hex literals; anything else `color-mix`es off them.
 - **TypeScript:** 5.x via `astro/tsconfigs/strict`, path alias `@/*` → **repo root**, not `src/`.
-- **Other deps:** `date-fns`, and `personal-config` pinned as a git dependency (D6) for the
-  survey catalog.
+- **Other deps:** `date-fns`, `satori` (draws the share images, `src/lib/og/`), and
+  `personal-config` pinned as a git dependency (D6) for the survey catalog.
 - **Hosting:** **Cloudflare Workers** with static assets, via `@astrojs/cloudflare` 14.3.1 and
   wrangler `^4.132.0`. Worker name `zacharyshort-com` (`wrangler.jsonc`). The Pages project
   `my-next-app` is retired by this cutover.
@@ -86,6 +86,17 @@ Verified 2026-09-16 from `package.json` and `bun install` output in a clean work
    canonical, no-slash form, the way the Pages site served them. Astro's own `trailingSlash`
    option cannot do this for prerendered pages — its own types say so. Do not simplify that
    line away; it decides the shape of every indexed URL on the site.
+7. **Every page's share image is rendered after the build, in Node.** `Base.astro` points
+   `og:image` at `/og/<path>.jpg` (`cardPath`), and the `ogCards` integration in
+   `astro.config.mjs` writes those files into `dist/client/og/` once the pages exist, then
+   **fails the build if any built page names an image it did not write**. A new page therefore
+   needs an entry in `src/lib/og/cards.ts` or `bun run build` stops and names it. The card list
+   reaches the integration as `/og/cards.json`, an endpoint it deletes before the build ends,
+   because the pages prerender inside workerd, where sharp and satori cannot load. **Do not set
+   `prerenderEnvironment: 'node'` to get around that** — tried 2026-10-01, it changes how all of
+   the site's CSS compiles (the `-webkit-backdrop-filter` prefix disappears). The card colours
+   are read out of `:root` in `global.css`, so re-skinning the site re-skins the cards.
+   `/p/<id>` is JSON on purpose and has no card.
 
 ## Directory map
 
@@ -97,6 +108,7 @@ Verified 2026-09-16 from `package.json` and `bun install` output in a clean work
 | `src/components/survey/` | The Preact island and its CSS — the only `.tsx` in the repo | Anything a static route renders |
 | `src/content/leetcode/` | One `.mdx` per solved problem. 61 files | Components, helpers, drafts |
 | `src/lib/` | Build-time and request-time helpers — the catalog, the profile store, the short id | React components |
+| `src/lib/og/` | The share-image pipeline: card data, layout, render, the build integration, and the subset ttf fonts it paints with | Anything a page renders at request time |
 | `src/styles/` | `global.css`, the token system | Component-scoped CSS |
 | `public/` | Static assets served from `/`; post images under `public/leetcode/images/` | Generated output |
 | repo root | `env.d.ts` — see *Gates that lie* | Application code |

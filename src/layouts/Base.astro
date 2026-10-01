@@ -2,6 +2,7 @@
 import { ClientRouter } from 'astro:transitions';
 import Footer from '@/src/components/Footer.astro';
 import Nav from '@/src/components/Nav.astro';
+import { cardPath } from '@/src/lib/og/card-path';
 import { site } from '@/src/site';
 import '@/src/styles/global.css';
 
@@ -29,6 +30,9 @@ const origin = Astro.site?.origin ?? '';
 // canonical would point at a URL that immediately redirects. `/` itself must keep its slash.
 const path = Astro.url.pathname.replace(/(.)\/$/, '$1');
 const canonical = origin ? `${origin}${path}` : undefined;
+// `og:image` must be absolute: a crawler resolves nothing against the page it found it on.
+const image = `${origin}${cardPath(path)}`;
+const cardTitle = ogTitle ?? fullTitle;
 ---
 
 <!doctype html>
@@ -44,10 +48,18 @@ const canonical = origin ? `${origin}${path}` : undefined;
     {canonical && <link rel="canonical" href={canonical} />}
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />
-    <meta property="og:title" content={ogTitle ?? fullTitle} />
+    <meta property="og:title" content={cardTitle} />
     <meta property="og:description" content={description} />
     {canonical && <meta property="og:url" content={canonical} />}
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:image" content={image} />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={cardTitle} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={image} />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preload" href="/fonts/BricolageGrotesque_72pt-Bold.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/Onest-Regular.woff2" as="font" type="font/woff2" crossorigin />
     {/* The reveal starts every section at opacity 0 and JS adds .in. Without this, a visitor
