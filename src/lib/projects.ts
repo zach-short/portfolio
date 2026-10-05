@@ -11,6 +11,11 @@ import ezh01 from '@/src/assets/projects/ezhomesteading/01.png';
 import ezh02 from '@/src/assets/projects/ezhomesteading/02.png';
 import ezh03 from '@/src/assets/projects/ezhomesteading/03.png';
 import ezh04 from '@/src/assets/projects/ezhomesteading/04.png';
+import pdfmailer01 from '@/src/assets/projects/pdfmailer/01.png';
+import pdfmailer02 from '@/src/assets/projects/pdfmailer/02.png';
+import pdfmailer03 from '@/src/assets/projects/pdfmailer/03.png';
+import pdfmailer04 from '@/src/assets/projects/pdfmailer/04.png';
+import pdfmailer05 from '@/src/assets/projects/pdfmailer/05.png';
 
 /** One panel of a story: the copy on the left, the screen that proves it on the phone. */
 export interface Frame {
@@ -145,8 +150,55 @@ const emoney: Project = {
   frames: [],
 };
 
+// PDF Mailer was added 2026-10-05 and is the one project here whose copy was picked in chat, not
+// read from DESIGN §7: Zach chose the plain register for the blurb and the headlines. Its five
+// captures are of the app running on localhost against a local Supabase, signed in as a test
+// account with made-up addresses and a generated PDF — nothing in them is a real person's data.
+// The slug has no hyphen, like the other three, and is permanent from the first deploy (BD-2).
+const pdfmailer: Project = {
+  slug: 'pdfmailer',
+  title: 'PDF Mailer',
+  blurb:
+    'Turns a PDF into the body of an email. Drop in a PDF and each page becomes an image. One click opens a message in Gmail, Outlook, Yahoo or your mail app, with the recipients filled in.',
+  tech: ['Next.js', 'Supabase', 'PDF.js'],
+  link: 'https://pdfmailer.app',
+  linkLabel: 'Go to site',
+  frames: [
+    {
+      eyebrow: 'The idea',
+      headline: 'A PDF becomes an email.',
+      sub: 'No attachment. Each page shows in the message itself.',
+      screen: pdfmailer01,
+    },
+    {
+      eyebrow: 'The preview',
+      headline: 'Every page, as an image.',
+      sub: 'See the finished email, with the pages in the body, before anything is saved.',
+      screen: pdfmailer02,
+    },
+    {
+      eyebrow: 'The lists',
+      headline: 'Lists with To, Cc and Bcc.',
+      sub: 'Save the people you write to. Each list keeps its own To, Cc and Bcc addresses.',
+      screen: pdfmailer03,
+    },
+    {
+      eyebrow: 'The send',
+      headline: 'One click opens your mail app.',
+      sub: 'Gmail, Outlook, Yahoo or the mail app on your computer opens with the recipients and subject filled in. Paste the email, then send.',
+      screen: pdfmailer04,
+    },
+    {
+      eyebrow: 'The sender',
+      headline: 'It sends from your account.',
+      sub: 'No sending service sits in between, so replies go straight to you.',
+      screen: pdfmailer05,
+    },
+  ],
+};
+
 // Module order is card order (D5).
-export const projects: Project[] = [furlough, ezhomesteading, emoney];
+export const projects: Project[] = [furlough, ezhomesteading, emoney, pdfmailer];
 
 export function hasStory(project: Project): boolean {
   return project.frames.length > 0;
