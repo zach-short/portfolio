@@ -1,6 +1,6 @@
 # portfolio
 
-The source for Zachary Short's personal site, served at https://www.zacharyshort.com. It has a home page with three project cards, a story page for each project that has screenshots, a blog of 61 LeetCode write-ups, and a short setup survey at `/setup` that stores a person's answers and hands back an eight-character id.
+The source for Zachary Short's personal site, served at https://www.zacharyshort.com. It has a home page with six project cards, a story page for each project that has screenshots, a blog of 61 LeetCode write-ups, and a short setup survey on the `/personal-config` page that stores a person's answers and hands back an eight-character id.
 
 The site is almost entirely static. Astro 7 prerenders every page at build time, and two routes opt out to read and write a Cloudflare KV namespace. The result deploys to Cloudflare Workers as `zacharyshort-com`. The survey is the only Preact island on the site.
 
@@ -45,7 +45,7 @@ Serves the last build locally with `astro preview`.
 ## Layout
 
 ```
-src/pages/           routes: index, blog/, projects/[slug], setup, p/[id], api/profile
+src/pages/           routes: index, blog/, projects/[slug], wk, personal-config, p/[id], api/profile
 src/layouts/         Base.astro: head, canonical link, page transitions, nav, footer
 src/components/      shared Astro components; leetcode/ helpers used inside posts;
                      survey/ holds the Preact island, the only .tsx in the repo
@@ -61,11 +61,11 @@ docs/                working standards for the repo
 scripts/portfolio    command dispatcher
 ```
 
-The project cards on the home page and the story pages both read `src/lib/projects.ts`, which is the only place a project is described. A project with an empty `frames` array gets a card but no `/projects/<slug>` page. E-Money is in that state today.
+The project cards on the home page and the story pages both read `src/lib/projects.ts`, which is the only place a project is described. A project with an empty `frames` array gets a card but no `/projects/<slug>` page. E-Money is in that state today. A project that sets `page` has its story at that path and not under `/projects/`: wk is at `/wk`, and personal-config's story heads the `/personal-config` page, above the survey.
 
 ## Routes
 
-Pages `/`, `/blog`, `/blog/leetcode`, `/blog/leetcode/<slug>`, `/projects/<slug>` and `/setup` are prerendered. Two routes run on demand and need the `PROFILES` KV binding:
+Pages `/`, `/blog`, `/blog/leetcode`, `/blog/leetcode/<slug>`, `/projects/<slug>`, `/wk` and `/personal-config` are prerendered. `/setup` was the survey's address until 2026-10-16 and now redirects to `/personal-config` with a 301 (`astro.config.mjs`). Two routes run on demand and need the `PROFILES` KV binding:
 
 - `POST /api/profile` validates a survey result (16 KB limit) and stores it under a new eight-character id.
 - `GET /p/<id>` returns the stored profile as JSON. The `setup --from <id>` command in the `personal-config` package fetches this URL, so the response must stay plain JSON and not become a page.

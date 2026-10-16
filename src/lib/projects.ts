@@ -16,6 +16,16 @@ import pdfmailer02 from '@/src/assets/projects/pdfmailer/02.png';
 import pdfmailer03 from '@/src/assets/projects/pdfmailer/03.png';
 import pdfmailer04 from '@/src/assets/projects/pdfmailer/04.png';
 import pdfmailer05 from '@/src/assets/projects/pdfmailer/05.png';
+import wk01 from '@/src/assets/projects/wk/01.png';
+import wk02 from '@/src/assets/projects/wk/02.png';
+import wk03 from '@/src/assets/projects/wk/03.png';
+import wk04 from '@/src/assets/projects/wk/04.png';
+import wk05 from '@/src/assets/projects/wk/05.png';
+import pc01 from '@/src/assets/projects/personal-config/01.png';
+import pc02 from '@/src/assets/projects/personal-config/02.png';
+import pc03 from '@/src/assets/projects/personal-config/03.png';
+import pc04 from '@/src/assets/projects/personal-config/04.png';
+import pc05 from '@/src/assets/projects/personal-config/05.png';
 
 /** One panel of a story: the copy on the left, the screen that proves it on the phone. */
 export interface Frame {
@@ -32,9 +42,20 @@ export interface Project {
   title: string;
   blurb: string;
   tech: string[];
-  link: string;
+  /**
+   * Where a reader can get the thing. Optional since 2026-10-16 because wk has no public home
+   * yet (its repo is private), and a link a reader cannot open is worse than none.
+   */
+  link?: string;
   /** Per project, because Furlough's link is a store page and not a site — Zach, 2026-09-16. */
-  linkLabel: string;
+  linkLabel?: string;
+  /** The public source repository, shown on the story page beside the main link. */
+  source?: string;
+  /**
+   * The story's own path when it is not `/projects/<slug>`. wk answers at `/wk`, and
+   * personal-config's story heads the page that was `/setup`, which also carries the survey.
+   */
+  page?: string;
   /**
    * Five (D8); S-1 is this array's length and is written nowhere else. Empty means the story
    * is not built yet: the project gets a home-page card and no `/projects/<slug>` page.
@@ -197,11 +218,114 @@ const pdfmailer: Project = {
   ],
 };
 
-// Module order is card order (D5).
-export const projects: Project[] = [furlough, ezhomesteading, emoney, pdfmailer];
+// wk and personal-config were added 2026-10-16. Every sentence below is checked against the
+// tools themselves: wk's README and source, and personal-config's published 0.8.0 package (the
+// copy in node_modules, which is what npm serves). Nothing here says why they were built or how
+// well they work; that is Zach's to write. The captures are real runs against throwaway repos
+// under a stand-in home folder, rendered from the terminal's own output, so no real repo, file
+// content or private path is in them.
+//
+// wk's repo is private on 2026-10-16, so it has no `link` and no `source`. Making it public is
+// one line here: `source: 'https://github.com/zach-short/wk'` (and a `link` if the CTA should
+// show too).
+const wk: Project = {
+  slug: 'wk',
+  title: 'wk',
+  blurb:
+    'Makes git worktrees for parallel coding agents with the dependencies already in place, cloned copy-on-write from a template instead of installed again. It also judges which worktrees are finished and removes them.',
+  tech: ['Go', 'Bubble Tea', 'APFS'],
+  page: '/wk',
+  frames: [
+    {
+      eyebrow: 'The workspace',
+      headline: 'One command, a warm workspace.',
+      sub: 'wk new 21 adds a worktree on branch wk/21 and clones node_modules from the template. It prints only the path on stdout, so cd "$(wk new 21)" lands inside.',
+      screen: wk01,
+    },
+    {
+      eyebrow: 'Setup',
+      headline: 'It reads the repo first.',
+      sub: 'Run wk with no arguments and a guided setup finds the manifests, lockfiles and .env files, then asks which to use. It reads file names only, so a .env file is listed and never opened.',
+      screen: wk02,
+    },
+    {
+      eyebrow: 'The verdicts',
+      headline: 'Every worktree gets a verdict.',
+      sub: 'Removable, kept, skipped or prunable, with every reason behind it. wk hive draws them in the terminal and reads them again every 3 seconds.',
+      screen: wk03,
+    },
+    {
+      eyebrow: 'The hive page',
+      headline: 'The same hive, in a browser.',
+      sub: 'wk viz serves the view on 127.0.0.1:8787 and reads the live verdicts on every load. Both views read a dry run, so neither can remove anything.',
+      screen: wk04,
+    },
+    {
+      eyebrow: 'The cleanup',
+      headline: 'It removes only what is finished.',
+      sub: 'A worktree goes only when it is unlocked, idle and clean, and the base branch already holds its commits. Setup can also install a launchd agent that runs wk gc --apply every hour.',
+      screen: wk05,
+    },
+  ],
+};
+
+// The page at `/personal-config` was the survey at `/setup` until 2026-10-16; `/setup` now
+// redirects to it (astro.config.mjs). The story heads that page and the survey follows it.
+const personalConfig: Project = {
+  slug: 'personal-config',
+  title: 'personal-config',
+  blurb:
+    'A terminal wizard on npm that writes an agent-driven working standard into your repos: a ledger, a board, code conventions and the rules a coding agent reads before it touches anything. Nothing is written until you have seen the whole file tree.',
+  tech: ['TypeScript', 'Node', 'Bun'],
+  link: 'https://www.npmjs.com/package/personal-config',
+  linkLabel: 'On npm',
+  source: 'https://github.com/zach-short/personal-config',
+  page: '/personal-config',
+  frames: [
+    {
+      eyebrow: 'The questions',
+      headline: 'One question at a time.',
+      sub: 'Each option comes with a practical example, and the recommended one is marked. Who runs git commit is one of the questions.',
+      screen: pc01,
+    },
+    {
+      eyebrow: 'Read more',
+      headline: 'The case against, before you choose.',
+      sub: 'Read more… prints the long form: what the option means, the strongest argument against it, what it writes and how to undo it.',
+      screen: pc02,
+    },
+    {
+      eyebrow: 'Your projects',
+      headline: 'It looks before it writes.',
+      sub: 'Name the folder that holds your projects. It lists the repos one level down, with the languages and package manager it found, and you pick which to set up.',
+      screen: pc03,
+    },
+    {
+      eyebrow: 'The preview',
+      headline: 'Every file, before any is written.',
+      sub: 'Each run prints the whole file tree and asks once for the batch. With --dry-run it writes nothing at all.',
+      screen: pc04,
+    },
+    {
+      eyebrow: 'Undo',
+      headline: 'Backed up first, undone once.',
+      sub: 'Anything a run overwrites is copied aside first. personal-config undo lists what it would put back, asks, then restores it.',
+      screen: pc05,
+    },
+  ],
+};
+
+// Module order is card order (D5). The two added 2026-10-16 go last until Zach says otherwise.
+export const projects: Project[] = [furlough, ezhomesteading, emoney, pdfmailer, wk, personalConfig];
 
 export function hasStory(project: Project): boolean {
   return project.frames.length > 0;
+}
+
+/** Where a project's story is published, or nothing when it has no story yet. */
+export function storyPath(project: Project): string | undefined {
+  if (!hasStory(project)) return undefined;
+  return project.page ?? `/projects/${project.slug}`;
 }
 
 export function findProject(slug: string): Project | undefined {

@@ -50,8 +50,13 @@ export default defineConfig({
   // runs against the deployed Worker (Cloudflare's real redirect handling), which is where a
   // true 3xx is actually expected; re-verify there rather than assuming this config alone
   // produces one. See `HANDOFF.md` for the full account.
+  //
+  // `/setup` became `/personal-config` on 2026-10-16, when the survey page also became that
+  // project's page, and old links keep working through the second entry. Verified that day: the
+  // adapter writes both entries to `dist/client/_redirects` as 301s.
   redirects: {
     '/blog/leetcode/roman-to-interger': '/blog/leetcode/roman-to-integer',
+    '/setup': '/personal-config',
   },
 
   // PLAN.md BD-6's `vite.css.postcss: { plugins: [] }` workaround used to sit here. It existed

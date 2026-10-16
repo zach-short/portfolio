@@ -3,7 +3,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import { formatSlug } from '@/src/lib/format-slug';
 import type { Card } from '@/src/lib/og/card';
 import { firstSentence } from '@/src/lib/og/text';
-import { hasStory, projects, type Project } from '@/src/lib/projects';
+import { hasStory, projects, storyPath, type Project } from '@/src/lib/projects';
 import { PAGE } from '@/src/lib/setup-copy';
 import { site } from '@/src/site';
 
@@ -35,7 +35,7 @@ function homeCard(): Card {
 
 function projectCard(project: Project): Card {
   return {
-    path: `/projects/${project.slug}`,
+    path: storyPath(project) ?? `/projects/${project.slug}`,
     eyebrow: 'Project',
     title: project.title,
     blurb: firstSentence(project.blurb),
@@ -75,8 +75,10 @@ const blogCard: Card = {
   blurb: 'LeetCode solutions and write-ups.',
 };
 
+// personal-config's page keeps the survey's card: it was `/setup` until 2026-10-16, and its
+// title and line are the survey's settled copy (setup-tracks DESIGN.md §7.1).
 const setupCard: Card = {
-  path: '/setup',
+  path: '/personal-config',
   eyebrow: PAGE.eyebrow,
   title: PAGE.title,
   blurb: PAGE.lede,
@@ -97,6 +99,7 @@ export async function getCards(): Promise<Card[]> {
     blogCard,
     leetcodeIndexCard(posts),
     ...posts.map(postCard),
-    ...projects.filter(hasStory).map(projectCard),
+    // Every story page but the one `setupCard` already draws, since one path gets one card.
+    ...projects.filter((project) => hasStory(project) && storyPath(project) !== setupCard.path).map(projectCard),
   ];
 }

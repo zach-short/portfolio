@@ -1,0 +1,14 @@
+---
+import Base from '@/src/layouts/Base.astro';
+import ProjectStory from '@/src/components/ProjectStory.astro';
+import { findProject } from '@/src/lib/projects';
+
+// wk's story, at the short path Zach hands out. The same data and component as every
+// `/projects/<slug>` page; `projects.ts` gives wk `page: '/wk'`, which keeps it out of that route.
+const project = findProject('wk');
+if (!project) throw new Error('wk.astro: no project with slug "wk" in src/lib/projects.ts');
+---
+
+<Base title={project.title} description={project.blurb}>
+  <ProjectStory project={project} />
+</Base>

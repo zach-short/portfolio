@@ -75,8 +75,8 @@ Verified 2026-09-16 from `package.json` and `bun install` output in a clean work
    validated by the zod schema in `src/content.config.ts` (D2). Astro's content layer cannot
    load TSX, which is why the 61 posts were converted on 2026-09-15.
 3. **Filename = slug = URL = LeetCode link.** See rule 2 above.
-4. **The survey is the only interactive thing on the site.** One Preact island at `/setup`
-   (`client:load`), 30 questions, posting to `/api/profile` and reading back from `/p/<id>`.
+4. **The survey is the only interactive thing on the site.** One Preact island at
+   `/personal-config` (`/setup` until 2026-10-16, now a 301) (`client:load`), 30 questions, posting to `/api/profile` and reading back from `/p/<id>`.
    Everything else ships zero client JavaScript.
 5. **The deploy artifact is `dist/`.** The adapter writes the resolved Worker config to
    `dist/server/wrangler.json`, filling in `main` and `assets` — that generated file is what

@@ -20,6 +20,20 @@ const { frames } = project;
     <ul class="tech">
       {project.tech.map((item) => <li class="chip">{item}</li>)}
     </ul>
+    {/* A page can put its own links first (personal-config's jumps to its survey); the source
+        link follows, and only for a repo a reader can open. */}
+    {
+      (Astro.slots.has('actions') || project.source) && (
+        <div class="head-actions">
+          <slot name="actions" />
+          {project.source && (
+            <a class="glass" href={project.source} target="_blank" rel="noopener noreferrer">
+              Source on GitHub &#8599;
+            </a>
+          )}
+        </div>
+      )
+    }
   </header>
 
   <div class="story">
@@ -40,9 +54,13 @@ const { frames } = project;
           ))
         }
       </div>
-      <a class="glass large prominent cta" href={project.link} target="_blank" rel="noopener noreferrer">
-        {project.linkLabel} &#8599;
-      </a>
+      {
+        project.link && (
+          <a class="glass large prominent cta" href={project.link} target="_blank" rel="noopener noreferrer">
+            {project.linkLabel} &#8599;
+          </a>
+        )
+      }
     </div>
 
     <div class="rail" aria-hidden="true">
@@ -112,6 +130,7 @@ const { frames } = project;
   .head .display { margin: 10px 0 18px; }
   .blurb { max-width: 56ch; }
   .tech { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 0; padding: 0; list-style: none; }
+  .head-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
 
   /* Mobile and tablet: one column, the phone sticking above the frames it illustrates, the
      line down the left gutter. `display: contents` lets the phone and the CTA become grid
@@ -343,3 +362,27 @@ const { frames } = project;
     }
   }
 </style>
+
+<script>
+  import { startStory } from '@/src/lib/story';
+
+  // Moved here from `pages/projects/[slug].astro` on 2026-10-16, when `/wk` and
+  // `/personal-config` started rendering this component too: the behaviour belongs to the story,
+  // not to one route. Astro bundles a component script once per page that uses it.
+  //
+  // This module runs once per session, not once per visit — so it registers listeners rather
+  // than doing the work inline. `astro:page-load` fires after every ClientRouter swap as well
+  // as on the first load, and `astro:before-swap` fires on the page being left, which is where
+  // the observer has to go: leaving this page for `/` and coming back must not arm a second one.
+  let stop: (() => void) | undefined;
+
+  document.addEventListener('astro:page-load', () => {
+    const root = document.querySelector<HTMLElement>('[data-story]');
+    if (root) stop = startStory(root);
+  });
+
+  document.addEventListener('astro:before-swap', () => {
+    stop?.();
+    stop = undefined;
+  });
+</script>

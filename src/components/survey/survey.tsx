@@ -15,7 +15,7 @@ import { Result } from '@/src/components/survey/result';
 import '@/src/components/survey/survey.css';
 
 /**
- * The site's one island (D5: Preact, `client:load`, at `/setup`) and its one piece of state.
+ * The site's one island (D5: Preact, `client:load`, at `/personal-config`) and its one piece of state.
  *
  * The survey and its result live on the same page on purpose. An island loses its state across
  * a `ClientRouter` navigation unless it is `transition:persist` (I4), so D4 avoids the problem

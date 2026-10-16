@@ -1,7 +1,8 @@
 import type { Phase } from '@/src/lib/catalog';
 
 /**
- * Every word a visitor reads on `/setup`, in one file.
+ * Every word a visitor reads in the survey on `/personal-config` (`/setup` until 2026-10-16), in
+ * one file. The project story above the survey reads `src/lib/projects.ts`.
  *
  * DIAL-2 (the result page's words) and DIAL-4 (the page title) were answered at GATE 2 in
  * **register only — warm** (`DESIGN.md` §5.1); the words themselves are Phase 3's to draft and
@@ -38,16 +39,17 @@ import type { Phase } from '@/src/lib/catalog';
  * **Do not reintroduce a count or a range here.** If a screen ever needs a live number again,
  * take it from `askedQuestions(answers)` inside the survey island the way `survey.tsx:101`
  * already does — never from a module-scope constant, and never for `PAGE.lede`, `.description`
- * or `.noscript`, which render in the static Astro shell (`src/pages/setup.astro:11-16,24`),
- * outside `<Survey client:load />`, and so can never read live answer state at all.
+ * or `.noscript`, which render in the static Astro shell
+ * (`src/pages/personal-config.astro:19,24-30,37`), outside `<Survey client:load />`, and so can
+ * never read live answer state at all.
  */
 
 /**
- * DIAL-4 — the `/setup` page. `title` is the `<title>`, suffixed with the site name by
- * Base.astro; `ogTitle` is the shared-link card's own title, which is why it names the tool
- * instead. Both are settled copy (`DESIGN.md` §7.1) — "your repo" turned away the visitor this
- * page was rewritten for (D11) before he had read a question, and "how you work" is true of a
- * repo and of a folder without hedging.
+ * DIAL-4 — the survey page, `/personal-config` (`/setup` until 2026-10-16). `title` is the
+ * `<title>`, suffixed with the site name by Base.astro; `ogTitle` is the shared-link card's own
+ * title, which is why it names the tool instead. Both are settled copy (`DESIGN.md` §7.1) —
+ * "your repo" turned away the visitor this page was rewritten for (D11) before he had read a
+ * question, and "how you work" is true of a repo and of a folder without hedging.
  *
  * The body copy below (`description`, `lede`, the phase blurbs and `setupPrompt`) was settled
  * the same day, 2026-09-17, alongside that title: "your projects" replaces "your repo(s)"
@@ -80,8 +82,8 @@ import type { Phase } from '@/src/lib/catalog';
  * - **Branching the copy on the visitor's own answers** was previously recorded here as
  *   "considered and deferred, blocked on the `0.3.0` pin" — that blocker is gone, and the note
  *   was wrong regardless of the pin. `lede`, `description` and `noscript` all render in the
- *   static Astro shell (`src/pages/setup.astro:11-16,24`), **outside**
- *   `<Survey client:load />` (`:22`). Branching them on live answers would mean moving that
+ *   static Astro shell (`src/pages/personal-config.astro:19,24-30,37`), **outside**
+ *   `<Survey client:load />` (`:35`). Branching them on live answers would mean moving that
  *   paragraph into the island itself — a different page structure, not a copy edit — and even
  *   then, `description` is a `<meta>` tag read by crawlers that never run JS and `noscript` is
  *   read only when JS is off: neither can execute the island's branching logic under any

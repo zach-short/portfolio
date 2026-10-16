@@ -1,0 +1,71 @@
+---
+import Base from '@/src/layouts/Base.astro';
+import ProjectStory from '@/src/components/ProjectStory.astro';
+import { Survey } from '@/src/components/survey/survey';
+import { findProject } from '@/src/lib/projects';
+import { PAGE } from '@/src/lib/setup-copy';
+
+// personal-config's page. Until 2026-10-16 this file was `setup.astro` and served the survey
+// alone at `/setup`, which now redirects here (astro.config.mjs). The project story comes first,
+// in the shape every other project page has, and the survey follows it under `#survey`.
+//
+// This page stays prerendered. Only the two routes that touch the KV binding opt out
+// (`src/pages/api/profile.ts`, `src/pages/p/[id].ts`); the survey itself is a static shell with
+// one island in it (D1, D5).
+const project = findProject('personal-config');
+if (!project) throw new Error('personal-config.astro: no project with slug "personal-config" in src/lib/projects.ts');
+---
+
+<Base title={PAGE.title} description={PAGE.description} ogTitle={PAGE.ogTitle}>
+  <ProjectStory project={project}>
+    <a slot="actions" class="glass prominent" href="#survey">Answer the questions here &#8595;</a>
+  </ProjectStory>
+
+  <section class="wrap survey-intro" id="survey" data-reveal>
+    <p class="eyebrow">{PAGE.eyebrow}</p>
+    {/* An h2 since 2026-10-16: the story above carries the page's one h1. */}
+    <h2 class="display">{PAGE.heading}</h2>
+    <p class="lede">{PAGE.lede}</p>
+    <p class="faint survey-reassurance">{PAGE.reassurance}</p>
+  </section>
+
+  <section class="wrap survey">
+    {/* D5: client:load, so the survey is interactive the moment it paints rather than after a
+        scroll. It is the only island on the site. */}
+    <Survey client:load />
+    <noscript>
+      <p class="card survey-noscript muted">{PAGE.noscript}</p>
+    </noscript>
+  </section>
+</Base>
+
+<script>
+  // A finished survey keeps `?p=<id>` in the address (survey.tsx), and the island shows the
+  // result for it. That result sits below the story now, so a visitor who comes back on such a
+  // link, including an old `/setup?p=<id>` one, is taken straight to it. `instant`, because the
+  // site sets `scroll-behavior: smooth` and an arrival should not animate past the whole story.
+  document.addEventListener('astro:page-load', () => {
+    if (!new URLSearchParams(window.location.search).has('p')) return;
+    document.getElementById('survey')?.scrollIntoView({ behavior: 'instant' });
+  });
+</script>
+
+<style>
+  .survey-intro {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-width: 720px;
+    margin-inline: auto;
+    padding: clamp(56px, 10vh, 104px) 0 clamp(28px, 5vh, 44px);
+    /* The sticky nav is 64 px; a jump to #survey should not tuck the eyebrow under it. */
+    scroll-margin-top: 72px;
+  }
+  .survey-reassurance { font-size: 13.5px; line-height: 1.55; max-width: 56ch; }
+  .survey {
+    max-width: 720px;
+    margin-inline: auto;
+    padding-bottom: clamp(48px, 9vh, 96px);
+  }
+  .survey-noscript { display: block; padding: 20px 22px; margin-top: 16px; }
+</style>
