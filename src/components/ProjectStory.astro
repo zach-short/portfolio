@@ -8,7 +8,9 @@ interface Props {
 
 const { project } = Astro.props;
 const { frames } = project;
-const terminal = project.display === 'terminal';
+const desktop = project.display === 'desktop';
+// Both windows share the terminal's stage rules: a wide box in place of the phone.
+const terminal = project.display === 'terminal' || desktop;
 
 const escapeHtml = (text: string) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
@@ -29,7 +31,7 @@ const transcript = (body: string) =>
 
 {/* `--count` is the only place the frame count reaches CSS; S-1 itself lives in the data
     module as the length of this array, and is written nowhere else. */}
-<article class:list={['story-page', 'wrap', { 'is-terminal': terminal }]} data-story style={`--count: ${frames.length}`}>
+<article class:list={['story-page', 'wrap', { 'is-terminal': terminal, 'is-desktop': desktop }]} data-story style={`--count: ${frames.length}`}>
   <header class="head" data-reveal>
     <p class="eyebrow">Project</p>
     <h1 class="display" transition:name={`project-${project.slug}`}>{project.title}</h1>
@@ -56,7 +58,30 @@ const transcript = (body: string) =>
   <div class="story">
     <div class="stage">
       {
-        terminal ? (
+        desktop ? (
+          <div class="term desk" role="group" aria-label={`${project.title} on a desktop`}>
+            <div class="term-bar">
+              <i />
+              <i />
+              <i />
+              <div class="term-titles">{project.link?.replace(/^https?:\/\//, '')}</div>
+            </div>
+            <div class="term-body">
+              {frames.map((frame, i) => (
+                <Image
+                  class="desk-screen"
+                  src={frame.screen}
+                  alt={frame.headline}
+                  width={1360}
+                  widths={[680, 1360, 1920]}
+                  sizes="(min-width: 860px) 680px, 100vw"
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                  style={`--i: ${i}`}
+                />
+              ))}
+            </div>
+          </div>
+        ) : terminal ? (
           <div class="term" role="group" aria-label="Terminal output">
             <div class="term-bar">
               <i />
@@ -340,11 +365,26 @@ const transcript = (body: string) =>
     transition: opacity var(--fade) var(--ease);
   }
   .term-screen { white-space: pre-wrap; overflow-wrap: anywhere; }
+  /* The desktop window: the same stage, with a 16:10 capture where the terminal has text. */
+  .is-desktop { --term-w: min(680px, 50vw); --term-h: calc(var(--term-w) * 10 / 16); }
+  .desk-screen {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    --d: calc(var(--i) - var(--active));
+    --nd: calc(var(--active) - var(--i));
+    opacity: calc(1 - min(1, max(var(--d), var(--nd))));
+    transition: opacity var(--fade) var(--ease);
+  }
   .term-screen :global(.ln.cmd) { color: #fff; }
   .term-screen :global(.ln.cmd b) { color: var(--accent-2); font-weight: 600; }
 
   @media (max-width: 859px) {
     .is-terminal { --term-h: 54vh; --term-w: 100%; }
+    .is-desktop { --term-h: calc(62.5vw - 25px); }
     /* The window sits above the copy as the phone does, so a frame's top offset is derived from
        its height: the bar is about 40 px, plus the same 24 px gap. */
     .is-terminal .frame { padding-top: calc(var(--stick-top) + var(--term-h) + 64px - (50vh - var(--frame-h) / 2)); }
@@ -358,7 +398,7 @@ const transcript = (body: string) =>
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .term-screen, .term-title { transition: none; }
+    .term-screen, .term-title, .desk-screen { transition: none; }
   }
 
   /* ── The line and its dots. ── */

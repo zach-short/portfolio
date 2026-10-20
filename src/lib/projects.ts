@@ -16,6 +16,7 @@ import pdfmailer02 from '@/src/assets/projects/pdfmailer/02.png';
 import pdfmailer03 from '@/src/assets/projects/pdfmailer/03.png';
 import pdfmailer04 from '@/src/assets/projects/pdfmailer/04.png';
 import pdfmailer05 from '@/src/assets/projects/pdfmailer/05.png';
+import pdfmailerCover from '@/src/assets/projects/pdfmailer/cover.png';
 import wk01 from '@/src/assets/projects/wk/01.png';
 import pc01 from '@/src/assets/projects/personal-config/01.png';
 
@@ -61,8 +62,10 @@ export interface Project {
   /**
    * `phone` (the default) shows each frame's `screen` on a phone. `terminal` is for command-line
    * tools, which have no phone screen: each frame's `terminal` shows in a wide window instead.
+   * `desktop` is for a web app captured at desktop width: each frame's `screen` shows in a
+   * browser window, and `cover` stands in for the phone-shaped home card and share image.
    */
-  display?: 'phone' | 'terminal';
+  display?: 'phone' | 'terminal' | 'desktop';
   /** The picture on the home card and the share image, for a story that has no `screen`s. */
   cover?: ImageMetadata;
 }
@@ -195,6 +198,8 @@ const pdfmailer: Project = {
   tech: ['Next.js', 'Supabase', 'PDF.js'],
   link: 'https://pdfmailer.app',
   linkLabel: 'Go to site',
+  display: 'desktop',
+  cover: pdfmailerCover,
   frames: [
     {
       eyebrow: 'The idea',
