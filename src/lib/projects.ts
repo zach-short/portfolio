@@ -17,23 +17,20 @@ import pdfmailer03 from '@/src/assets/projects/pdfmailer/03.png';
 import pdfmailer04 from '@/src/assets/projects/pdfmailer/04.png';
 import pdfmailer05 from '@/src/assets/projects/pdfmailer/05.png';
 import wk01 from '@/src/assets/projects/wk/01.png';
-import wk02 from '@/src/assets/projects/wk/02.png';
-import wk03 from '@/src/assets/projects/wk/03.png';
-import wk04 from '@/src/assets/projects/wk/04.png';
-import wk05 from '@/src/assets/projects/wk/05.png';
 import pc01 from '@/src/assets/projects/personal-config/01.png';
-import pc02 from '@/src/assets/projects/personal-config/02.png';
-import pc03 from '@/src/assets/projects/personal-config/03.png';
-import pc04 from '@/src/assets/projects/personal-config/04.png';
-import pc05 from '@/src/assets/projects/personal-config/05.png';
 
 /** One panel of a story: the copy on the left, the screen that proves it on the phone. */
 export interface Frame {
   eyebrow: string;
   headline: string;
   sub: string;
-  /** A real capture of the product (D4). Its `alt` is the headline — BD-8. */
-  screen: ImageMetadata;
+  /** A real capture of the product (D4). Its `alt` is the headline — BD-8. Phone stories only. */
+  screen?: ImageMetadata;
+  /**
+   * A terminal story's panel: real output from the tool, run against a throwaway repo under a
+   * stand-in home folder. A line that starts with `$ ` is a command the reader types.
+   */
+  terminal?: { title: string; body: string };
 }
 
 export interface Project {
@@ -61,6 +58,20 @@ export interface Project {
    * is not built yet: the project gets a home-page card and no `/projects/<slug>` page.
    */
   frames: Frame[];
+  /**
+   * `phone` (the default) shows each frame's `screen` on a phone. `terminal` is for command-line
+   * tools, which have no phone screen: each frame's `terminal` shows in a wide window instead.
+   */
+  display?: 'phone' | 'terminal';
+  /** The picture on the home card and the share image, for a story that has no `screen`s. */
+  cover?: ImageMetadata;
+}
+
+/** The home card's and the share image's picture of a project. */
+export function coverOf(project: Project): ImageMetadata {
+  const cover = project.cover ?? project.frames[0].screen;
+  if (!cover) throw new Error(`projects.ts: "${project.slug}" has no cover and no screen on its first frame`);
+  return cover;
 }
 
 // Furlough's five are frames 1, 2, 6, 8 and 10 of its ten (D8), renumbered 01–05 in source
@@ -218,53 +229,112 @@ const pdfmailer: Project = {
   ],
 };
 
-// wk and personal-config were added 2026-10-16. Every sentence below is checked against the
-// tools themselves: wk's README and source, and personal-config's published 0.8.0 package (the
-// copy in node_modules, which is what npm serves). Nothing here says why they were built or how
-// well they work; that is Zach's to write. The captures are real runs against throwaway repos
-// under a stand-in home folder, rendered from the terminal's own output, so no real repo, file
-// content or private path is in them.
+// wk and personal-config were added 2026-10-16 and brought up to date 2026-10-20, to wk's
+// README and the 0.9.0 source of personal-config. Nothing here says why they were built or how
+// well they work; that is Zach's to write. They are command-line tools, so their stories use
+// `display: 'terminal'` and show their own output, not a phone. Each panel is a real run against
+// a throwaway repo under a stand-in home folder, so no real repo, file content or private path is
+// in it. Where a line was trimmed it was cut whole, never reworded; the demo repo's path is
+// shortened to ~/code/demo.
 //
-// wk's repo is private on 2026-10-16, so it has no `link` and no `source`. Making it public is
+// wk's repo is private on 2026-10-20, so it has no `link` and no `source`. Making it public is
 // one line here: `source: 'https://github.com/zach-short/wk'` (and a `link` if the CTA should
 // show too).
 const wk: Project = {
   slug: 'wk',
   title: 'wk',
   blurb:
-    'Makes git worktrees for parallel coding agents with the dependencies already in place, cloned copy-on-write from a template instead of installed again. It also judges which worktrees are finished and removes them.',
+    'Makes git worktrees for parallel coding agents with the dependencies already in place, cloned copy-on-write from a template instead of installed again. It also lands their work through a gated queue and removes the worktrees that are finished.',
   tech: ['Go', 'Bubble Tea', 'APFS'],
   page: '/wk',
+  display: 'terminal',
+  cover: wk01,
   frames: [
     {
       eyebrow: 'The workspace',
       headline: 'One command, a warm workspace.',
-      sub: 'wk new 21 adds a worktree on branch wk/21 and clones node_modules from the template. It prints only the path on stdout, so cd "$(wk new 21)" lands inside.',
-      screen: wk01,
+      sub: 'wk new 21 adds a worktree on branch wk/21 and clones node_modules from the template copy-on-write, so nothing is installed again. It prints only the path on stdout, so cd "$(wk new 21)" lands inside.',
+      terminal: {
+        title: '~/code/demo · wk new',
+        body: `$ cd "$(wk new 21)"
+wk: worktree add --no-checkout         0.02s
+wk: clone node_modules                 0.00s
+wk: checkout                           0.01s
+wk: skip the post-clone commands: the clones were made at this commit
+$ pwd
+~/code/demo/.claude/worktrees/wk-21`,
+      },
     },
     {
       eyebrow: 'Setup',
-      headline: 'It reads the repo first.',
-      sub: 'Run wk with no arguments and a guided setup finds the manifests, lockfiles and .env files, then asks which to use. It reads file names only, so a .env file is listed and never opened.',
-      screen: wk02,
+      headline: 'It reads the repo, or takes the defaults.',
+      sub: 'Run wk in a repository and a guided setup finds the manifests, lockfiles and .env files, then asks which to use. It reads file names only. An agent with no terminal runs wk setup --yes, which writes the same config from the defaults and builds nothing.',
+      terminal: {
+        title: '~/code/demo · wk setup --yes',
+        body: `$ wk setup --yes
+wk setup: base main
+wk setup: clone dir node_modules
+~/.wk/demo.toml
+$ wk config show | head -6
+# ~/.wk/demo.toml (found)
+[template]
+  path = ".claude/worktrees/wk-template"
+  refresh_on = ""
+  follow_base = true
+  clone_dirs = ["node_modules"]`,
+      },
     },
     {
       eyebrow: 'The verdicts',
       headline: 'Every worktree gets a verdict.',
-      sub: 'Removable, kept, skipped or prunable, with every reason behind it. wk hive draws them in the terminal and reads them again every 3 seconds.',
-      screen: wk03,
+      sub: 'Removable, kept, skipped or prunable, with every reason behind it. A worktree goes only when it is unlocked, idle and clean and the base already holds its commits. wk hive draws the verdicts in the terminal and wk viz in a browser.',
+      terminal: {
+        title: '~/code/demo · wk gc',
+        body: `$ wk gc
+kept, run /land-worktrees  .claude/worktrees/wk-21        it changed 0 minutes ago and a session may still be in it; 1 changed path
+skip                       .claude/worktrees/wk-template  the wk template
+skip                       .claude/worktrees/wk-trial     the wk gate trial; the landing worker reuses it
+0 of 3 removable; dry run, nothing removed (wk gc --apply removes them)`,
+      },
     },
     {
-      eyebrow: 'The hive page',
-      headline: 'The same hive, in a browser.',
-      sub: 'wk viz serves the view on 127.0.0.1:8787 and reads the live verdicts on every load. Both views read a dry run, so neither can remove anything.',
-      screen: wk04,
+      eyebrow: 'The landing queue',
+      headline: 'Agents submit. wk gates, then lands.',
+      sub: 'With landing on, an agent runs wk submit and never git commit. One worker predicts the merge, runs the gates once over the final tree and lands the batch only on green. A red gate names itself and the changeset waits for a fix.',
+      terminal: {
+        title: '~/code/demo · wk submit',
+        body: `$ wk submit -m "add the page"
+wk: includes page.txt
+5fa624343778
+$ wk status
+landing.enabled = true
+last gate run: green, 5fa624343778 on tree 5f8adee0a2ef
+  page pass (0.0s)
+5fa624343778  landed  ~/code/demo/.claude/worktrees/wk-21  add the page
+  commit: 17f9d6624afa995fd06ec4475ae8099314821108
+  reason: gates: page pass
+$ git log --oneline
+17f9d66 add the page
+c526dfb init`,
+      },
     },
     {
-      eyebrow: 'The cleanup',
-      headline: 'It removes only what is finished.',
-      sub: 'A worktree goes only when it is unlocked, idle and clean, and the base branch already holds its commits. Setup can also install a launchd agent that runs wk gc --apply every hour.',
-      screen: wk05,
+      eyebrow: 'The hooks',
+      headline: 'Claude Code asks wk for its worktrees.',
+      sub: 'wk hooks install adds four hooks to the repo local settings. Every worktree a session or subagent makes then comes from the warm template, a finished subagent is marked for cleanup, and heavy gate commands take turns. It never writes ~/.claude/settings.json.',
+      terminal: {
+        title: '~/code/demo · wk hooks install',
+        body: `$ wk hooks install
+~/code/demo/.claude/settings.local.json: updated
+~/code/demo/.claude/worktrees/wk-template/.claude/settings.local.json: updated
+$ jq '.hooks | keys' .claude/settings.local.json
+[
+  "PreToolUse",
+  "SubagentStop",
+  "WorktreeCreate",
+  "WorktreeRemove"
+]`,
+      },
     },
   ],
 };
@@ -275,42 +345,126 @@ const personalConfig: Project = {
   slug: 'personal-config',
   title: 'personal-config',
   blurb:
-    'A terminal wizard on npm that writes an agent-driven working standard into your repos: a ledger, a board, code conventions and the rules a coding agent reads before it touches anything. Nothing is written until you have seen the whole file tree.',
+    'A terminal wizard on npm that writes an agent-driven working standard into your repos: a ledger, a board, code conventions and the rules a coding agent reads before it touches anything. Save your answers as a profile, apply it to many folders at once, and see every file before any is written.',
   tech: ['TypeScript', 'Node', 'Bun'],
   link: 'https://www.npmjs.com/package/personal-config',
   linkLabel: 'On npm',
   source: 'https://github.com/zach-short/personal-config',
   page: '/personal-config',
+  display: 'terminal',
+  cover: pc01,
   frames: [
     {
-      eyebrow: 'The questions',
-      headline: 'One question at a time.',
-      sub: 'Each option comes with a practical example, and the recommended one is marked. Who runs git commit is one of the questions.',
-      screen: pc01,
-    },
-    {
-      eyebrow: 'Read more',
-      headline: 'The case against, before you choose.',
-      sub: 'Read more… prints the long form: what the option means, the strongest argument against it, what it writes and how to undo it.',
-      screen: pc02,
-    },
-    {
-      eyebrow: 'Your projects',
-      headline: 'It looks before it writes.',
-      sub: 'Name the folder that holds your projects. It lists the repos one level down, with the languages and package manager it found, and you pick which to set up.',
-      screen: pc03,
+      eyebrow: 'Profiles',
+      headline: 'Answer once, apply to many folders.',
+      sub: 'A profile is a named set of folder answers, started from Light, Medium, Heavy or Writing. Each preset sets the folder model ceiling first: Light allows Sonnet at most, and Haiku is allowed under all three.',
+      terminal: {
+        title: '~/code · personal-config profile',
+        body: `$ personal-config profile new light light
+This run would write:
+
+~/.config/personal-config/profiles
+  light.json  — profile "light"  [new]
+
+1 file(s) to write, 0 to remove, 0 already current.
+
+Wrote 1 file(s).
+$ personal-config profile list
+light                light — up to sonnet, 0 folders`,
+      },
     },
     {
       eyebrow: 'The preview',
       headline: 'Every file, before any is written.',
-      sub: 'Each run prints the whole file tree and asks once for the batch. With --dry-run it writes nothing at all.',
-      screen: pc04,
+      sub: 'profile apply plans every folder and the profile record into one preview and asks once for the batch. With --dry-run it writes nothing at all.',
+      terminal: {
+        title: '~/code · personal-config profile apply',
+        body: `$ personal-config profile apply light ~/code/api --dry-run
+  api: remote owner unknown ≠ you — untracked mode.
+light → ~/code/api
+
+This run would write:
+
+~/.config/personal-config/profiles
+  light.json  — profile "light"  [+3 −1]
+~/code/api
+  CLAUDE.local.md  — personal router (untracked)  [new]
+  HANDOFF.md  — the ledger — what is true  [new]
+  .personal-config.json  — per-repo config  [new]
+  AGENT-PRACTICES.local.md  — the working standard, short form  [new]
+~/code/api/.git/info
+  exclude  — ignore entries  [+5 −0]
+~/code/api/.claude
+  settings.local.json  — settings.local.json — tier ceiling merged in  [new]
+
+7 file(s) to write, 0 to remove, 0 already current.
+
+--dry-run: nothing was written.`,
+      },
+    },
+    {
+      eyebrow: 'No terminal',
+      headline: 'The same run, with no one at the keyboard.',
+      sub: 'setup --yes and profile apply --yes ask nothing, for an agent or a script. Setup lists the repos one level under your projects folder, with the languages and package manager it found, and sets up every one.',
+      terminal: {
+        title: '~/code/notes · personal-config setup --yes --dry-run',
+        body: `$ personal-config setup --yes --dry-run
+personal-config — setup (non-interactive)
+
+Found 2 repo(s) under ~/code:
+
+  repo                   languages          pm          existing
+  api                    typescript         bun         —
+  site                   go                 —           —
+Configuring 2 of 2 found.
+
+This run would write:
+
+~/.claude/rules
+  commits.md  — global rule — commit policy  [new]
+  model-routing.md  — global rule — model routing  [new]
+  language-style.md  — global rule — chat style  [new]
+
+24 file(s) to write, 0 already current.
+
+--dry-run: nothing was written.`,
+      },
     },
     {
       eyebrow: 'Undo',
       headline: 'Backed up first, undone once.',
-      sub: 'Anything a run overwrites is copied aside first. personal-config undo lists what it would put back, asks, then restores it.',
-      screen: pc05,
+      sub: 'Anything a run overwrites is copied aside first. personal-config undo lists what it would put back, asks, then restores it. With no terminal to ask in, it restores nothing and says how to.',
+      terminal: {
+        title: '~/code/api · personal-config undo',
+        body: `$ personal-config profile apply light ~/code/api --yes
+7 file(s) to write, 0 to remove, 0 already current.
+
+Wrote 7 file(s).
+Backed up 2 overwritten file(s) — \`personal-config undo\` restores them.
+$ personal-config undo
+The backup taken at 2026-10-20T19-59-08 holds 2 file(s):
+  ~/.config/personal-config/profiles/light.json
+  ~/code/api/.git/info/exclude
+
+No terminal to ask in, so nothing was restored. The list above is what \`--yes\` would put
+back: run \`personal-config undo --yes\` to restore it.`,
+      },
+    },
+    {
+      eyebrow: 'Checks and updates',
+      headline: 'It checks its own work and knows when it is behind.',
+      sub: 'doctor checks what was written against the rules it follows. update asks the npm registry for the latest release and, on a yes, installs it. A profile that lands work through wk also gets a check that its gate list matches wk.',
+      terminal: {
+        title: '~/code/api · personal-config doctor',
+        body: `$ personal-config doctor
+~/code/api — 3 markdown file(s) checked
+
+doctor: no findings.
+$ personal-config -v
+0.9.0
+$ personal-config update --dry-run
+personal-config 0.9.0 is up to date.`,
+      },
     },
   ],
 };

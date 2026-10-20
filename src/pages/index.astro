@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import Base from '@/src/layouts/Base.astro';
-import { projects, storyPath } from '@/src/lib/projects';
+import { coverOf, projects, storyPath } from '@/src/lib/projects';
 ---
 
 <Base>
@@ -37,7 +37,7 @@ import { projects, storyPath } from '@/src/lib/projects';
                 <a class="thumb" href={story} tabindex="-1" aria-hidden="true">
                   <Image
                     class="thumb-screen"
-                    src={project.frames[0].screen}
+                    src={coverOf(project)}
                     alt={project.frames[0].headline}
                     width={180}
                     widths={[180, 360]}

@@ -3,7 +3,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import { formatSlug } from '@/src/lib/format-slug';
 import type { Card } from '@/src/lib/og/card';
 import { firstSentence } from '@/src/lib/og/text';
-import { hasStory, projects, storyPath, type Project } from '@/src/lib/projects';
+import { coverOf, hasStory, projects, storyPath, type Project } from '@/src/lib/projects';
 import { PAGE } from '@/src/lib/setup-copy';
 import { site } from '@/src/site';
 
@@ -14,7 +14,7 @@ type Post = CollectionEntry<'leetcode'>;
 // types leave the property out. The render step needs the original, not the hashed copy the page
 // serves, and a `/_astro/` URL does not exist yet when this list is built.
 function screenFile(project: Project): string {
-  const { fsPath } = project.frames[0].screen as ImageMetadata & { fsPath?: string };
+  const { fsPath } = coverOf(project) as ImageMetadata & { fsPath?: string };
   if (fsPath) return fsPath;
   throw new Error(`og cards: no file path on the first screen of "${project.slug}"`);
 }

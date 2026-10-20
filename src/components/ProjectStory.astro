@@ -8,11 +8,28 @@ interface Props {
 
 const { project } = Astro.props;
 const { frames } = project;
+const terminal = project.display === 'terminal';
+
+const escapeHtml = (text: string) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+/**
+ * A transcript as markup, built as one string because a `pre` keeps every space the template
+ * would put between its elements. A line that starts with `$ ` is a command the reader types.
+ */
+const transcript = (body: string) =>
+  `<code>${body
+    .split('\n')
+    .map((line) =>
+      line.startsWith('$ ')
+        ? `<span class="ln cmd"><b>$</b>${escapeHtml(line.slice(1))}</span>`
+        : `<span class="ln">${escapeHtml(line)}</span>`,
+    )
+    .join('\n')}</code>`;
 ---
 
 {/* `--count` is the only place the frame count reaches CSS; S-1 itself lives in the data
     module as the length of this array, and is written nowhere else. */}
-<article class="story-page wrap" data-story style={`--count: ${frames.length}`}>
+<article class:list={['story-page', 'wrap', { 'is-terminal': terminal }]} data-story style={`--count: ${frames.length}`}>
   <header class="head" data-reveal>
     <p class="eyebrow">Project</p>
     <h1 class="display" transition:name={`project-${project.slug}`}>{project.title}</h1>
@@ -38,6 +55,28 @@ const { frames } = project;
 
   <div class="story">
     <div class="stage">
+      {
+        terminal ? (
+          <div class="term" role="group" aria-label="Terminal output">
+            <div class="term-bar">
+              <i />
+              <i />
+              <i />
+              <div class="term-titles">
+                {frames.map((frame, i) => (
+                  <span class="term-title" style={`--i: ${i}`}>
+                    {frame.terminal?.title}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div class="term-body">
+              {frames.map((frame, i) => (
+                <pre class="term-screen" style={`--i: ${i}`} aria-label={frame.headline} set:html={transcript(frame.terminal?.body ?? '')} />
+              ))}
+            </div>
+          </div>
+        ) : (
       <div class="phone">
         {
           frames.map((frame, i) => (
@@ -54,6 +93,8 @@ const { frames } = project;
           ))
         }
       </div>
+        )
+      }
       {
         project.link && (
           <a class="glass large prominent cta" href={project.link} target="_blank" rel="noopener noreferrer">
@@ -243,6 +284,82 @@ const { frames } = project;
   }
 
   .cta { white-space: nowrap; }
+
+  /* ── The terminal display, for command-line tools. A phone is the wrong shape for them: their
+     output is wide and has no screen of its own. Same stacking and cross-fade as the phone, with
+     a window as the stage. Long lines wrap, so no transcript needs to scroll. ── */
+  .is-terminal { --term-w: min(600px, 50vw); --term-h: min(440px, calc(100svh - 250px)); }
+  .term {
+    grid-area: 1 / 1 / 3 / -1;
+    align-self: start;
+    position: sticky;
+    top: var(--stick-top);
+    justify-self: center;
+    z-index: 2;
+    width: min(100%, var(--term-w));
+    border-radius: 14px;
+    border: 1px solid var(--edge);
+    background: color-mix(in srgb, var(--ground) 92%, black);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5), 0 0 90px color-mix(in srgb, var(--ember) 10%, transparent);
+    overflow: hidden;
+  }
+  .term-bar {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--edge);
+    background: rgba(255, 255, 255, 0.04);
+  }
+  .term-bar > i { width: 10px; height: 10px; border-radius: 50%; background: rgba(255, 255, 255, 0.18); flex: none; }
+  .term-titles { position: relative; flex: 1; height: 1.2em; margin-left: 8px; font: 500 12px/1.2 var(--mono); color: rgba(255, 255, 255, 0.6); }
+  .term-title {
+    position: absolute;
+    inset: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    --d: calc(var(--i) - var(--active));
+    --nd: calc(var(--active) - var(--i));
+    opacity: calc(1 - min(1, max(var(--d), var(--nd))));
+    transition: opacity var(--fade) var(--ease);
+  }
+  .term-body { position: relative; height: var(--term-h); }
+  .term-screen {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    padding: 14px 16px;
+    overflow: hidden;
+    font: 500 12px/1.55 var(--mono);
+    letter-spacing: 0;
+    color: rgba(255, 255, 255, 0.82);
+    --d: calc(var(--i) - var(--active));
+    --nd: calc(var(--active) - var(--i));
+    opacity: calc(1 - min(1, max(var(--d), var(--nd))));
+    transition: opacity var(--fade) var(--ease);
+  }
+  .term-screen { white-space: pre-wrap; overflow-wrap: anywhere; }
+  .term-screen :global(.ln.cmd) { color: #fff; }
+  .term-screen :global(.ln.cmd b) { color: var(--accent-2); font-weight: 600; }
+
+  @media (max-width: 859px) {
+    .is-terminal { --term-h: 54vh; --term-w: 100%; }
+    /* The window sits above the copy as the phone does, so a frame's top offset is derived from
+       its height: the bar is about 40 px, plus the same 24 px gap. */
+    .is-terminal .frame { padding-top: calc(var(--stick-top) + var(--term-h) + 64px - (50vh - var(--frame-h) / 2)); }
+    .is-terminal .frame:where(:first-child) { padding-top: calc(var(--term-h) + 64px); }
+    .term-screen { font-size: 10.5px; padding: 12px; }
+  }
+
+  @media (min-width: 860px) {
+    .is-terminal .story { grid-template-columns: var(--term-w) var(--rail-w) minmax(0, 1fr); }
+    .is-terminal .term { position: relative; top: auto; grid-area: auto; width: 100%; z-index: auto; align-self: auto; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .term-screen, .term-title { transition: none; }
+  }
 
   /* ── The line and its dots. ── */
   .rail { position: relative; align-self: stretch; justify-self: center; width: 24px; }
