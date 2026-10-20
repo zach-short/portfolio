@@ -19,6 +19,11 @@ import pdfmailer05 from '@/src/assets/projects/pdfmailer/05.png';
 import pdfmailerCover from '@/src/assets/projects/pdfmailer/cover.png';
 import wk01 from '@/src/assets/projects/wk/01.png';
 import pc01 from '@/src/assets/projects/personal-config/01.png';
+import kessik01 from '@/src/assets/projects/kessik/01.png';
+import kessik02 from '@/src/assets/projects/kessik/02.png';
+import kessik03 from '@/src/assets/projects/kessik/03.png';
+import kessik04 from '@/src/assets/projects/kessik/04.png';
+import kessik05 from '@/src/assets/projects/kessik/05.png';
 
 /** One panel of a story: the copy on the left, the screen that proves it on the phone. */
 export interface Frame {
@@ -474,8 +479,55 @@ personal-config 0.9.0 is up to date.`,
   ],
 };
 
+// Kessik was added 2026-10-20. Its five captures are the app running in the iPhone 17 Pro Max
+// simulator, logged in over SSH to a throwaway server on localhost, with demo folders and made-up
+// build output. The sentences below are checked against Kessik's README. None of the five shows
+// Claude Code itself: the demo sessions are plain shells, so no caption claims a Claude screen.
+const kessik: Project = {
+  slug: 'kessik',
+  title: 'Kessik',
+  blurb:
+    'An iPhone app that opens Claude Code on your Mac over SSH. Every session runs inside tmux, so it keeps going when the phone locks and you attach to it again later. There is no server part: the Mac needs only Remote Login, tmux and Claude Code.',
+  tech: ['Swift', 'SwiftUI', 'SSH'],
+  link: 'https://kessik.com',
+  linkLabel: 'Go to site',
+  source: 'https://github.com/zach-short/kessik',
+  frames: [
+    {
+      eyebrow: 'The sessions',
+      headline: 'Lock the phone. The work goes on.',
+      sub: 'The Sessions tab lists the tmux sessions on your Mac with the folder each one runs in. They keep running when the phone locks or loses signal.',
+      screen: kessik01,
+    },
+    {
+      eyebrow: 'The keys',
+      headline: 'The keys a phone forgot.',
+      sub: 'Esc, ctrl, tab, shift+tab and the arrow keys sit above the keyboard, with copy and paste. Ctrl is a toggle, so ctrl and then c stops a command.',
+      screen: kessik02,
+    },
+    {
+      eyebrow: 'The prompt box',
+      headline: 'Write it. Send it once.',
+      sub: 'A long or dictated prompt goes into the terminal as one paste, so a new line in it does not send it early. Send adds the Return.',
+      screen: kessik03,
+    },
+    {
+      eyebrow: 'The preview',
+      headline: 'See the dev server on the phone.',
+      sub: 'Preview a port forwards a port on the phone to the same port on the Mac over SSH, so a server that listens only on the Mac opens in the app.',
+      screen: kessik04,
+    },
+    {
+      eyebrow: 'The search',
+      headline: 'Search the last 10,000 lines.',
+      sub: 'Type a word and Kessik shows only the lines that hold it, with a count and each match highlighted. It reads the tmux history on the Mac.',
+      screen: kessik05,
+    },
+  ],
+};
+
 // Module order is card order (D5). The two added 2026-10-16 go last until Zach says otherwise.
-export const projects: Project[] = [furlough, ezhomesteading, emoney, pdfmailer, wk, personalConfig];
+export const projects: Project[] = [furlough, ezhomesteading, emoney, pdfmailer, wk, personalConfig, kessik];
 
 export function hasStory(project: Project): boolean {
   return project.frames.length > 0;
